@@ -10,11 +10,11 @@ SOURCES=fineline-iepre10.c fllog.c flutil.c flsocket.c flieindexparser.c flevent
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=fineline-iepre10
 INCPREFIX=../../libs/libmsiecf-20140131
-INCLUDES=-I$(INCPREFIX)/common/ -I$(INCPREFIX)/libfdatetime/ -I$(INCPREFIX)/libcerror/ -I$(INCPREFIX)/libcstring/
+INCLUDES=-I$(INCPREFIX)/common -I$(INCPREFIX)/libfdatetime -I$(INCPREFIX)/libcerror -I$(INCPREFIX)/libcstring -I../common
 
 all: $(SOURCES) $(EXECUTABLE)
-	
-$(EXECUTABLE): $(OBJECTS) 
+
+$(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 .c.o:
@@ -23,7 +23,7 @@ $(EXECUTABLE): $(OBJECTS)
 strip:
 	strip fineline-iepre10
 
-clean: 
+clean:
 	rm *.o fineline-iepre10
 
 
