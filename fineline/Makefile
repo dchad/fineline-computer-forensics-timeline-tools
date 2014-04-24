@@ -10,11 +10,11 @@ SOURCES=fineline.c fllog.c flutil.c fleventparser.c fleventfile.c fleventhashmap
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=fineline
 INCPREFIX=../../libs/libevtx-20131211
-INCLUDES=-I$(INCPREFIX)/common/ -I$(INCPREFIX)/libfdatetime/ -I$(INCPREFIX)/libcerror/ -I$(INCPREFIX)/libcstring/
+INCLUDES=-I$(INCPREFIX)/common -I$(INCPREFIX)/libfdatetime -I$(INCPREFIX)/libcerror -I$(INCPREFIX)/libcstring -I../common
 
 all: $(SOURCES) $(EXECUTABLE)
-	
-$(EXECUTABLE): $(OBJECTS) 
+
+$(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 .c.o:
@@ -23,7 +23,7 @@ $(EXECUTABLE): $(OBJECTS)
 strip:
 	strip fineline
 
-clean: 
+clean:
 	rm *.o fineline
 
 
