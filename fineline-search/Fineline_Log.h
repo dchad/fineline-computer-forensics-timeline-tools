@@ -46,7 +46,7 @@ class Fineline_Log
       virtual ~Fineline_Log();
 
       int open_log_file();
-      int print_log_entry(char *estr);
+      int print_log_entry(const char *estr);
       int print_log_entry(string estr, int error_number);
       int close_log_file();
 

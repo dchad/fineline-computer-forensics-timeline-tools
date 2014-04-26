@@ -46,14 +46,16 @@ class Fineline_Socket_BSD
       Fineline_Socket_BSD(string ip_addr, Fineline_Log &logger);
       virtual ~Fineline_Socket_BSD();
 
-      int open();
-      int close();
-      int send();
-      int receive();
+      int open_socket();
+      int close_socket();
+      int send_event(char *event_string);
+      int receive_message();
 
    protected:
    private:
       Fineline_Log flog;
+
+      string gui_ip_address;
 };
 
 #endif // FINELINE_SOCKET_BSD_CPP_H

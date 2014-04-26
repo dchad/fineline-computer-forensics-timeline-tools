@@ -85,7 +85,7 @@ int Fineline_Log::open_log_file()
    Input   : Log string.
    Output  : Timestamped log entry.
 */
-int Fineline_Log::print_log_entry(char *estr)
+int Fineline_Log::print_log_entry(const char *estr)
 {
    time_t curtime;
    struct tm *loctime;
