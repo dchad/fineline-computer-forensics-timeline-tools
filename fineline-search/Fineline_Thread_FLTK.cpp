@@ -34,7 +34,7 @@
 
 
 #include "Fineline_Thread_FLTK.h"
-#include "threads.h"
+#include "../common/threads.h"
 
 #ifdef LINUX_BUILD
 #include <unistd.h>
@@ -110,6 +110,7 @@ void Fineline_Thread::start_task(Fl_Browser *flb)
 void Fineline_Thread::stop_task()
 {
 	running = 0;
+	active_threads = 0;
 }
 
 long Fineline_Thread::get_active_threads()

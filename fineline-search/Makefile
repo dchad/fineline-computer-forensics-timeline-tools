@@ -22,7 +22,9 @@ Fineline_Event_Map.cpp   \
 Fineline_Log.cpp         \
 Fineline_Socket_BSD.cpp  \
 Fineline_Socket_ACE.cpp  \
-Fineline_Util.cpp
+Fineline_Filter_List.cpp \
+Fineline_Event_List.cpp  \
+../common/flutil.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)
 

@@ -18,13 +18,13 @@
 */
 
 /*
-   Fineline_Filter_Map.h
+   Fineline_Filter_List.h
 
    Title : FineLine Computer Forensics Timeline Constructor
    Author: Derek Chadwick
-   Date  : 10/04/2014
+   Date  : 25/04/2014
 
-   Purpose:  Loads in the file filter list into a hashmap. Each filter value can be
+   Purpose:  Loads the file filter list into an STL vector. Each filter value can be
              a partial or full filename/path or just a keyword.
 
              Filter List Format: plain text file, place each file/keyword on a separate line.
@@ -38,19 +38,39 @@
              accounts.xls
              C:\temp\utils\exploit.txt
 
+
 */
 
 
-#ifndef FINELINE_FILTER_MAP_H
-#define FINELINE_FILTER_MAP_H
+#ifndef FINELINE_FILTER_LIST_H
+#define FINELINE_FILTER_LIST_H
 
-class Fineline_Filter_Map
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Fineline_Filter_List
 {
    public:
-      Fineline_Filter_Map();
-      virtual ~Fineline_Filter_Map();
+
+      Fineline_Filter_List();
+      Fineline_Filter_List(string filename);
+      virtual ~Fineline_Filter_List();
+
+      int load_filter_file();
+      int load_filter_file(string filename);
+      int add_keyword(string kword);
+      int remove_keyword(string kword);
+      int find_keyword(string kword);
+      int match_filename(string filename);
+      int sort_list();
+
    protected:
    private:
+
+      vector<string> keyword_vector;
+      string filter_filename;
 };
 
-#endif // FINELINE_FILTER_MAP_H
+#endif // FINELINE_FILTER_LIST_H

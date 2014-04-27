@@ -1,4 +1,3 @@
-
 /*  Copyright 2014 Derek Chadwick
 
     This file is part of the FineLine Computer Forensics Timeline Tools.
@@ -18,39 +17,65 @@
 */
 
 /*
-   Fineline_Filter_Map.h
+   Fineline_Filter_List.cpp
 
    Title : FineLine Computer Forensics Timeline Constructor
    Author: Derek Chadwick
-   Date  : 10/04/2014
+   Date  : 25/04/2014
 
-   Purpose:  Loads in the file filter list into a hashmap. Each filter value can be
-             a partial or full filename/path or just a keyword.
-
-             Filter List Format: plain text file, place each file/keyword on a separate line.
-
-             Examples:
-
-             C:\temp
-             exploit
-             shellcode.bin
-             warez.doc
-             accounts.xls
-             C:\temp\utils\exploit.txt
+   Purpose:  Stores a list of file names and metadata into an STL vector.
 
 */
 
+#include "Fineline_Event_List.h"
 
-#ifndef FINELINE_FILTER_MAP_H
-#define FINELINE_FILTER_MAP_H
+using namespace std;
 
-class Fineline_Filter_Map
+Fineline_Event_List::Fineline_Event_List()
 {
-   public:
-      Fineline_Filter_Map();
-      virtual ~Fineline_Filter_Map();
-   protected:
-   private:
-};
+   //ctor
+}
 
-#endif // FINELINE_FILTER_MAP_H
+Fineline_Event_List::~Fineline_Event_List()
+{
+   //dtor
+}
+
+int Fineline_Event_List::add_file_record(fl_file_record_t * flf)
+{
+   file_list.push_back(flf);
+
+   return(file_list.size());
+}
+
+int Fineline_Event_List::delete_file_record(int record_index)
+{
+
+   return(0);
+}
+
+int Fineline_Event_List::find_file_record(string filename)
+{
+   return(0);
+}
+
+int Fineline_Event_List::sort_records()
+{
+   return(0);
+}
+
+int Fineline_Event_List::write_records()
+{
+   return(0);
+}
+
+int Fineline_Event_List::send_records()
+{
+   return(0);
+}
+
+int Fineline_Event_List::list_size()
+{
+   return(file_list.size());
+}
+

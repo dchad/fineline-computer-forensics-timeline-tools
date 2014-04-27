@@ -69,7 +69,7 @@ int Fineline_Log::open_log_file()
 
 	if (log_file == NULL)
 	{
-	   printf("open_log_file() <ERROR>: could not open logfile: %s\n", LOG_FILE);
+	   printf("open_log_file() <ERROR>: Could not open logfile: %s\n", LOG_FILE);
       return(-1);
 	}
 
@@ -79,7 +79,6 @@ int Fineline_Log::open_log_file()
 
 /*
    Method  : print_log_entry()
-
    Purpose : Creates a log entry and prints to the log file and stdin.
            :
    Input   : Log string.
@@ -90,13 +89,13 @@ int Fineline_Log::print_log_entry(const char *estr)
    time_t curtime;
    struct tm *loctime;
    string log_entry;
-   string time_str;
+   char *time_str;
 
    /* Get the current time. */
    curtime = time (NULL);
    loctime = localtime (&curtime);
    time_str = asctime(loctime);
-   log_entry = time_str;
+   log_entry = rtrim(time_str);
    log_entry.append(" ");
    log_entry.append(estr);
    fputs (log_entry.c_str(), log_file);
@@ -107,7 +106,6 @@ int Fineline_Log::print_log_entry(const char *estr)
 
 /*
    Method  : print_log_entry()
-
    Purpose : Creates a log entry and prints to the log file and stdin.
            :
    Input   : Log string.

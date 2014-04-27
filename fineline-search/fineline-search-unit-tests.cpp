@@ -34,16 +34,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 #include "gtest/gtest.h"
 
 using ::testing::InitGoogleTest;
+using namespace std;
 
 //1. Test Series FINELINE SEARCH
 
 #include "Fineline_UI.h"
+#include "Fineline_Filter_List.h"
+#include "Fineline_Log.h"
+#include "Fineline_Event_List.h"
 
-TEST(FineLineSearchThreadTests, ThreadCounterCorrect)
+TEST(FineLineSearchThreadTests, ValidateMethods)
 {
 	Fineline_Thread *flt = new Fineline_Thread();
 	Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
@@ -69,12 +74,16 @@ TEST(FineLineSearchThreadTests, ThreadCounterCorrect)
 	EXPECT_EQ(3, flt->get_active_threads());
    EXPECT_EQ(1, flt->get_running());
 
+   flt->stop_task();
+
+ 	EXPECT_EQ(0, flt->get_active_threads());
+	EXPECT_EQ(0, flt->get_running());
+
    delete flt;
    delete flb;
 }
 
-
-TEST(FineLineSearchUITests, UIValid)
+TEST(FineLineSearchUITests, ValidUI)
 {
 
    Fineline_UI *flui = new Fineline_UI();
@@ -84,14 +93,54 @@ TEST(FineLineSearchUITests, UIValid)
    delete flui;
 }
 
+TEST(FineLineSearchFilterTests, ValidateMethods)
+{
+   string filter_file("fl-file-filter-list-example.txt");
+   string filter_file_bad("bad_file.txt");
+   Fineline_Filter_List *flist = new Fineline_Filter_List();
 
-//2. Test Series fineline-ws
+   ASSERT_TRUE(NULL != flist);
 
-//3. Test Series fineline-ie
+   EXPECT_EQ(-1, flist->load_filter_file());
+   EXPECT_EQ(-1, flist->load_filter_file(filter_file_bad));
+   EXPECT_EQ(0, flist->load_filter_file(filter_file));
+   EXPECT_EQ(0, flist->match_filename("inbox.eml"));
+   EXPECT_GE(flist->match_filename("C:\\temp\\mypasswords.doc"), 0);
+   EXPECT_GE(flist->match_filename("randomstuff.pdf"), 0);
+   EXPECT_EQ(-1, flist->match_filename("randomstuff.bin"));
 
-//4. Test Series fineline-iepre10
+   delete flist;
+}
 
-//5. Test Series fineline-vs
+TEST(FineLineSearchLogTests, ValidateMethods)
+{
+
+   Fineline_Log *flog = new Fineline_Log();
+
+   ASSERT_TRUE(NULL != flog);
+
+   EXPECT_EQ(0, flog->open_log_file());
+   EXPECT_EQ(0, flog->print_log_entry("Unit Test.\n"));
+
+   delete flog;
+}
+
+
+TEST(FineLineSearchEventListTests, ValidateMethods)
+{
+
+   Fineline_Event_List *flist = new Fineline_Event_List();
+   fl_file_record_t * flf = (fl_file_record_t *) xmalloc(sizeof(fl_file_record_t));
+
+   ASSERT_TRUE(NULL != flist);
+   ASSERT_TRUE(NULL != flf);
+
+   EXPECT_EQ(0, flist->list_size());
+   EXPECT_EQ(1, flist->add_file_record(flf));
+
+   delete flist;
+   xfree((char *) flf, sizeof(fl_file_record_t));
+}
 
 
 
