@@ -79,3 +79,18 @@ int Fineline_Event_List::list_size()
    return(file_list.size());
 }
 
+int Fineline_Event_List::clear_list()
+{
+   //fl_file_record_t *p;
+   //unsigned int i;
+
+   //for (i = 0; i < file_list.size(); i++)
+   //{
+   //   p = file_list[i];
+   //   xfree((char *)p, sizeof(fl_file_record_t));
+   //}
+
+   file_list.clear();
+
+   return(file_list.size());
+}

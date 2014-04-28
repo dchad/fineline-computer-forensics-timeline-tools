@@ -21,6 +21,7 @@ class Fineline_Event_List
       int write_records();
       int send_records();
       int list_size();
+      int clear_list();
 
 
    protected:

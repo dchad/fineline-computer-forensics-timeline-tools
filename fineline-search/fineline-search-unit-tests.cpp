@@ -131,6 +131,9 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
 
    Fineline_Event_List *flist = new Fineline_Event_List();
    fl_file_record_t * flf = (fl_file_record_t *) xmalloc(sizeof(fl_file_record_t));
+   string filename;
+   char num[256];
+   int i;
 
    ASSERT_TRUE(NULL != flist);
    ASSERT_TRUE(NULL != flf);
@@ -138,8 +141,20 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
    EXPECT_EQ(0, flist->list_size());
    EXPECT_EQ(1, flist->add_file_record(flf));
 
+   for (i = 0; i < 100000; i++)
+   {
+      flf = (fl_file_record_t *) xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\temp\\file";
+      filename.append(xitoa(i, num, 256, 10));
+      filename.append(".doc");
+      flist->add_file_record(flf);
+   }
+
+   EXPECT_EQ(100001, flist->list_size());
+   EXPECT_EQ(0, flist->clear_list());
    delete flist;
-   xfree((char *) flf, sizeof(fl_file_record_t));
+   //xfree((char *) flf, sizeof(fl_file_record_t));
 }
 
 
