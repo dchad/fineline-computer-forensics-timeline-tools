@@ -9,7 +9,7 @@ LDFLAGS=
 # Library Dependencies
 
 TESTLDDIRS=-L../../libs/gtest-1.7.0/lib/.libs
-LIBS=-lfltk -lXext -lX11 -lm -lpthread
+LIBS=-lfltk -lXext -lX11 -lm -lpthread -ltsk -lewf -lafflib
 TESTLIBS=-lgtest
 
 # Source files

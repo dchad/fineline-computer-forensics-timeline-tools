@@ -1,3 +1,4 @@
+
 /*  Copyright 2014 Derek Chadwick
 
     This file is part of the FineLine Computer Forensics Timeline Tools.
@@ -18,34 +19,56 @@
 
 
 /*
-   Fineline_Thread_FLTK.h
+   Fineline_File_System.cpp
 
-   Title : FineLine Computer Forensics Image Searcher FLTK Thread Class (posix threads)
+   Title : FineLine Computer Forensics Tools
    Author: Derek Chadwick
-   Date  : 02/04/2014
+   Date  : 28/04/2014
 
-   Purpose: FineLine FLTK based thread class definition implements a wrapper
-            class for posix or Win32 threads in an FLTK GUI.
+   Purpose: Class implementation for a file system class that uses the
+            Sleuth Kit library to analyse disk images.
 
    Notes: EXPERIMENTAL
 
 */
 
-#include <stdio.h>
-#include <FL/Fl.H>
-#include <FL/Fl_Browser.H>
 
-class Fineline_Thread
+
+#include "Fineline_File_System.h"
+
+
+Fineline_File_System::Fineline_File_System(Fineline_Log *log)
 {
-private:
+   flog = log;
+}
 
-public:
+Fineline_File_System::~Fineline_File_System()
+{
+   //dtor
+}
 
-	Fineline_Thread();
-	~Fineline_Thread();
+int open_file_system_image(string fs_image)
+{
+   int ret_val = 0;
 
-	void start_task(Fl_Browser *flb);
-	void stop_task();
-	long get_active_threads();
-	int get_running();
-};
+   image_info = new TskImgInfo();
+
+   if (image_info->open(fs_image.c_string(), TSK_IMG_TYPE_DETECT, 0) == 1)
+   {
+      delete image_info;
+      fllog->print_log_entry("Error opening file\n");
+      ret_val = -1;
+    }
+   return(ret_val);
+}
+
+int parse_file_system_image()
+{
+   return(0);
+}
+
+int close_file_system_image()
+{
+   return(0);
+}
+
