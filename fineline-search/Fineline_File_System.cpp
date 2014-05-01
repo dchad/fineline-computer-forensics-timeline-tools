@@ -47,27 +47,27 @@ Fineline_File_System::~Fineline_File_System()
    //dtor
 }
 
-int open_file_system_image(string fs_image)
+int Fineline_File_System::open_file_system_image(string fs_image)
 {
    int ret_val = 0;
 
    image_info = new TskImgInfo();
 
-   if (image_info->open(fs_image.c_string(), TSK_IMG_TYPE_DETECT, 0) == 1)
+   if (image_info->open(fs_image.c_str(), TSK_IMG_TYPE_DETECT, 0) == 1)
    {
       delete image_info;
-      fllog->print_log_entry("Error opening file\n");
+      flog->print_log_entry("Error opening file\n");
       ret_val = -1;
     }
    return(ret_val);
 }
 
-int parse_file_system_image()
+int Fineline_File_System::parse_file_system_image()
 {
    return(0);
 }
 
-int close_file_system_image()
+int Fineline_File_System::close_file_system_image()
 {
    return(0);
 }

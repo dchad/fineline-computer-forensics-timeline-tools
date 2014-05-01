@@ -58,6 +58,7 @@ class Fineline_File_System
    private:
 
       TskImgInfo *image_info;
+	  Fineline_Log *flog;
 };
 
 #endif // FINELINE_FILE_SYSTEM_H

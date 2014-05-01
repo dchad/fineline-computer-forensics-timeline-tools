@@ -49,7 +49,7 @@ class Fineline_Socket_BSD
       int open_socket();
       int close_socket();
       int send_event(char *event_string);
-      int receive_message();
+      char *receive_message();
 
    protected:
    private:

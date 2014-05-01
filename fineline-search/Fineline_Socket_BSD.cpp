@@ -171,7 +171,7 @@ int Fineline_Socket_BSD::open_socket()
     hints.ai_protocol = IPPROTO_TCP;
 
     /* Resolve the server address and port NOTE* getaddrinfo is in ws2_32.lib not in the old wsock32.lib */
-    result = getaddrinfo(gui_ip_address, GUI_SERVER_PORT_STRING, &hints, &resultaddrinfo);
+	result = getaddrinfo(gui_ip_address.c_str(), GUI_SERVER_PORT_STRING, &hints, &resultaddrinfo);
     if (result != 0)
     {
         flog.print_log_entry("init_socket() <ERROR> getaddrinfo failed with error.\n");
