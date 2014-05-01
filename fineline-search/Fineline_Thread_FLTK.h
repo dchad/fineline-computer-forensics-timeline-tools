@@ -35,13 +35,15 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Browser.H>
 
+#include "Fineline_Log.h"
+
 class Fineline_Thread
 {
 private:
 
 public:
 
-	Fineline_Thread();
+	Fineline_Thread(Fineline_Log *log);
 	~Fineline_Thread();
 
 	void start_task(Fl_Browser *flb);

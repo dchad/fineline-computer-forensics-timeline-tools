@@ -129,9 +129,9 @@ int Fineline_Socket_BSD::send_event(char *event_string)
    return(k);
 }
 
-int Fineline_Socket_BSD::receive_message()
+char *Fineline_Socket_BSD::receive_message()
 {
-   return(0);
+   return(NULL);
 }
 
 int Fineline_Socket_BSD::close_socket()

@@ -47,14 +47,18 @@ using namespace std;
 #include "Fineline_Filter_List.h"
 #include "Fineline_Log.h"
 #include "Fineline_Event_List.h"
+#include "Fineline_File_System.h"
+
 
 TEST(FineLineSearchThreadTests, ValidateMethods)
 {
-	Fineline_Thread *flt = new Fineline_Thread();
+   Fineline_Log *flg = new Fineline_Log();
+	Fineline_Thread *flt = new Fineline_Thread(flg);
 	Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
 
    ASSERT_TRUE(NULL != flt);
    ASSERT_TRUE(NULL != flb);
+   ASSERT_TRUE(NULL != flg);
 
 	EXPECT_EQ(0, flt->get_active_threads());
 	EXPECT_EQ(0, flt->get_running());
@@ -83,6 +87,7 @@ TEST(FineLineSearchThreadTests, ValidateMethods)
    delete flb;
 }
 
+
 TEST(FineLineSearchUITests, ValidUI)
 {
 
@@ -92,6 +97,7 @@ TEST(FineLineSearchUITests, ValidUI)
 
    delete flui;
 }
+
 
 TEST(FineLineSearchFilterTests, ValidateMethods)
 {
@@ -111,6 +117,7 @@ TEST(FineLineSearchFilterTests, ValidateMethods)
 
    delete flist;
 }
+
 
 TEST(FineLineSearchLogTests, ValidateMethods)
 {
@@ -157,7 +164,49 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
    //xfree((char *) flf, sizeof(fl_file_record_t));
 }
 
+TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
+{
+   Fineline_Log *flog = new Fineline_Log();
+   Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
+   string test_image_1 = "test-image-1.dd";
+   string test_image_2 = "test-image-2.ewf";
+   string test_image_3 = "test-image-3.aff";
+   string bad_image = "bad-image.dd";
+   Fineline_File_System *ffs = new Fineline_File_System(flb, bad_image, flog);
 
+   ASSERT_TRUE(NULL != ffs);
+
+   flog->open_log_file();
+
+   EXPECT_EQ(-1, ffs->open_forensic_image());
+
+   delete ffs;
+   ffs = new Fineline_File_System(flb, test_image_1, flog);
+
+   EXPECT_EQ(0, ffs->open_forensic_image());
+   EXPECT_EQ(0, ffs->process_forensic_image());
+   EXPECT_EQ(0, ffs->close_forensic_image());
+
+   delete ffs;
+   ffs = new Fineline_File_System(flb, test_image_2, flog);
+
+   EXPECT_EQ(0, ffs->open_forensic_image());
+   EXPECT_EQ(0, ffs->process_forensic_image());
+   EXPECT_EQ(0, ffs->close_forensic_image());
+
+   delete ffs;
+   ffs = new Fineline_File_System(flb, test_image_3, flog);
+
+   EXPECT_EQ(0, ffs->open_forensic_image());
+   EXPECT_EQ(0, ffs->process_forensic_image());
+   EXPECT_EQ(0, ffs->close_forensic_image());
+
+   flog->close_log_file();
+
+   delete ffs;
+   delete flb;
+   delete flog;
+}
 
 int main(int argc, char **argv)
 {

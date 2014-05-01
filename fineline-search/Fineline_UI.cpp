@@ -35,6 +35,7 @@
 
 static Fineline_Thread *socket_thread;
 static Fl_Browser *event_browser;
+static Fineline_Log *flog;
 
 Fineline_UI::Fineline_UI()
 {
@@ -69,7 +70,8 @@ Fineline_UI::Fineline_UI()
 
    window->end();
 
-   socket_thread = new Fineline_Thread();
+   flog = new Fineline_Log();
+   socket_thread = new Fineline_Thread(flog);
 
 }
 

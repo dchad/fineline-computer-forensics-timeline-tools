@@ -60,7 +60,6 @@ class Fineline_UI
       Fl_Menu_Bar *menu;
       Fl_Box *box;
 
-
 };
 
 #endif // FINELINE_UI_H

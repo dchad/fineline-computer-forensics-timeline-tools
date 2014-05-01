@@ -36,8 +36,11 @@
 #ifndef FINELINE_FILE_SYSTEM_H
 #define FINELINE_FILE_SYSTEM_H
 
+#include <stdio.h>
 #include <string>
 #include <tsk/libtsk.h>
+#include <FL/Fl.H>
+#include <FL/Fl_Browser.H>
 
 #include "fineline-search.h"
 
@@ -47,18 +50,22 @@ using namespace std;
 class Fineline_File_System
 {
    public:
-      Fineline_File_System(Fineline_Log *log);
+      Fineline_File_System(Fl_Browser *fltk_browser, string fs_image, Fineline_Log *log);
       ~Fineline_File_System();
 
-      int open_file_system_image(string fs_image);
-      int parse_file_system_image();
-      int close_file_system_image();
+      void start_task();
+	   void stop_task();
+	   int get_running();
+      int open_forensic_image();
+      int process_forensic_image();
+      int close_forensic_image();
+
+      Fl_Browser *flb;
 
    protected:
    private:
 
-      TskImgInfo *image_info;
-	  Fineline_Log *flog;
+	   string fs_image;
 };
 
 #endif // FINELINE_FILE_SYSTEM_H

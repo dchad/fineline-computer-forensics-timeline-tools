@@ -45,9 +45,11 @@
 
 static int running = 0;
 static long active_threads = 0;
+static Fineline_Log *flog;
 
-Fineline_Thread::Fineline_Thread()
+Fineline_Thread::Fineline_Thread(Fineline_Log *log)
 {
+   flog = log;
 	running = 0;
 }
 
@@ -72,7 +74,7 @@ void* thread_task(void* p)
    long update_num = 0;
    char msg[256];
 
-   printf("Start thread %ld\n", id); fflush(stdout);
+   flog->print_log_entry("Start thread %ld\n", id);
 
    while(running)
    {
@@ -85,7 +87,7 @@ void* thread_task(void* p)
 
 	  update_num++;
 	  sprintf(msg, "Thread #%ld Update %ld\n", id, update_num);
-     printf("%s",msg); fflush(stdout);
+     flog->print_log_entry(msg);
 
      Fl::lock();
 
