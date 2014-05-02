@@ -59,6 +59,7 @@ class Fineline_File_System
       int open_forensic_image();
       int process_forensic_image();
       int close_forensic_image();
+      const char *get_image_name();
 
       Fl_Browser *flb;
 

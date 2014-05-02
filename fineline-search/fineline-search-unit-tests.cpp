@@ -168,9 +168,9 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
 {
    Fineline_Log *flog = new Fineline_Log();
    Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
-   string test_image_1 = "test-image-1.dd";
-   string test_image_2 = "test-image-2.ewf";
-   string test_image_3 = "test-image-3.aff";
+   string test_image_1 = "../../testing/ext3-img-kw-1.dd";
+   string test_image_2 = "../../testing/8-jpeg-search.dd";
+   string test_image_3 = "../../testing/ext-part-test-2.dd";
    string bad_image = "bad-image.dd";
    Fineline_File_System *ffs = new Fineline_File_System(flb, bad_image, flog);
 

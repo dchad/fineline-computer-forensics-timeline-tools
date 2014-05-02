@@ -65,15 +65,15 @@ static TSK_WALK_RET_ENUM file_callback(TskFsFile * fs_file, TSK_OFF_T a_off, TSK
 
 static uint8_t process_file(TskFsFile * fs_file, const char *path)
 {
-   fprintf(stdout, "file systems file name: %s\n", fs_file->getName()->getName());
+   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", fs_file->getName()->getName());
 
-   Fl::lock();
+   //Fl::lock();
 
       //do some GUI updates here...
-   event_browser->add(fs_file->getName()->getName());
+   //event_browser->add(fs_file->getName()->getName());
 
-   Fl::awake(event_browser); //TODO: is this necessary?
-   Fl::unlock();
+   //Fl::awake(event_browser); //TODO: is this necessary?
+   //Fl::unlock();
 
 
    return(0);
@@ -170,9 +170,10 @@ static uint8_t process_volume_system(TskImgInfo * img_info, TSK_OFF_T start)
 void* fs_thread_task(void* p)
 {
    Fineline_File_System *file_system_image = (Fineline_File_System *)p;
+   char msg[256];
    event_browser = file_system_image->flb;
-
-   flog->print_log_entry("thread_task() <INFO> Start forensic image processing thread.\n");
+   sprintf(msg, "fs_thread_task() <INFO> Start forensic image processing thread: %s\n", file_system_image->get_image_name());
+   flog->print_log_entry(msg);
 
    file_system_image->open_forensic_image();
    file_system_image->process_forensic_image();
@@ -203,6 +204,7 @@ Fineline_File_System::~Fineline_File_System()
 
 int Fineline_File_System::open_forensic_image()
 {
+   char msg[256];
    image_info = new TskImgInfo();
 
    if (image_info->open(fs_image.c_str(), TSK_IMG_TYPE_DETECT, 0) == 1)
@@ -211,6 +213,9 @@ int Fineline_File_System::open_forensic_image()
       flog->print_log_entry("open_file_system_image() <ERROR> Could not open image file.\n");
       return(-1);
    }
+
+   sprintf(msg, "Fineline_File_System::open_forensic_image() <INFO> Opened image: %s\n", fs_image.c_str());
+   flog->print_log_entry(msg);
 
    return(0);
 }
@@ -248,6 +253,11 @@ void Fineline_File_System::stop_task()
 int Fineline_File_System::get_running()
 {
 	return(running);
+}
+
+const char *Fineline_File_System::get_image_name()
+{
+   return(fs_image.c_str());
 }
 
 
