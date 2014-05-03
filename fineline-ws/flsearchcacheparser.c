@@ -58,11 +58,11 @@ int parse_winsearch_cache_file(char *winsearchfile, char *fl_event_filename, int
    libcerror_error_t *error     = NULL;
    libesedb_file_t *input_file  = NULL;
    libesedb_table_t *table      = NULL;
-   char *table_name;
-   int table_index        = 0;
-   int number_of_tables   = 0;
-   size_t table_name_size    = 0;
-   FILE *fl_evt_file = NULL;
+   char *table_name             = NULL;       
+   int table_index              = 0;
+   int number_of_tables         = 0;
+   size_t table_name_size       = 0;
+   FILE *fl_evt_file            = NULL;
 
    if(libesedb_file_initialize(&input_file, &error) != 1)
    {

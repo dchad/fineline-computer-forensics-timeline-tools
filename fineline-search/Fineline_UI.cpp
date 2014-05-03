@@ -42,10 +42,10 @@ Fineline_UI::Fineline_UI()
    window = new Fl_Double_Window(800,600);
 
    menu = new Fl_Menu_Bar(0,0,800,30);		// Create menubar, items..
-   menu->add("&File/&Open",    "^o", main_menu_callback);
-   menu->add("&File/&Save",    "^s", main_menu_callback);
-   menu->add("&File/&Save As", "^a", main_menu_callback);
-   menu->add("&File/&Export",  "^e", main_menu_callback, 0, FL_MENU_DIVIDER);
+   menu->add("&File/&Open",    "^o", open_menu_callback);
+   menu->add("&File/&Save",    "^s", save_menu_callback);
+   menu->add("&File/&Save As", "^a", save_menu_callback);
+   menu->add("&File/&Export",  "^e", export_menu_callback, 0, FL_MENU_DIVIDER);
    menu->add("&File/&Quit",    "^q", main_menu_callback);
 
    menu->add("&Edit/&Copy",    "^c", main_menu_callback);
@@ -57,6 +57,7 @@ Fineline_UI::Fineline_UI()
    menu->add("&Edit/Toggle 3",  0, main_menu_callback, 0, FL_MENU_TOGGLE|FL_MENU_VALUE);	// Default: on
 
    menu->add("&Help/Google",    0, main_menu_callback);
+   menu->add("&Help/About",     0, main_menu_callback);
 
    menu->add("&Sockets/Start",  0, main_menu_callback);
    menu->add("&Sockets/Stop",   0, main_menu_callback);
@@ -105,21 +106,55 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
   {		// Toggle or radio item?
     fprintf(stderr, ", value is %s", item->value()?"on":"off");	// Print item's value
   }
-  fprintf(stderr, "\n");
-  if ( strcmp(item->label(), "Google") == 0 )
+  else if ( strcmp(item->label(), "Google") == 0 )
   {
      fl_open_uri("http://google.com/");
   }
-  if ( strcmp(item->label(), "Start") == 0 )
+  else if ( strcmp(item->label(), "Start") == 0 )
   {
      socket_thread->start_task(event_browser);
   }
-  if ( strcmp(item->label(), "Stop") == 0 )
+  else if ( strcmp(item->label(), "Stop") == 0 )
   {
 	 socket_thread->stop_task();
   }
-  if ( strcmp(item->label(), "&Quit") == 0 )
+  else if ( strcmp(item->label(), "&Quit") == 0 )
   {
      exit(0);
   }
+}
+
+
+void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
+{
+  Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
+  const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
+  char ipath[256];
+
+  menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
+
+
+}
+
+
+void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
+{
+   Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
+   const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
+   char ipath[256];
+
+   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
+   if ( strcmp(item->label(), "&Save") == 0 )
+   {
+	  // open the save file dialogue
+   }
+   else if ( strcmp(item->label(), "&Save As") == 0 )
+   {
+      // open the save as file dialogue
+   }
+}
+
+void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
+{
+	// open the export file dialogue
 }

@@ -52,6 +52,9 @@ class Fineline_UI
       void show(int argc, char *argv[]);
       //Fl_Browser *get_browser();
 	  static void main_menu_callback(Fl_Widget *w, void *x);
+	  static void open_menu_callback(Fl_Widget *w, void *x);
+	  static void save_menu_callback(Fl_Widget *w, void *x);
+	  static void export_menu_callback(Fl_Widget *w, void *x);
 
    protected:
    private:
