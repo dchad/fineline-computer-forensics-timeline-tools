@@ -61,8 +61,6 @@ class Fineline_File_System
       int close_forensic_image();
       const char *get_image_name();
 
-      Fl_Browser *flb;
-
    protected:
    private:
 

@@ -175,6 +175,8 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
    Fineline_File_System *ffs = new Fineline_File_System(flb, bad_image, flog);
 
    ASSERT_TRUE(NULL != ffs);
+   ASSERT_TRUE(NULL != flb);
+   ASSERT_TRUE(NULL != flog);
 
    flog->open_log_file();
 

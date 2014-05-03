@@ -42,16 +42,20 @@ Fineline_UI::Fineline_UI()
    window = new Fl_Double_Window(800,600);
 
    menu = new Fl_Menu_Bar(0,0,800,30);		// Create menubar, items..
-   menu->add("&File/&Open",  "^o", main_menu_callback);
-   menu->add("&File/&Save",  "^s", main_menu_callback, 0, FL_MENU_DIVIDER);
-   menu->add("&File/&Quit",  "^q", main_menu_callback);
-   menu->add("&Edit/&Copy",  "^c", main_menu_callback);
-   menu->add("&Edit/&Paste", "^v", main_menu_callback, 0, FL_MENU_DIVIDER);
+   menu->add("&File/&Open",    "^o", main_menu_callback);
+   menu->add("&File/&Save",    "^s", main_menu_callback);
+   menu->add("&File/&Save As", "^a", main_menu_callback);
+   menu->add("&File/&Export",  "^e", main_menu_callback, 0, FL_MENU_DIVIDER);
+   menu->add("&File/&Quit",    "^q", main_menu_callback);
+
+   menu->add("&Edit/&Copy",    "^c", main_menu_callback);
+   menu->add("&Edit/&Paste",   "^v", main_menu_callback, 0, FL_MENU_DIVIDER);
    menu->add("&Edit/Radio 1",   0, main_menu_callback, 0, FL_MENU_RADIO);
    menu->add("&Edit/Radio 2",   0, main_menu_callback, 0, FL_MENU_RADIO|FL_MENU_DIVIDER);
    menu->add("&Edit/Toggle 1",  0, main_menu_callback, 0, FL_MENU_TOGGLE);			// Default: off
    menu->add("&Edit/Toggle 2",  0, main_menu_callback, 0, FL_MENU_TOGGLE);			// Default: off
    menu->add("&Edit/Toggle 3",  0, main_menu_callback, 0, FL_MENU_TOGGLE|FL_MENU_VALUE);	// Default: on
+
    menu->add("&Help/Google",    0, main_menu_callback);
 
    menu->add("&Sockets/Start",  0, main_menu_callback);

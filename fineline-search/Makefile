@@ -62,7 +62,7 @@ strip:
 	strip fineline-search
 
 clean:
-	rm *.o fineline-search fineline-search-unit-tests
+	rm *.o *.log fineline-search fineline-search-unit-tests
 
 tests: $(TESTSOURCES) $(TESTEXECUTABLE)
 

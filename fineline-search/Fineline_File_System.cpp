@@ -67,13 +67,13 @@ static uint8_t process_file(TskFsFile * fs_file, const char *path)
 {
    fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", fs_file->getName()->getName());
 
-   //Fl::lock();
+   Fl::lock();
 
       //do some GUI updates here...
-   //event_browser->add(fs_file->getName()->getName());
+   event_browser->add(fs_file->getName()->getName());
 
-   //Fl::awake(event_browser); //TODO: is this necessary?
-   //Fl::unlock();
+   Fl::awake(event_browser); //TODO: is this necessary?
+   Fl::unlock();
 
 
    return(0);
@@ -171,7 +171,7 @@ void* fs_thread_task(void* p)
 {
    Fineline_File_System *file_system_image = (Fineline_File_System *)p;
    char msg[256];
-   event_browser = file_system_image->flb;
+
    sprintf(msg, "fs_thread_task() <INFO> Start forensic image processing thread: %s\n", file_system_image->get_image_name());
    flog->print_log_entry(msg);
 
@@ -179,7 +179,7 @@ void* fs_thread_task(void* p)
    file_system_image->process_forensic_image();
    file_system_image->close_forensic_image();
 
-   return 0;
+   return(0);
 }
 
 
@@ -193,7 +193,7 @@ void* fs_thread_task(void* p)
 Fineline_File_System::Fineline_File_System(Fl_Browser *fltk_browser, string image_path, Fineline_Log *log)
 {
    flog = log;
-   flb = fltk_browser;
+   event_browser = fltk_browser;
    fs_image = image_path;
 }
 
@@ -224,9 +224,9 @@ int Fineline_File_System::process_forensic_image()
 {
    if (process_volume_system(image_info, 0))
    {
-        delete image_info;
-        tsk_error_print(stderr);
-        return(-1);
+      delete image_info;
+      tsk_error_print(stderr);
+      return(-1);
    }
 
    return(0);
