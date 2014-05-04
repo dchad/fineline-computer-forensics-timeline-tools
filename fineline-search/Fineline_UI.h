@@ -20,7 +20,7 @@
 /*
    Fineline_UI.h
 
-   Title : FineLine Computer Forensics Image Searcher GUI
+   Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
    Date  : 02/04/2014
 

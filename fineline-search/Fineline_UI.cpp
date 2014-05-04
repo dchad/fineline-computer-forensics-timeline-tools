@@ -31,14 +31,28 @@
 
 */
 
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Tabs.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Button.H>
+#include <FL/fl_ask.H>
+
 #include "Fineline_UI.h"
 
 static Fineline_Thread *socket_thread;
 static Fl_Browser *event_browser;
 static Fineline_Log *flog;
 
+
+static void button_callback(Fl_Button *b, void *p)
+{
+  fl_message("Make sure you cannot change the tabs while this modal window is up");
+}
+
 Fineline_UI::Fineline_UI()
 {
+   Fl::scheme("plastic");
    window = new Fl_Double_Window(800,600);
 
    menu = new Fl_Menu_Bar(0,0,800,30);		// Create menubar, items..
@@ -64,15 +78,90 @@ Fineline_UI::Fineline_UI()
    menu->add("&ACE/ACE Start",  0, main_menu_callback);
    menu->add("&ACE/ACE Stop",   0, main_menu_callback);
 
+   // Define the top level Tabbed panel
+   {
+      Fl_Tabs* o = new Fl_Tabs(10, 35, 800, 600);
+      o->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
+      o->selection_color((Fl_Color)4);
+      o->labelcolor(FL_BACKGROUND2_COLOR);
+      {
+         Fl_Group* o = new Fl_Group(10, 60, 800, 600, "Volume&Browser");
+         o->tooltip("Loads a file system from a forensice image into a tree browser");
+         //o->selection_color((Fl_Color)1);
+         //{
+         //   Fl_Input* o = new Fl_Input(60, 80, 240, 40, "input:");
+         //   o->tooltip("This is the first input field");
+         //} // Fl_Input* o
+         //{
+            //box = new Fl_Box(20,40,760,100,"FineLine Search");
+            //box->box(FL_UP_BOX);
+            //box->labelfont(FL_BOLD+FL_ITALIC);
+            //box->labelsize(36);
+            //box->labeltype(FL_SHADOW_LABEL);
+         //}
+         //{
+         event_browser = new Fl_Browser(20, 140, 760, 400);
+         //}
 
-   box = new Fl_Box(20,40,760,100,"FineLine Search");
-   box->box(FL_UP_BOX);
-   box->labelfont(FL_BOLD+FL_ITALIC);
-   box->labelsize(36);
-   box->labeltype(FL_SHADOW_LABEL);
+         o->end();
+         Fl_Group::current()->resizable(o);
+      } // Fl_Group* o
+      {
+         Fl_Group* o = new Fl_Group(10, 60, 800, 600, "tab&2");
+         o->tooltip("TODO");
+         //o->selection_color((Fl_Color)2);
+         o->hide();
+         { Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
+            o->callback((Fl_Callback*)button_callback);
+         }  // Fl_Button* o
+         {
+            new Fl_Input(140, 130, 100, 30, "input in box2");
+         } // Fl_Input* o
+         {
+            new Fl_Button(30, 170, 260, 30, "This is stuff inside the Fl_Group \"tab2\"");
+         } // Fl_Button* o
+         {
+            Fl_Button* o = new Fl_Button(30, 200, 260, 30, "Test event blocking by modal window");
+            o->callback((Fl_Callback*)button_callback);
+         } // Fl_Button* o
+         o->end();
+      } // Fl_Group* o
+      {
+         Fl_Group* o = new Fl_Group(10, 60, 800, 600, "tab&3");
+         o->tooltip("TODO");
+         //o->selection_color((Fl_Color)3);
+         o->hide();
+         {
+            new Fl_Button(20, 90, 60, 80, "button2");
+         } // Fl_Button* o
+         {
+            new Fl_Button(80, 90, 60, 80, "button");
+         } // Fl_Button* o
+         {
+            new Fl_Button(140, 90, 60, 80, "button");
+         } // Fl_Button* o
+         o->end();
+      } // Fl_Group* o
+      {
+         Fl_Group* o = new Fl_Group(10, 60, 800, 6000, "&tab4");
+         o->tooltip("TODO");
+         //o->selection_color((Fl_Color)5);
+         o->labeltype(FL_ENGRAVED_LABEL);
+         o->labelfont(2);
+         o->hide();
+         {
+            new Fl_Button(20, 80, 60, 110, "button2");
+         } // Fl_Button* o
+         {
+            new Fl_Button(80, 80, 60, 110, "button");
+         } // Fl_Button* o
+         {
+            new Fl_Button(140, 80, 60, 110, "button");
+         } // Fl_Button* o
+         o->end();
+      } // Fl_Group* o
 
-   event_browser = new Fl_Browser(20, 140, 760, 400);
-
+   }
    window->end();
 
    flog = new Fineline_Log();
@@ -132,7 +221,8 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
   char ipath[256];
 
   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
-
+  fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
+  fprintf(stderr, ", item_pathname() is '%s'", ipath);
 
 }
 
