@@ -31,6 +31,8 @@
 
 */
 
+#include <iostream>
+
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
@@ -40,20 +42,17 @@
 
 #include "Fineline_UI.h"
 
+using namespace std;
+
 static Fineline_Thread *socket_thread;
 static Fl_Browser *event_browser;
 static Fineline_Log *flog;
 
 
-static void button_callback(Fl_Button *b, void *p)
-{
-  fl_message("Make sure you cannot change the tabs while this modal window is up");
-}
-
 Fineline_UI::Fineline_UI()
 {
    Fl::scheme("plastic");
-   window = new Fl_Double_Window(800,600);
+   window = new Fl_Double_Window(25, 35, Fl::w()-50, Fl::h()-50, "FineLine Forensic Image Analyser");
 
    menu = new Fl_Menu_Bar(0,0,800,30);		// Create menubar, items..
    menu->add("&File/&Open",    "^o", open_menu_callback);
@@ -79,14 +78,17 @@ Fineline_UI::Fineline_UI()
    menu->add("&ACE/ACE Stop",   0, main_menu_callback);
 
    // Define the top level Tabbed panel
-   {
-      Fl_Tabs* o = new Fl_Tabs(10, 35, 800, 600);
-      o->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
-      o->selection_color((Fl_Color)4);
-      o->labelcolor(FL_BACKGROUND2_COLOR);
-      {
-         Fl_Group* o = new Fl_Group(10, 60, 800, 600, "Volume&Browser");
-         o->tooltip("Loads a file system from a forensice image into a tree browser");
+      
+   Fl_Tabs* tab_panel = new Fl_Tabs(10, 35, 800, 600);
+   tab_panel->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
+   tab_panel->selection_color((Fl_Color)4);
+   tab_panel->labelcolor(FL_BACKGROUND2_COLOR);
+   
+   // Tab 1 - the file browser tree and file content display tab
+   cout << "Making tab 1...\n" << endl;
+
+   Fl_Group* image_browser_tab = new Fl_Group(10, 60, 800, 600, "Volume&Browser");
+   image_browser_tab->tooltip("Loads a file system from a forensice image into a tree browser");
          //o->selection_color((Fl_Color)1);
          //{
          //   Fl_Input* o = new Fl_Input(60, 80, 240, 40, "input:");
@@ -100,37 +102,34 @@ Fineline_UI::Fineline_UI()
             //box->labeltype(FL_SHADOW_LABEL);
          //}
          //{
-         event_browser = new Fl_Browser(20, 140, 760, 400);
-         //}
+   event_browser = new Fl_Browser(20, 140, 760, 400);
 
-         o->end();
-         Fl_Group::current()->resizable(o);
-      } // Fl_Group* o
-      {
-         Fl_Group* o = new Fl_Group(10, 60, 800, 600, "tab&2");
-         o->tooltip("TODO");
+   image_browser_tab->end();
+   Fl_Group::current()->resizable(image_browser_tab);
+   
+   // Tab 2 - Event summary graph panel
+   cout << "Making tab 2...\n" << endl;
+   Fl_Group* summary_graph_tab = new Fl_Group(10, 60, 800, 600, "Summary Graph");
+   summary_graph_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)2);
-         o->hide();
-         { Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
+   summary_graph_tab->hide();
+         { 
+			Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
             o->callback((Fl_Callback*)button_callback);
          }  // Fl_Button* o
-         {
-            new Fl_Input(140, 130, 100, 30, "input in box2");
-         } // Fl_Input* o
-         {
-            new Fl_Button(30, 170, 260, 30, "This is stuff inside the Fl_Group \"tab2\"");
-         } // Fl_Button* o
          {
             Fl_Button* o = new Fl_Button(30, 200, 260, 30, "Test event blocking by modal window");
             o->callback((Fl_Callback*)button_callback);
          } // Fl_Button* o
-         o->end();
-      } // Fl_Group* o
-      {
-         Fl_Group* o = new Fl_Group(10, 60, 800, 600, "tab&3");
-         o->tooltip("TODO");
+   summary_graph_tab->end();
+   Fl_Group::current()->resizable(summary_graph_tab);
+
+   // Tab 3 - Timeline graph panel
+   cout << "Making tab 3...\n" << endl;
+   Fl_Group* timeline_graph_tab = new Fl_Group(10, 60, 800, 600, "Timeline Graph");
+   timeline_graph_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)3);
-         o->hide();
+   timeline_graph_tab->hide();
          {
             new Fl_Button(20, 90, 60, 80, "button2");
          } // Fl_Button* o
@@ -140,33 +139,41 @@ Fineline_UI::Fineline_UI()
          {
             new Fl_Button(140, 90, 60, 80, "button");
          } // Fl_Button* o
-         o->end();
-      } // Fl_Group* o
-      {
-         Fl_Group* o = new Fl_Group(10, 60, 800, 6000, "&tab4");
-         o->tooltip("TODO");
+   timeline_graph_tab->end();
+   Fl_Group::current()->resizable(timeline_graph_tab);
+         
+   // Tab 4 - Text/Keyword search panel
+   cout << "Making tab 4...\n" << endl;
+   Fl_Group* search_tab = new Fl_Group(10, 60, 800, 6000, "&tab4");
+   search_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)5);
-         o->labeltype(FL_ENGRAVED_LABEL);
-         o->labelfont(2);
-         o->hide();
-         {
+   search_tab->labeltype(FL_ENGRAVED_LABEL);
+   search_tab->labelfont(2);
+   search_tab->hide();
+      {
             new Fl_Button(20, 80, 60, 110, "button2");
-         } // Fl_Button* o
-         {
+      } // Fl_Button* o
+      {
             new Fl_Button(80, 80, 60, 110, "button");
-         } // Fl_Button* o
-         {
+      } // Fl_Button* o
+      {
             new Fl_Button(140, 80, 60, 110, "button");
-         } // Fl_Button* o
-         o->end();
-      } // Fl_Group* o
+      } // Fl_Button* o
+   search_tab->end();
+   Fl_Group::current()->resizable(search_tab);
 
-   }
+   tab_panel->end();
+   Fl_Group::current()->resizable(tab_panel);
+
    window->end();
+   //Fl_Group::current()->resizable(window); ??????????????????????
 
    flog = new Fineline_Log();
+   flog->open_log_file();
+
    socket_thread = new Fineline_Thread(flog);
 
+   cout << "Finished making UI...\n" << endl;
 }
 
 Fineline_UI::~Fineline_UI()
@@ -189,7 +196,7 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
 
   fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
-  fprintf(stderr, ", item_pathname() is '%s'", ipath);		   // ..and full pathname
+  fprintf(stderr, ", item_pathname() is '%s'\n", ipath);		   // ..and full pathname
 
   if (item->flags & (FL_MENU_RADIO|FL_MENU_TOGGLE))
   {		// Toggle or radio item?
@@ -222,7 +229,7 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
 
   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
   fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
-  fprintf(stderr, ", item_pathname() is '%s'", ipath);
+  fprintf(stderr, ", item_pathname() is '%s'\n", ipath);
 
 }
 
@@ -247,4 +254,35 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
 void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 {
 	// open the export file dialogue
+}
+
+
+void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p) 
+{
+    Fl_Browser *browser = (Fl_Browser *)p;
+    int x, y, w, h;
+    char line[128];
+    browser->clear();
+
+    sprintf(line, "Main screen work area: %dx%d@%d,%d", Fl::w(), Fl::h(), Fl::x(), Fl::y());
+    browser->add(line);
+    Fl::screen_work_area(x, y, w, h);
+    sprintf(line, "Mouse screen work area: %dx%d@%d,%d", w, h, x, y);
+    browser->add(line);
+
+    for (int n = 0; n < Fl::screen_count(); n++) 
+	{
+	   int x, y, w, h;
+	   Fl::screen_xywh(x, y, w, h, n);
+	   sprintf(line, "Screen %d: %dx%d@%d,%d", n, w, h, x, y);
+	   browser->add(line);
+	   Fl::screen_work_area(x, y, w, h, n);
+	   sprintf(line, "Work area %d: %dx%d@%d,%d", n, w, h, x, y);
+	   browser->add(line);
+    }
+}
+
+void Fineline_UI::button_callback(Fl_Button *b, void *p)
+{
+   fl_message("Make sure you cannot change the tabs while this modal window is up");
 }

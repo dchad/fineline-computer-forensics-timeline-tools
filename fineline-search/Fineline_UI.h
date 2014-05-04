@@ -40,6 +40,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/filename.H>
+#include <FL/Fl_Button.H>
 
 #include "Fineline_Thread_FLTK.h"
 
@@ -55,6 +56,8 @@ class Fineline_UI
 	  static void open_menu_callback(Fl_Widget *w, void *x);
 	  static void save_menu_callback(Fl_Widget *w, void *x);
 	  static void export_menu_callback(Fl_Widget *w, void *x);
+	  static void update_screeninfo(Fl_Widget *b, void *p);
+	  static void button_callback(Fl_Button *b, void *p);
 
    protected:
    private:

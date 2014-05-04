@@ -33,8 +33,12 @@
 */
 
 
+#include <iostream>
+
 #include "Fineline_Thread_FLTK.h"
 #include "../common/threads.h"
+
+using namespace std;
 
 #ifdef LINUX_BUILD
 #include <unistd.h>
@@ -50,12 +54,12 @@ static Fineline_Log *flog;
 Fineline_Thread::Fineline_Thread(Fineline_Log *log)
 {
    flog = log;
-	running = 0;
+   running = 0;
 }
 
 Fineline_Thread::~Fineline_Thread()
 {
-	running = 0;
+   running = 0;
 }
 
 /*
@@ -87,15 +91,15 @@ void* thread_task(void* p)
 
 	  update_num++;
 	  sprintf(msg, "Thread #%ld Update %ld\n", id, update_num);
-     flog->print_log_entry(msg);
+      flog->print_log_entry(msg);
 
-     Fl::lock();
+      Fl::lock();
 
       //do some GUI updates here...
 	  event_browser->add(msg);
 
 	  Fl::awake(p); //TODO: is this necessary?
-     Fl::unlock();
+      Fl::unlock();
 
    }
    return 0;
@@ -103,6 +107,7 @@ void* thread_task(void* p)
 
 void Fineline_Thread::start_task(Fl_Browser *flb)
 {
+	cout << "Fineline_Thread_FLTK::start_task() <INFO> Starting thread." << endl;
 	running = 1;
 	Fl_Thread thread_id;
 	active_threads++;
