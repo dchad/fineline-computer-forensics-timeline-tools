@@ -44,7 +44,7 @@ struct fl_file_record
    long creation_time;
    long access_time;
    long modification_time;
-   int access_count;
+   int  file_type;
    char file_access_time_string[32];
    char file_creation_time_string[32];
    char file_modification_time_string[32];

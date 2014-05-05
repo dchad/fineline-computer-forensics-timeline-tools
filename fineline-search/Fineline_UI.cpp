@@ -46,6 +46,7 @@ using namespace std;
 
 static Fineline_Thread *socket_thread;
 static Fl_Browser *event_browser;
+static Fl_Tree *file_system_tree;
 static Fineline_Log *flog;
 
 
@@ -102,6 +103,8 @@ Fineline_UI::Fineline_UI()
             //box->labeltype(FL_SHADOW_LABEL);
          //}
          //{
+
+   file_system_tree = new Fl_Tree(20, 140, 760, 400);
    event_browser = new Fl_Browser(20, 140, 760, 400);
 
    image_browser_tab->end();
@@ -166,7 +169,7 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(tab_panel);
 
    window->end();
-   //Fl_Group::current()->resizable(window); ??????????????????????
+   Fl_Group::current()->resizable(window); ??????????????????????
 
    flog = new Fineline_Log();
    flog->open_log_file();

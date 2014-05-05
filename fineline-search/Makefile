@@ -25,6 +25,7 @@ Fineline_Socket_ACE.cpp  \
 Fineline_Filter_List.cpp \
 Fineline_Event_List.cpp  \
 Fineline_File_System.cpp \
+Fineline_File_System_Tree.cpp \
 ../common/flutil.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)
