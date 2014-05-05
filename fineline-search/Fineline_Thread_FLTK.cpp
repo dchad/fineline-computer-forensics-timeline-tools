@@ -84,21 +84,26 @@ void* thread_task(void* p)
    {
 
 #ifdef LINUX_BUILD
-      usleep(500000); //Linux 500 milliseconds
+      usleep(5000); //Linux 5 milliseconds
 #else
       Sleep(500);     //Wndows half a second
 #endif
 
-	  update_num++;
-	  sprintf(msg, "Thread #%ld Update %ld\n", id, update_num);
-      flog->print_log_entry(msg);
+	   update_num++;
+	   sprintf(msg, "Thread #%ld Update %ld\n", id, update_num);
+      cout << msg;
+     //flog->print_log_entry(msg);
 
       Fl::lock();
 
       //do some GUI updates here...
-	  event_browser->add(msg);
+	   if (event_browser != NULL)
+	   {
+	      event_browser->add(msg);
+	      Fl::awake(event_browser); //TODO: is this necessary?
+      }
 
-	  Fl::awake(p); //TODO: is this necessary?
+
       Fl::unlock();
 
    }

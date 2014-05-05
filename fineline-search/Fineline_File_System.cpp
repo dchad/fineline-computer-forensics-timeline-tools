@@ -210,7 +210,7 @@ int Fineline_File_System::open_forensic_image()
    if (image_info->open(fs_image.c_str(), TSK_IMG_TYPE_DETECT, 0) == 1)
    {
       delete image_info;
-      flog->print_log_entry("open_file_system_image() <ERROR> Could not open image file.\n");
+      flog->print_log_entry("open_forensic_image() <ERROR> Could not open image file.\n");
       return(-1);
    }
 
@@ -225,7 +225,7 @@ int Fineline_File_System::process_forensic_image()
    if (process_volume_system(image_info, 0))
    {
       delete image_info;
-      tsk_error_print(stderr);
+      flog->print_log_entry("process_forensic_image() <ERROR> Could not process image file.\n");
       return(-1);
    }
 

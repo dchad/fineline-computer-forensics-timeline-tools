@@ -52,9 +52,9 @@ static Fineline_Log *flog;
 Fineline_UI::Fineline_UI()
 {
    Fl::scheme("plastic");
-   window = new Fl_Double_Window(25, 35, Fl::w()-50, Fl::h()-50, "FineLine Forensic Image Analyser");
+   window = new Fl_Double_Window(25, 50, Fl::w()-50, Fl::h()-100, "FineLine Forensic Image Analyser");
 
-   menu = new Fl_Menu_Bar(0,0,800,30);		// Create menubar, items..
+   menu = new Fl_Menu_Bar(10,0,Fl::w()-70,30);		// Create menubar, items..
    menu->add("&File/&Open",    "^o", open_menu_callback);
    menu->add("&File/&Save",    "^s", save_menu_callback);
    menu->add("&File/&Save As", "^a", save_menu_callback);
@@ -78,16 +78,16 @@ Fineline_UI::Fineline_UI()
    menu->add("&ACE/ACE Stop",   0, main_menu_callback);
 
    // Define the top level Tabbed panel
-      
-   Fl_Tabs* tab_panel = new Fl_Tabs(10, 35, 800, 600);
+
+   Fl_Tabs* tab_panel = new Fl_Tabs(10, 40, Fl::w()-70, Fl::h()-200);
    tab_panel->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
    tab_panel->selection_color((Fl_Color)4);
    tab_panel->labelcolor(FL_BACKGROUND2_COLOR);
-   
-   // Tab 1 - the file browser tree and file content display tab
-   cout << "Making tab 1...\n" << endl;
 
-   Fl_Group* image_browser_tab = new Fl_Group(10, 60, 800, 600, "Volume&Browser");
+   // Tab 1 - the file browser tree and file content display tab
+   cout << "Making tab 1..." << endl;
+
+   Fl_Group* image_browser_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Volume Browser");
    image_browser_tab->tooltip("Loads a file system from a forensice image into a tree browser");
          //o->selection_color((Fl_Color)1);
          //{
@@ -106,14 +106,14 @@ Fineline_UI::Fineline_UI()
 
    image_browser_tab->end();
    Fl_Group::current()->resizable(image_browser_tab);
-   
+
    // Tab 2 - Event summary graph panel
-   cout << "Making tab 2...\n" << endl;
-   Fl_Group* summary_graph_tab = new Fl_Group(10, 60, 800, 600, "Summary Graph");
+   cout << "Making tab 2..." << endl;
+   Fl_Group* summary_graph_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Summary Graph");
    summary_graph_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)2);
    summary_graph_tab->hide();
-         { 
+         {
 			Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
             o->callback((Fl_Callback*)button_callback);
          }  // Fl_Button* o
@@ -125,8 +125,8 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(summary_graph_tab);
 
    // Tab 3 - Timeline graph panel
-   cout << "Making tab 3...\n" << endl;
-   Fl_Group* timeline_graph_tab = new Fl_Group(10, 60, 800, 600, "Timeline Graph");
+   cout << "Making tab 3..." << endl;
+   Fl_Group* timeline_graph_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Timeline Graph");
    timeline_graph_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)3);
    timeline_graph_tab->hide();
@@ -141,10 +141,10 @@ Fineline_UI::Fineline_UI()
          } // Fl_Button* o
    timeline_graph_tab->end();
    Fl_Group::current()->resizable(timeline_graph_tab);
-         
+
    // Tab 4 - Text/Keyword search panel
-   cout << "Making tab 4...\n" << endl;
-   Fl_Group* search_tab = new Fl_Group(10, 60, 800, 6000, "&tab4");
+   cout << "Making tab 4..." << endl;
+   Fl_Group* search_tab = new Fl_Group(10, 70,Fl::w()-80, Fl::h()-210, "Keyword Search");
    search_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)5);
    search_tab->labeltype(FL_ENGRAVED_LABEL);
@@ -257,7 +257,7 @@ void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 }
 
 
-void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p) 
+void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
 {
     Fl_Browser *browser = (Fl_Browser *)p;
     int x, y, w, h;
@@ -270,7 +270,7 @@ void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
     sprintf(line, "Mouse screen work area: %dx%d@%d,%d", w, h, x, y);
     browser->add(line);
 
-    for (int n = 0; n < Fl::screen_count(); n++) 
+    for (int n = 0; n < Fl::screen_count(); n++)
 	{
 	   int x, y, w, h;
 	   Fl::screen_xywh(x, y, w, h, n);

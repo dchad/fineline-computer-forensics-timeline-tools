@@ -52,13 +52,15 @@ using namespace std;
 
 TEST(FineLineSearchThreadTests, ValidateMethods)
 {
-   Fineline_Log *flg = new Fineline_Log();
-	Fineline_Thread *flt = new Fineline_Thread(flg);
+   Fineline_Log *flog = new Fineline_Log();
+	Fineline_Thread *flt = new Fineline_Thread(flog);
 	Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
 
    ASSERT_TRUE(NULL != flt);
    ASSERT_TRUE(NULL != flb);
-   ASSERT_TRUE(NULL != flg);
+   ASSERT_TRUE(NULL != flog);
+
+   EXPECT_EQ(0, flog->open_log_file());
 
 	EXPECT_EQ(0, flt->get_active_threads());
 	EXPECT_EQ(0, flt->get_running());
@@ -83,8 +85,10 @@ TEST(FineLineSearchThreadTests, ValidateMethods)
  	EXPECT_EQ(0, flt->get_active_threads());
 	EXPECT_EQ(0, flt->get_running());
 
-   delete flt;
-   delete flb;
+   //EXPECT_EQ(0, flog->close_log_file());
+
+   //delete flt;
+   //delete flb;
 }
 
 
@@ -128,6 +132,7 @@ TEST(FineLineSearchLogTests, ValidateMethods)
 
    EXPECT_EQ(0, flog->open_log_file());
    EXPECT_EQ(0, flog->print_log_entry("Unit Test.\n"));
+   EXPECT_EQ(0, flog->close_log_file());
 
    delete flog;
 }
@@ -160,6 +165,7 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
 
    EXPECT_EQ(100001, flist->list_size());
    EXPECT_EQ(0, flist->clear_list());
+
    delete flist;
    //xfree((char *) flf, sizeof(fl_file_record_t));
 }
