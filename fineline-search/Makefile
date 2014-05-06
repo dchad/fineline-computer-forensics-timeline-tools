@@ -16,12 +16,8 @@ TESTLIBS=-lgtest
 
 SOURCES=Fineline_UI.cpp  \
 Fineline_Thread_FLTK.cpp \
-Fineline_Thread_ACE.cpp  \
-Fineline_Filter_Map.cpp  \
-Fineline_Event_Map.cpp   \
 Fineline_Log.cpp         \
 Fineline_Socket_BSD.cpp  \
-Fineline_Socket_ACE.cpp  \
 Fineline_Filter_List.cpp \
 Fineline_Event_List.cpp  \
 Fineline_File_System.cpp \
