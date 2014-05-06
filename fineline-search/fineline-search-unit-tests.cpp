@@ -175,15 +175,15 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
 TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
 {
    Fineline_Log *flog = new Fineline_Log();
-   Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
+   Fineline_File_System_Tree *fltree = new Fineline_File_System_Tree(20, 20, 100, 100);
    string test_image_1 = "../../testing/ext3-img-kw-1.dd";
    string test_image_2 = "../../testing/8-jpeg-search.dd";
    string test_image_3 = "../../testing/ext-part-test-2.dd";
    string bad_image = "bad-image.dd";
-   Fineline_File_System *ffs = new Fineline_File_System(flb, bad_image, flog);
+   Fineline_File_System *ffs = new Fineline_File_System(fltree, bad_image, flog);
 
    ASSERT_TRUE(NULL != ffs);
-   ASSERT_TRUE(NULL != flb);
+   ASSERT_TRUE(NULL != fltree);
    ASSERT_TRUE(NULL != flog);
 
    flog->open_log_file();
@@ -191,21 +191,21 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
    EXPECT_EQ(-1, ffs->open_forensic_image());
 
    delete ffs;
-   ffs = new Fineline_File_System(flb, test_image_1, flog);
+   ffs = new Fineline_File_System(fltree, test_image_1, flog);
 
    EXPECT_EQ(0, ffs->open_forensic_image());
    EXPECT_EQ(0, ffs->process_forensic_image());
    EXPECT_EQ(0, ffs->close_forensic_image());
 
    delete ffs;
-   ffs = new Fineline_File_System(flb, test_image_2, flog);
+   ffs = new Fineline_File_System(fltree, test_image_2, flog);
 
    EXPECT_EQ(0, ffs->open_forensic_image());
    EXPECT_EQ(0, ffs->process_forensic_image());
    EXPECT_EQ(0, ffs->close_forensic_image());
 
    delete ffs;
-   ffs = new Fineline_File_System(flb, test_image_3, flog);
+   ffs = new Fineline_File_System(fltree, test_image_3, flog);
 
    EXPECT_EQ(0, ffs->open_forensic_image());
    EXPECT_EQ(0, ffs->process_forensic_image());
@@ -214,7 +214,7 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
    flog->close_log_file();
 
    delete ffs;
-   delete flb;
+   delete fltree;
    delete flog;
 }
 

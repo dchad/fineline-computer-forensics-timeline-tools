@@ -41,8 +41,10 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/filename.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 #include "Fineline_Thread_FLTK.h"
+#include "Fineline_File_System_Tree.h"
 
 class Fineline_UI
 {
@@ -52,12 +54,12 @@ class Fineline_UI
 
       void show(int argc, char *argv[]);
       //Fl_Browser *get_browser();
-	  static void main_menu_callback(Fl_Widget *w, void *x);
-	  static void open_menu_callback(Fl_Widget *w, void *x);
-	  static void save_menu_callback(Fl_Widget *w, void *x);
-	  static void export_menu_callback(Fl_Widget *w, void *x);
-	  static void update_screeninfo(Fl_Widget *b, void *p);
-	  static void button_callback(Fl_Button *b, void *p);
+	   static void main_menu_callback(Fl_Widget *w, void *x);
+	   static void open_menu_callback(Fl_Widget *w, void *x);
+	   static void save_menu_callback(Fl_Widget *w, void *x);
+	   static void export_menu_callback(Fl_Widget *w, void *x);
+	   static void update_screeninfo(Fl_Widget *b, void *p);
+	   static void button_callback(Fl_Button *b, void *p);
 
    protected:
    private:
@@ -65,6 +67,12 @@ class Fineline_UI
       Fl_Double_Window *window;
       Fl_Menu_Bar *menu;
       Fl_Box *box;
+
+      static Fineline_Thread *socket_thread;
+      static Fl_Browser *event_browser;
+      static Fineline_File_System_Tree *file_system_tree;
+      static Fl_Native_File_Chooser *fc;
+      static Fineline_Log *flog;
 
 };
 

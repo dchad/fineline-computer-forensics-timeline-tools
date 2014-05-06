@@ -42,15 +42,15 @@
 #include <FL/fl_ask.H>
 
 #include "Fineline_UI.h"
-#include "Fineline_File_System_Tree.h"
+
 
 using namespace std;
 
-static Fineline_Thread *socket_thread;
-static Fl_Browser *event_browser;
-static Fineline_File_System_Tree *file_system_tree;
-static Fineline_Log *flog;
-
+Fineline_Thread *Fineline_UI::socket_thread;
+Fl_Browser *Fineline_UI::event_browser;
+Fineline_File_System_Tree *Fineline_UI::file_system_tree;
+Fl_Native_File_Chooser *Fineline_UI::fc;
+Fineline_Log *Fineline_UI::flog;
 
 Fineline_UI::Fineline_UI()
 {
@@ -141,8 +141,8 @@ Fineline_UI::Fineline_UI()
    Fl_Group* search_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Keyword Search");
    search_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)5);
-   search_tab->labeltype(FL_ENGRAVED_LABEL);
-   search_tab->labelfont(2);
+   //search_tab->labeltype(FL_ENGRAVED_LABEL);
+   //search_tab->labelfont(2);
    search_tab->hide();
       {
             new Fl_Button(20, 80, 60, 110, "button2");
@@ -164,7 +164,7 @@ Fineline_UI::Fineline_UI()
 
    flog = new Fineline_Log();
    flog->open_log_file();
-
+   fc = new Fl_Native_File_Chooser();
    socket_thread = new Fineline_Thread(flog);
 
    cout << "Finished making UI...\n" << endl;
@@ -217,14 +217,26 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
 
 void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
 {
-  Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
-  const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
-  char ipath[256];
+   Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
+   const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
+   char ipath[256];
 
-  menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
-  fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
-  fprintf(stderr, ", item_pathname() is '%s'\n", ipath);
+   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
+   fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
+   fprintf(stderr, ", item_pathname() is '%s'\n", ipath);
 
+   fc->title("Open");
+   fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+   switch ( fc->show() )
+   {
+      case -1: break;	// Error
+      case  1: break; 	// Cancel
+      default:		// Choice
+         fc->preset_file(fc->filename());
+         //open(fc->filename());
+   }
+
+   return;
 }
 
 

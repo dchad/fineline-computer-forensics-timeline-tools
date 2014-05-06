@@ -34,9 +34,9 @@
 
 */
 
-
-
+#include "fineline-search.h"
 #include "Fineline_File_System.h"
+#include "../common/Fineline_Util.h"
 #include "../common/threads.h"
 
 #ifdef LINUX_BUILD
@@ -49,7 +49,9 @@
 /* Static C callback functions for the TSK library calls */
 static Fineline_Log *flog = NULL;
 static Fl_Browser *event_browser = NULL;
+static Fineline_File_System_Tree *file_system_tree = NULL;
 static TskImgInfo *image_info = NULL;
+static Fineline_Util flut;
 static int running = 0;
 
 static TSK_WALK_RET_ENUM file_callback(TskFsFile * fs_file, TSK_OFF_T a_off, TSK_DADDR_T addr, char *buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
@@ -65,12 +67,17 @@ static TSK_WALK_RET_ENUM file_callback(TskFsFile * fs_file, TSK_OFF_T a_off, TSK
 
 static uint8_t process_file(TskFsFile * fs_file, const char *path)
 {
-   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", fs_file->getName()->getName());
+   fl_file_record_t *frec = (fl_file_record_t *)flut.xcalloc(sizeof(fl_file_record_t));
+   frec->file_size = fs_file->getMeta()->getSize();
+   frec->access_time = fs_file->getMeta()->getATime();
+   frec->creation_time = fs_file->getMeta()->getCrTime();
+   strncpy(frec->file_name, fs_file->getName()->getName(), strlen(fs_file->getName()->getName()));
+   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", frec->file_name);
 
    Fl::lock();
 
       //do some GUI updates here...
-   event_browser->add(fs_file->getName()->getName());
+   file_system_tree->add_file(fs_file->getName()->getName(), frec);
 
    Fl::awake(event_browser); //TODO: is this necessary?
    Fl::unlock();
@@ -164,7 +171,7 @@ static uint8_t process_volume_system(TskImgInfo * img_info, TSK_OFF_T start)
 /*
    Function: thread_task
    Purpose : Worker function for the posix/win32 thread, must be a C function.
-   Input   : Pointer to the Fineline_File_System object (this).
+   Input   : Pointer to the Fineline_File_System object.
    Output  : Adds events to the GUI widget.
 */
 void* fs_thread_task(void* p)
@@ -190,10 +197,10 @@ void* fs_thread_task(void* p)
 
 
 
-Fineline_File_System::Fineline_File_System(Fl_Browser *fltk_browser, string image_path, Fineline_Log *log)
+Fineline_File_System::Fineline_File_System(Fineline_File_System_Tree *ffst, string image_path, Fineline_Log *log)
 {
    flog = log;
-   event_browser = fltk_browser;
+   file_system_tree = ffst;
    fs_image = image_path;
 }
 

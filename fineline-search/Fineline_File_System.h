@@ -42,7 +42,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Browser.H>
 
-#include "fineline-search.h"
+#include "Fineline_File_System_Tree.h"
 
 using namespace std;
 
@@ -50,7 +50,7 @@ using namespace std;
 class Fineline_File_System
 {
    public:
-      Fineline_File_System(Fl_Browser *fltk_browser, string fs_image, Fineline_Log *log);
+      Fineline_File_System(Fineline_File_System_Tree *ffst, string fs_image, Fineline_Log *log);
       ~Fineline_File_System();
 
       void start_task();
