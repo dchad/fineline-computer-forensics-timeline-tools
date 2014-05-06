@@ -52,13 +52,19 @@ class Fineline_File_System_Tree : Fl_Tree
       virtual ~Fineline_File_System_Tree();
 
       static void file_system_tree_callback(Fl_Tree *flt, void *vp);
-
       int add_file(string filename, fl_file_record_t *flrp);
+      fl_file_record_t *find_file(string filename);
+      int remove_file(string filename);
+      int tree_size();
+      int clear_tree();
+      int save_tree();
+      int print_tree();
+      void assign_user_icons();
 
    protected:
    private:
 
-      static map<string, fl_file_record_t> file_map;
+      map< string, fl_file_record_t* > file_map;
 
 };
 

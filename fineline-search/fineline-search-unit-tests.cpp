@@ -48,6 +48,7 @@ using namespace std;
 #include "Fineline_Log.h"
 #include "Fineline_Event_List.h"
 #include "Fineline_File_System.h"
+#include "Fineline_File_System_Tree.h"
 #include "Fineline_Util.h"
 
 
@@ -88,7 +89,7 @@ TEST(FineLineSearchThreadTests, ValidateMethods)
 
    //EXPECT_EQ(0, flog->close_log_file());
 
-   //delete flt;
+   //delete flt; NOTE: will cause a segfault because threads have not exited yet.
    //delete flb;
 }
 
@@ -215,6 +216,63 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
    delete ffs;
    delete flb;
    delete flog;
+}
+
+
+TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
+{
+   Fineline_Util flut;
+   Fineline_File_System_Tree *ftree = new Fineline_File_System_Tree(20, 100, 800, 600);
+   fl_file_record_t * flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+   string filename;
+   char num[256];
+   int i;
+
+   ASSERT_TRUE(NULL != ftree);
+   ASSERT_TRUE(NULL != flf);
+
+   EXPECT_EQ(0, ftree->tree_size());
+
+   for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\temp\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".doc");
+      ftree->add_file(filename, flf);
+   }
+   for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\Windows\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".exe");
+      ftree->add_file(filename, flf);
+   }
+      for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\Users\\admin\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".txt");
+      ftree->add_file(filename, flf);
+   }
+      for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "/etc/file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".bin");
+      ftree->add_file(filename, flf);
+   }
+   EXPECT_EQ(4000, ftree->tree_size());
+   EXPECT_EQ(0, ftree->clear_tree());
+
+   delete ftree;
 }
 
 int main(int argc, char **argv)

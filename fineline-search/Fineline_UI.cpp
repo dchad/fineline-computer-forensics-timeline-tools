@@ -54,10 +54,12 @@ static Fineline_Log *flog;
 
 Fineline_UI::Fineline_UI()
 {
+   int win_width = Fl::w() - 50;
+   int win_height = Fl::h() - 75;
    Fl::scheme("plastic");
-   window = new Fl_Double_Window(25, 50, Fl::w()-50, Fl::h()-100, "FineLine Forensic Image Analyser");
+   window = new Fl_Double_Window(25, 25, win_width, win_height, "FineLine Forensic Image Analyser");
 
-   menu = new Fl_Menu_Bar(10,0,Fl::w()-70,30);		// Create menubar, items..
+   menu = new Fl_Menu_Bar(5,0, win_width - 10, 30);		// Create menubar, items..
    menu->add("&File/&Open",    "^o", open_menu_callback);
    menu->add("&File/&Save",    "^s", save_menu_callback);
    menu->add("&File/&Save As", "^a", save_menu_callback);
@@ -82,7 +84,7 @@ Fineline_UI::Fineline_UI()
 
    // Define the top level Tabbed panel
 
-   Fl_Tabs* tab_panel = new Fl_Tabs(10, 40, Fl::w()-70, Fl::h()-200);
+   Fl_Tabs* tab_panel = new Fl_Tabs(5, 35, win_width - 10, win_height - 70);
    tab_panel->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
    tab_panel->selection_color((Fl_Color)4);
    tab_panel->labelcolor(FL_BACKGROUND2_COLOR);
@@ -90,18 +92,18 @@ Fineline_UI::Fineline_UI()
    // Tab 1 - the file browser tree and file content display tab
    cout << "Making tab 1..." << endl;
 
-   Fl_Group* image_browser_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Volume Browser");
+   Fl_Group* image_browser_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Volume Browser");
    image_browser_tab->tooltip("Loads a file system from a forensice image into a tree browser");
 
-   file_system_tree = new Fineline_File_System_Tree(20, 140, 760, 400);
-   event_browser = new Fl_Browser(20, 140, 760, 400);
+   file_system_tree = new Fineline_File_System_Tree(10, 90, win_width/2 - 15, win_height - 200);
+   event_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
 
    image_browser_tab->end();
    Fl_Group::current()->resizable(image_browser_tab);
 
    // Tab 2 - Event summary graph panel
    cout << "Making tab 2..." << endl;
-   Fl_Group* summary_graph_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Summary Graph");
+   Fl_Group* summary_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Summary Graph");
    summary_graph_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)2);
    summary_graph_tab->hide();
@@ -118,7 +120,7 @@ Fineline_UI::Fineline_UI()
 
    // Tab 3 - Timeline graph panel
    cout << "Making tab 3..." << endl;
-   Fl_Group* timeline_graph_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Timeline Graph");
+   Fl_Group* timeline_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Timeline Graph");
    timeline_graph_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)3);
    timeline_graph_tab->hide();
@@ -136,7 +138,7 @@ Fineline_UI::Fineline_UI()
 
    // Tab 4 - Text/Keyword search panel
    cout << "Making tab 4..." << endl;
-   Fl_Group* search_tab = new Fl_Group(10, 70,Fl::w()-80, Fl::h()-210, "Keyword Search");
+   Fl_Group* search_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Keyword Search");
    search_tab->tooltip("TODO");
          //o->selection_color((Fl_Color)5);
    search_tab->labeltype(FL_ENGRAVED_LABEL);
