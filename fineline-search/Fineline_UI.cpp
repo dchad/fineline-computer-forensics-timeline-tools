@@ -35,6 +35,7 @@
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Tabs.H>
+#include <FL/Fl_Tree.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>

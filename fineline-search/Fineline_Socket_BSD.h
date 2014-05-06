@@ -39,6 +39,7 @@ using namespace std;
 #include <string>
 
 #include "Fineline_Log.h"
+#include "Fineline_Util.h"
 
 class Fineline_Socket_BSD
 {
@@ -54,7 +55,7 @@ class Fineline_Socket_BSD
    protected:
    private:
       Fineline_Log flog;
-
+	  Fineline_Util flut;
       string gui_ip_address;
 };
 

@@ -243,7 +243,7 @@ int Fineline_Socket_BSD::send_event(char *event_string)
 /* TODO: acknowledge from server */
 char *Fineline_Socket_BSD::receive_message()
 {
-   char *resp = (char *)xcalloc(FL_MAX_INPUT_STR);
+   char *resp = (char *)flut.xcalloc(FL_MAX_INPUT_STR);
    int result;
 
    result = recv(connect_socket, resp, FL_MAX_INPUT_STR, 0);
