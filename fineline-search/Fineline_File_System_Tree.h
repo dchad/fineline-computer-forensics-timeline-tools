@@ -36,7 +36,7 @@
 #define FINELINE_FILE_SYSTEM_TREE_H
 
 #include <string>
-#include <vector>
+#include <map>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Tree.H>
@@ -48,7 +48,7 @@ using namespace std;
 class Fineline_File_System_Tree : Fl_Tree
 {
    public:
-      Fineline_File_System_Tree();
+      Fineline_File_System_Tree(int x, int y, int w, int h);
       virtual ~Fineline_File_System_Tree();
 
       static void file_system_tree_callback(Fl_Tree *flt, void *vp);

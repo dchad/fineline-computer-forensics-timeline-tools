@@ -36,6 +36,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "Fineline_Util.h"
+
 using namespace std;
 
 class Fineline_Log
@@ -54,6 +56,8 @@ class Fineline_Log
    private:
 
       FILE *log_file;
+
+      Fineline_Util flut;
 };
 
 #endif // FINELINE_LOG_H

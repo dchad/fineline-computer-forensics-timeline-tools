@@ -41,12 +41,13 @@
 #include <FL/fl_ask.H>
 
 #include "Fineline_UI.h"
+#include "Fineline_File_System_Tree.h"
 
 using namespace std;
 
 static Fineline_Thread *socket_thread;
 static Fl_Browser *event_browser;
-static Fl_Tree *file_system_tree;
+static Fineline_File_System_Tree *file_system_tree;
 static Fineline_Log *flog;
 
 
@@ -90,21 +91,8 @@ Fineline_UI::Fineline_UI()
 
    Fl_Group* image_browser_tab = new Fl_Group(10, 70, Fl::w()-80, Fl::h()-210, "Volume Browser");
    image_browser_tab->tooltip("Loads a file system from a forensice image into a tree browser");
-         //o->selection_color((Fl_Color)1);
-         //{
-         //   Fl_Input* o = new Fl_Input(60, 80, 240, 40, "input:");
-         //   o->tooltip("This is the first input field");
-         //} // Fl_Input* o
-         //{
-            //box = new Fl_Box(20,40,760,100,"FineLine Search");
-            //box->box(FL_UP_BOX);
-            //box->labelfont(FL_BOLD+FL_ITALIC);
-            //box->labelsize(36);
-            //box->labeltype(FL_SHADOW_LABEL);
-         //}
-         //{
 
-   file_system_tree = new Fl_Tree(20, 140, 760, 400);
+   file_system_tree = new Fineline_File_System_Tree(20, 140, 760, 400);
    event_browser = new Fl_Browser(20, 140, 760, 400);
 
    image_browser_tab->end();
@@ -169,7 +157,7 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(tab_panel);
 
    window->end();
-   Fl_Group::current()->resizable(window); ??????????????????????
+   //Fl_Group::current()->resizable(window); causes segmentation fault!!!
 
    flog = new Fineline_Log();
    flog->open_log_file();

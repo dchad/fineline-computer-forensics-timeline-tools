@@ -38,9 +38,9 @@
 
 #include "Fineline_File_System_Tree.h"
 
-Fineline_File_System_Tree::Fineline_File_System_Tree()
+Fineline_File_System_Tree::Fineline_File_System_Tree(int x, int y, int w, int h) : Fl_Tree(x, y, w, h, "File System")
 {
-   Fl_Tree(15, 22, 320, 539, "File System");
+
    tooltip("Test tree");
    box(FL_DOWN_BOX);
    color((Fl_Color)55);
@@ -54,10 +54,22 @@ Fineline_File_System_Tree::Fineline_File_System_Tree()
    when(FL_WHEN_RELEASE);
    end();
 
-   file_map =
 }
 
 Fineline_File_System_Tree::~Fineline_File_System_Tree()
 {
    //dtor
 }
+
+void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *vp)
+{
+
+   return;
+}
+
+int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
+{
+   return(0);
+}
+
+

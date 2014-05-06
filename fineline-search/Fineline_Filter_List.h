@@ -48,6 +48,8 @@
 #include <vector>
 #include <string>
 
+#include "Fineline_Util.h"
+
 using namespace std;
 
 class Fineline_Filter_List
@@ -71,6 +73,7 @@ class Fineline_Filter_List
 
       vector<string> keyword_vector;
       string filter_filename;
+      Fineline_Util flut;
 };
 
 #endif // FINELINE_FILTER_LIST_H

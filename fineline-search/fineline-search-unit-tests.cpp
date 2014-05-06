@@ -48,6 +48,7 @@ using namespace std;
 #include "Fineline_Log.h"
 #include "Fineline_Event_List.h"
 #include "Fineline_File_System.h"
+#include "Fineline_Util.h"
 
 
 TEST(FineLineSearchThreadTests, ValidateMethods)
@@ -140,9 +141,9 @@ TEST(FineLineSearchLogTests, ValidateMethods)
 
 TEST(FineLineSearchEventListTests, ValidateMethods)
 {
-
+   Fineline_Util flut;
    Fineline_Event_List *flist = new Fineline_Event_List();
-   fl_file_record_t * flf = (fl_file_record_t *) xmalloc(sizeof(fl_file_record_t));
+   fl_file_record_t * flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
    string filename;
    char num[256];
    int i;
@@ -155,10 +156,10 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
 
    for (i = 0; i < 100000; i++)
    {
-      flf = (fl_file_record_t *) xmalloc(sizeof(fl_file_record_t));
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
       ASSERT_TRUE(NULL != flf);
       filename = "C:\\temp\\file";
-      filename.append(xitoa(i, num, 256, 10));
+      filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".doc");
       flist->add_file_record(flf);
    }

@@ -98,7 +98,7 @@ int Fineline_Filter_List::load_filter_file()
 
    while (fgets(instr, FL_MAX_INPUT_STR, filter_file) != NULL)
    {
-      string kword(trim(instr));
+      string kword(flut.trim(instr));
       filter_counter++;
       keyword_vector.push_back(kword);
 
