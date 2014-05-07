@@ -49,6 +49,7 @@ using namespace std;
 Fineline_Thread *Fineline_UI::socket_thread;
 Fl_Browser *Fineline_UI::event_browser;
 Fineline_File_System_Tree *Fineline_UI::file_system_tree;
+Fineline_File_System *Fineline_UI::file_system;
 Fl_Native_File_Chooser *Fineline_UI::fc;
 Fineline_Log *Fineline_UI::flog;
 
@@ -85,15 +86,15 @@ Fineline_UI::Fineline_UI()
    // Define the top level Tabbed panel
 
    Fl_Tabs* tab_panel = new Fl_Tabs(5, 35, win_width - 10, win_height - 70);
-   tab_panel->tooltip("the various index cards test different aspects of the Fl_Tabs widget");
+   tab_panel->tooltip("Forensic image browser, timeline graphs and keyword searches.");
    tab_panel->selection_color((Fl_Color)4);
    tab_panel->labelcolor(FL_BACKGROUND2_COLOR);
 
    // Tab 1 - the file browser tree and file content display tab
    cout << "Making tab 1..." << endl;
 
-   Fl_Group* image_browser_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Volume Browser");
-   image_browser_tab->tooltip("Loads a file system from a forensice image into a tree browser");
+   Fl_Group* image_browser_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Image Browser");
+   image_browser_tab->tooltip("Displays a file system from a forensice image in a tree browser.");
 
    file_system_tree = new Fineline_File_System_Tree(10, 90, win_width/2 - 15, win_height - 200);
    event_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
@@ -104,7 +105,7 @@ Fineline_UI::Fineline_UI()
    // Tab 2 - Event summary graph panel
    cout << "Making tab 2..." << endl;
    Fl_Group* summary_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Summary Graph");
-   summary_graph_tab->tooltip("TODO");
+   summary_graph_tab->tooltip("Summary graph of file system activity.");
          //o->selection_color((Fl_Color)2);
    summary_graph_tab->hide();
          {
@@ -121,7 +122,7 @@ Fineline_UI::Fineline_UI()
    // Tab 3 - Timeline graph panel
    cout << "Making tab 3..." << endl;
    Fl_Group* timeline_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Timeline Graph");
-   timeline_graph_tab->tooltip("TODO");
+   timeline_graph_tab->tooltip("File System Event Timeline");
          //o->selection_color((Fl_Color)3);
    timeline_graph_tab->hide();
          {
@@ -139,7 +140,7 @@ Fineline_UI::Fineline_UI()
    // Tab 4 - Text/Keyword search panel
    cout << "Making tab 4..." << endl;
    Fl_Group* search_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Keyword Search");
-   search_tab->tooltip("TODO");
+   search_tab->tooltip("File System Keyword Search");
          //o->selection_color((Fl_Color)5);
    //search_tab->labeltype(FL_ENGRAVED_LABEL);
    //search_tab->labelfont(2);
@@ -233,7 +234,7 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
       case  1: break; 	// Cancel
       default:		// Choice
          fc->preset_file(fc->filename());
-         //open(fc->filename());
+         load_forensic_image(fc->filename());
    }
 
    return;
@@ -291,4 +292,31 @@ void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
 void Fineline_UI::button_callback(Fl_Button *b, void *p)
 {
    fl_message("Make sure you cannot change the tabs while this modal window is up");
+}
+
+int Fineline_UI::load_forensic_image(const char *filename)
+{
+   string fns = filename;
+   file_system = new Fineline_File_System(file_system_tree, fns, flog);
+
+   if (file_system == NULL)
+   {
+      flog->print_log_entry("Fineline_UI::load_forensic_image() <ERROR> Could not create file system object.\n");
+      return(-1);
+   }
+   if (file_system->open_forensic_image() == -1)
+   {
+      flog->print_log_entry("Fineline_UI::load_forensic_image() <ERROR> Could not open image file.\n");
+      return(-1);
+   }
+   if (file_system->process_forensic_image() == -1)
+   {
+      flog->print_log_entry("Fineline_UI::load_forensic_image() <ERROR> Could process open image file.\n");
+      return(-1);
+   }
+   file_system->close_forensic_image();
+
+   delete file_system;
+
+   return(0);
 }

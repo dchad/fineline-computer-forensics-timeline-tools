@@ -30,6 +30,8 @@
             The process consists of:
             open image -> analyse volume system -> analyse file system -> analyse directory -> analyse file
 
+            The process can be run in a thread if the forensic image is very large.
+
    Notes: EXPERIMENTAL
 
 */
@@ -67,17 +69,23 @@ static TSK_WALK_RET_ENUM file_callback(TskFsFile * fs_file, TSK_OFF_T a_off, TSK
 
 static uint8_t process_file(TskFsFile * fs_file, const char *path)
 {
+   string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)flut.xcalloc(sizeof(fl_file_record_t));
+
    frec->file_size = fs_file->getMeta()->getSize();
    frec->access_time = fs_file->getMeta()->getATime();
    frec->creation_time = fs_file->getMeta()->getCrTime();
+
    strncpy(frec->file_name, fs_file->getName()->getName(), strlen(fs_file->getName()->getName()));
-   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", frec->file_name);
+   strncpy(frec->file_path, path, strlen(path));
+   full_file_path.append(frec->file_name);
+
+   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
 
    Fl::lock();
 
       //do some GUI updates here...
-   file_system_tree->add_file(fs_file->getName()->getName(), frec);
+   file_system_tree->add_file(full_file_path.c_str(), frec);
 
    Fl::awake(event_browser); //TODO: is this necessary?
    Fl::unlock();
@@ -217,7 +225,7 @@ int Fineline_File_System::open_forensic_image()
    if (image_info->open(fs_image.c_str(), TSK_IMG_TYPE_DETECT, 0) == 1)
    {
       delete image_info;
-      flog->print_log_entry("open_forensic_image() <ERROR> Could not open image file.\n");
+      flog->print_log_entry("Fineline_File_System::open_forensic_image() <ERROR> Could not open image file.\n");
       return(-1);
    }
 
@@ -232,7 +240,7 @@ int Fineline_File_System::process_forensic_image()
    if (process_volume_system(image_info, 0))
    {
       delete image_info;
-      flog->print_log_entry("process_forensic_image() <ERROR> Could not process image file.\n");
+      flog->print_log_entry("Fineline_File_System::process_forensic_image() <ERROR> Could not process image file.\n");
       return(-1);
    }
 
