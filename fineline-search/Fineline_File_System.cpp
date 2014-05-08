@@ -99,10 +99,10 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
 {
 
     /* Ignore NTFS System files */
-   if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (fs_file->getName()->getName()[0] == '$'))
-   {
-      return TSK_WALK_CONT;
-   }
+   //if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (fs_file->getName()->getName()[0] == '$'))
+   //{
+   //   return TSK_WALK_CONT;
+   //}
     /* If the name has corresponding metadata, then walk it */
    if (fs_file->getMeta())
    {
@@ -180,8 +180,8 @@ static uint8_t process_volume_system(TskImgInfo * img_info, TSK_OFF_T start)
 /*
    Function: thread_task
    Purpose : Worker function for the posix/win32 thread, must be a C function.
-   Input   : Pointer to the Fineline_File_System object.
-   Output  : Adds events to the GUI widget.
+   Input   : Pointer to the file system object.
+   Output  : Adds events to the file system tree GUI widget.
 */
 void* fs_thread_task(void* p)
 {
@@ -191,11 +191,20 @@ void* fs_thread_task(void* p)
    sprintf(msg, "fs_thread_task() <INFO> Start forensic image processing thread: %s\n", file_system_image->get_image_name());
    flog->print_log_entry(msg);
 
-   file_system_image->open_forensic_image();
+   if (file_system_image->open_forensic_image() == -1)
+   {
+      flog->print_log_entry("fs_thread_task() <ERROR> Could not open forensic image.\n");
+      return(NULL);
+   }
+
    file_system_image->process_forensic_image();
+
+   //Completed parsing the image so notify the GUI
+   file_system_tree->rebuild_tree();
+
    file_system_image->close_forensic_image();
 
-   return(0);
+   return(NULL);
 }
 
 
@@ -238,7 +247,7 @@ int Fineline_File_System::open_forensic_image()
 
 int Fineline_File_System::process_forensic_image()
 {
-   if (process_volume_system(image_info, 0))
+   if (process_volume_system(image_info, 0) == 1)
    {
       delete image_info;
       flog->print_log_entry("Fineline_File_System::process_forensic_image() <ERROR> Could not process image file.\n");

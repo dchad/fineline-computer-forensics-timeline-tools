@@ -93,16 +93,19 @@ fl_file_record_t *Fineline_File_System_Tree::find_file(string filename)
 
 int Fineline_File_System_Tree::remove_file(string filename)
 {
+   //TODO:
    return(file_map.size());
 }
 
 int Fineline_File_System_Tree::save_tree()
 {
+   //TODO:
    return(0);
 }
 
 int Fineline_File_System_Tree::print_tree()
 {
+   //TODOD:
    return(0);
 }
 
@@ -160,6 +163,11 @@ void Fineline_File_System_Tree::assign_user_icons()
    {
       item->usericon(item->has_children() ? &L_folderpixmap : &L_documentpixmap);
    }
-   redraw();
+
 }
 
+void Fineline_File_System_Tree::rebuild_tree()
+{
+   assign_user_icons();
+   redraw();
+}

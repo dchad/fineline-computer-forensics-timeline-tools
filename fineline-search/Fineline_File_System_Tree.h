@@ -60,6 +60,7 @@ class Fineline_File_System_Tree : Fl_Tree
       int save_tree();
       int print_tree();
       void assign_user_icons();
+      void rebuild_tree();
 
    protected:
    private:

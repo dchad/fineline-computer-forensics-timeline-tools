@@ -99,6 +99,11 @@ Fineline_UI::Fineline_UI()
    file_system_tree = new Fineline_File_System_Tree(10, 90, win_width/2 - 15, win_height - 200);
    event_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
 
+   popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 200);
+   popup_menu->type(Fl_Menu_Button::POPUP3);
+   popup_menu->add("Mark File|Open File|Export File|Copy Metadata|Create Event");
+   popup_menu->callback(popup_menu_callback);
+
    image_browser_tab->end();
    Fl_Group::current()->resizable(image_browser_tab);
 
@@ -234,7 +239,8 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
       case  1: break; 	// Cancel
       default:		// Choice
          fc->preset_file(fc->filename());
-         load_forensic_image(fc->filename());
+         //load_forensic_image(fc->filename());
+         start_image_process_thread(fc->filename());
    }
 
    return;
@@ -250,34 +256,70 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
    menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
    if ( strcmp(item->label(), "&Save") == 0 )
    {
-	  // open the save file dialogue
+	  // TODO: open the save file dialogue
    }
    else if ( strcmp(item->label(), "&Save As") == 0 )
    {
-      // open the save as file dialogue
+      // TODO: open the save as file dialogue
    }
+   return;
 }
 
 void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 {
-	// open the export file dialogue
+   if (DEBUG)
+      cout << "Fineline_UI::popup_menu_callback() <INFO> " << endl;
+	// TODO: open the export file dialogue
+	return;
 }
 
+void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
+{
+   Fl_Menu_Button *menu_button = (Fl_Menu_Button*)w;				// Get the menubar widget
+   const Fl_Menu_Item *item = menu_button->mvalue();		// Get the menu item that was picked
+
+   if ( strcmp(item->label(), "Mark File") == 0 )
+   {
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   else if ( strcmp(item->label(), "Open File") == 0 )
+   {
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   else if ( strcmp(item->label(), "Export File") == 0 )
+   {
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   else if ( strcmp(item->label(), "Copy Metadata") == 0 )
+   {
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   else if ( strcmp(item->label(), "Create Event") == 0 )
+   {
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   return;
+}
 
 void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
 {
-    Fl_Browser *browser = (Fl_Browser *)p;
-    int x, y, w, h;
-    char line[128];
-    browser->clear();
+   Fl_Browser *browser = (Fl_Browser *)p;
+   int x, y, w, h;
+   char line[128];
+   browser->clear();
 
-    sprintf(line, "Main screen work area: %dx%d@%d,%d", Fl::w(), Fl::h(), Fl::x(), Fl::y());
-    browser->add(line);
-    Fl::screen_work_area(x, y, w, h);
-    sprintf(line, "Mouse screen work area: %dx%d@%d,%d", w, h, x, y);
-    browser->add(line);
+   sprintf(line, "Main screen work area: %dx%d@%d,%d", Fl::w(), Fl::h(), Fl::x(), Fl::y());
+   browser->add(line);
+   Fl::screen_work_area(x, y, w, h);
+   sprintf(line, "Mouse screen work area: %dx%d@%d,%d", w, h, x, y);
+   browser->add(line);
 
-    for (int n = 0; n < Fl::screen_count(); n++)
+   for (int n = 0; n < Fl::screen_count(); n++)
 	{
 	   int x, y, w, h;
 	   Fl::screen_xywh(x, y, w, h, n);
@@ -286,14 +328,47 @@ void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
 	   Fl::screen_work_area(x, y, w, h, n);
 	   sprintf(line, "Work area %d: %dx%d@%d,%d", n, w, h, x, y);
 	   browser->add(line);
-    }
+   }
+   return;
 }
 
 void Fineline_UI::button_callback(Fl_Button *b, void *p)
 {
    fl_message("Make sure you cannot change the tabs while this modal window is up");
+   return;
 }
 
+/*
+   Name   : start_image_process_thread()
+   Purpose: creates a file system object to process the image file system(s)
+            in a thread. Recommended for large forensic images so the GUI
+            does not block.
+   Input  : file path of the forensic image.
+   Output : returns 0 on success, -1 on fail.
+
+*/
+int Fineline_UI::start_image_process_thread(const char *filename)
+{
+   string fns = filename;
+   file_system = new Fineline_File_System(file_system_tree, fns, flog);
+
+   if (file_system == NULL)
+   {
+      flog->print_log_entry("Fineline_UI::load_forensic_image() <ERROR> Could not create file system object.\n");
+      return(-1);
+   }
+   file_system->start_task(); //Note: do not delete file system object after starting the thread
+
+   return(0);
+}
+
+/*
+   Name   : load_forensic_image()
+   Purpose: creates a file system object to process the image file system(s).
+   Input  : file path of the forensic image.
+   Output : returns 0 on success, -1 on fail.
+
+*/
 int Fineline_UI::load_forensic_image(const char *filename)
 {
    string fns = filename;

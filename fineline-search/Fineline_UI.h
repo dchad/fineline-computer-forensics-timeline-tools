@@ -39,6 +39,7 @@
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Menu_Button.H>
 #include <FL/filename.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
@@ -59,15 +60,20 @@ class Fineline_UI
 	   static void open_menu_callback(Fl_Widget *w, void *x);
 	   static void save_menu_callback(Fl_Widget *w, void *x);
 	   static void export_menu_callback(Fl_Widget *w, void *x);
+	   static void popup_menu_callback(Fl_Widget *w, void *x);
 	   static void update_screeninfo(Fl_Widget *b, void *p);
 	   static void button_callback(Fl_Button *b, void *p);
 	   static int load_forensic_image(const char *filename);
+	   static int start_image_process_thread(const char *filename);
+
+
 
    protected:
    private:
 
       Fl_Double_Window *window;
       Fl_Menu_Bar *menu;
+      Fl_Menu_Button *popup_menu;
       Fl_Box *box;
 
       static Fineline_Thread *socket_thread;
