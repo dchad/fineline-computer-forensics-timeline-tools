@@ -47,7 +47,7 @@
 using namespace std;
 
 Fineline_Thread *Fineline_UI::socket_thread;
-Fl_Browser *Fineline_UI::event_browser;
+Fl_Browser *Fineline_UI::file_metadata_browser;
 Fineline_File_System_Tree *Fineline_UI::file_system_tree;
 Fineline_File_System *Fineline_UI::file_system;
 Fl_Native_File_Chooser *Fineline_UI::fc;
@@ -97,7 +97,10 @@ Fineline_UI::Fineline_UI()
    image_browser_tab->tooltip("Displays a file system from a forensice image in a tree browser.");
 
    file_system_tree = new Fineline_File_System_Tree(10, 90, win_width/2 - 15, win_height - 200);
-   event_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
+   file_system_tree->callback((Fl_Callback*)file_system_tree_callback, (void *)1234);
+
+   file_metadata_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
+   //TODO: file_metadata_callback
 
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 200);
    popup_menu->type(Fl_Menu_Button::POPUP3);
@@ -109,10 +112,10 @@ Fineline_UI::Fineline_UI()
 
    // Tab 2 - Event summary graph panel
 
-   Fl_Group* summary_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Summary Graph");
-   summary_graph_tab->tooltip("Summary graph of file system activity.");
+   Fl_Group* statistical_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Statistics Graph");
+   statistical_graph_tab->tooltip("Summary graph of file system activity.");
          //o->selection_color((Fl_Color)2);
-   summary_graph_tab->hide();
+   statistical_graph_tab->hide();
          {
 			Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
             o->callback((Fl_Callback*)button_callback);
@@ -121,8 +124,8 @@ Fineline_UI::Fineline_UI()
             Fl_Button* o = new Fl_Button(30, 200, 260, 30, "Test event blocking by modal window");
             o->callback((Fl_Callback*)button_callback);
          } // Fl_Button* o
-   summary_graph_tab->end();
-   Fl_Group::current()->resizable(summary_graph_tab);
+   statistical_graph_tab->end();
+   Fl_Group::current()->resizable(statistical_graph_tab);
 
    // Tab 3 - Timeline graph panel
 
@@ -208,7 +211,7 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
   }
   else if ( strcmp(item->label(), "Start") == 0 )
   {
-     socket_thread->start_task(event_browser);
+     socket_thread->start_task(file_metadata_browser);
   }
   else if ( strcmp(item->label(), "Stop") == 0 )
   {
@@ -303,6 +306,24 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
+   return;
+}
+
+void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
+{
+	//DEPRECATED Fl_Tree_Item * flti = flt->item_clicked();
+	Fl_Tree_Item *flti = flt->callback_item();
+
+	switch ( flt->callback_reason() )
+	{
+      case FL_TREE_REASON_OPENED: break;
+      case FL_TREE_REASON_CLOSED: break;
+      case FL_TREE_REASON_SELECTED: cout << "Clicked on: " << flti->label() << endl; break;
+      //case FL_TREE_REASON_RESELECTED: break;
+      case FL_TREE_REASON_DESELECTED: break;
+      case FL_TREE_REASON_NONE: break;
+   }
+
    return;
 }
 

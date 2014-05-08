@@ -45,13 +45,12 @@
 
 using namespace std;
 
-class Fineline_File_System_Tree : Fl_Tree
+class Fineline_File_System_Tree : public Fl_Tree
 {
    public:
       Fineline_File_System_Tree(int x, int y, int w, int h);
       virtual ~Fineline_File_System_Tree();
-
-      static void file_system_tree_callback(Fl_Tree *flt, void *vp);
+      static void file_system_tree_callback(Fl_Tree *flt, void *p);
       int add_file(string filename, fl_file_record_t *flrp);
       fl_file_record_t *find_file(string filename);
       int remove_file(string filename);

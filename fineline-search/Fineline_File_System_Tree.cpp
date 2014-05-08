@@ -52,8 +52,8 @@ Fineline_File_System_Tree::Fineline_File_System_Tree(int x, int y, int w, int h)
    labelfont(0);
    labelsize(14);
    labelcolor(FL_FOREGROUND_COLOR);
-   callback((Fl_Callback*)file_system_tree_callback, (void*)(1234));
    align(Fl_Align(FL_ALIGN_TOP));
+   //callback((Fl_Callback *)file_system_tree_callback);
    when(FL_WHEN_RELEASE);
    end();
 
@@ -64,7 +64,9 @@ Fineline_File_System_Tree::~Fineline_File_System_Tree()
    //dtor
 }
 
-void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *vp)
+/*
+*/
+void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *p)
 {
 	Fl_Tree_Item * flti = flt->item_clicked();
    cout << "Clicked on: " << flti->label() << endl;

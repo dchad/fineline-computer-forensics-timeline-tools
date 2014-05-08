@@ -63,6 +63,7 @@ class Fineline_UI
 	   static void popup_menu_callback(Fl_Widget *w, void *x);
 	   static void update_screeninfo(Fl_Widget *b, void *p);
 	   static void button_callback(Fl_Button *b, void *p);
+      static void file_system_tree_callback(Fl_Tree *flt, void *x);
 	   static int load_forensic_image(const char *filename);
 	   static int start_image_process_thread(const char *filename);
 
@@ -77,7 +78,7 @@ class Fineline_UI
       Fl_Box *box;
 
       static Fineline_Thread *socket_thread;
-      static Fl_Browser *event_browser;
+      static Fl_Browser *file_metadata_browser;
       static Fineline_File_System_Tree *file_system_tree;
       static Fineline_File_System *file_system;
       static Fl_Native_File_Chooser *fc;
