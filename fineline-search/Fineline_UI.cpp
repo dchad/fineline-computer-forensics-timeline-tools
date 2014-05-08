@@ -55,6 +55,7 @@ Fineline_Log *Fineline_UI::flog;
 
 Fineline_UI::Fineline_UI()
 {
+
    int win_width = Fl::w() - 50;
    int win_height = Fl::h() - 75;
    Fl::scheme("plastic");
@@ -91,7 +92,6 @@ Fineline_UI::Fineline_UI()
    tab_panel->labelcolor(FL_BACKGROUND2_COLOR);
 
    // Tab 1 - the file browser tree and file content display tab
-   cout << "Making tab 1..." << endl;
 
    Fl_Group* image_browser_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Image Browser");
    image_browser_tab->tooltip("Displays a file system from a forensice image in a tree browser.");
@@ -103,7 +103,7 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(image_browser_tab);
 
    // Tab 2 - Event summary graph panel
-   cout << "Making tab 2..." << endl;
+
    Fl_Group* summary_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Summary Graph");
    summary_graph_tab->tooltip("Summary graph of file system activity.");
          //o->selection_color((Fl_Color)2);
@@ -120,7 +120,7 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(summary_graph_tab);
 
    // Tab 3 - Timeline graph panel
-   cout << "Making tab 3..." << endl;
+
    Fl_Group* timeline_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Timeline Graph");
    timeline_graph_tab->tooltip("File System Event Timeline");
          //o->selection_color((Fl_Color)3);
@@ -138,12 +138,9 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(timeline_graph_tab);
 
    // Tab 4 - Text/Keyword search panel
-   cout << "Making tab 4..." << endl;
+
    Fl_Group* search_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Keyword Search");
    search_tab->tooltip("File System Keyword Search");
-         //o->selection_color((Fl_Color)5);
-   //search_tab->labeltype(FL_ENGRAVED_LABEL);
-   //search_tab->labelfont(2);
    search_tab->hide();
       {
             new Fl_Button(20, 80, 60, 110, "button2");
@@ -163,12 +160,15 @@ Fineline_UI::Fineline_UI()
    window->end();
    //Fl_Group::current()->resizable(window); causes segmentation fault!!!
 
+   // Now make all the ancillary objects
+
    flog = new Fineline_Log();
    flog->open_log_file();
    fc = new Fl_Native_File_Chooser();
    socket_thread = new Fineline_Thread(flog);
 
-   cout << "Finished making UI...\n" << endl;
+   if (DEBUG)
+      cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
 }
 
 Fineline_UI::~Fineline_UI()

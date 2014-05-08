@@ -56,31 +56,32 @@ static TskImgInfo *image_info = NULL;
 static Fineline_Util flut;
 static int running = 0;
 
-static TSK_WALK_RET_ENUM file_callback(TskFsFile * fs_file, TSK_OFF_T a_off, TSK_DADDR_T addr, char *buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
-{
-    TSK_MD5_CTX *md = (TSK_MD5_CTX *) ptr;
-    if (md == NULL)
-        return TSK_WALK_CONT;
-
-    TSK_MD5_Update(md, (unsigned char *) buf, (unsigned int) size);
-
-    return TSK_WALK_CONT;
-}
 
 static uint8_t process_file(TskFsFile * fs_file, const char *path)
 {
    string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)flut.xcalloc(sizeof(fl_file_record_t));
+   int file_name_length = strlen(fs_file->getName()->getName());
 
-   frec->file_size = fs_file->getMeta()->getSize();
-   frec->access_time = fs_file->getMeta()->getATime();
-   frec->creation_time = fs_file->getMeta()->getCrTime();
-
-   strncpy(frec->file_name, fs_file->getName()->getName(), strlen(fs_file->getName()->getName()));
+   strncpy(frec->file_name, fs_file->getName()->getName(), file_name_length);
    strncpy(frec->file_path, path, strlen(path));
+
+   //if ((strncmp(frec->file_name, ".", 1) == 0) || (strncmp(frec->file_name, "..", 2) == 0))
+   if ((file_name_length < 3) && (frec->file_name[0] == '.')) // ignore directory and parent directory entries
+   {
+	   flut.xfree((char*)frec, sizeof(fl_file_record_t));
+	   return(0);
+   }
+
+   frec->file_size = (long)fs_file->getMeta()->getSize();
+   frec->access_time = (long)fs_file->getMeta()->getATime();
+   frec->creation_time = (long)fs_file->getMeta()->getCrTime();
+
+
    full_file_path.append(frec->file_name);
 
-   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
+   //if (DEBUG)
+   //   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
 
    Fl::lock();
 

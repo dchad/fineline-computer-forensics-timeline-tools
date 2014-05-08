@@ -37,7 +37,7 @@
 #define FINELINE_COMMON_H
 
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define GUI_SERVER_PORT_STRING "58989"
 

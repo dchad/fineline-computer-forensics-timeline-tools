@@ -20,18 +20,20 @@
 /*
    fineline-search.cpp
 
-   Title : FineLine Computer Forensics Windows Search Cache Parser
+   Title : FineLine Computer Forensics Image Searcher
    Author: Derek Chadwick
    Date  : 02/04/2014
 
-   Purpose: FineLine search main. Searches file systems and forensic
-            images for evidence.
+   Purpose: FineLine search main. Searches forensic images for evidence. Image types supported:
+            Raw images (single/multi)
+			EWF format
+			AFF format
+
+   Dependencies: FLTI GUI library, The Sleuth Kit (TSK) library, libewf, libaff.
 
 */
 
 #include "Fineline_UI.h"
-
-//Fineline_UI *flui; = new Fineline_UI();
 
 int main(int argc, char *argv[])
 {

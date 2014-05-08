@@ -66,13 +66,15 @@ Fineline_File_System_Tree::~Fineline_File_System_Tree()
 
 void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *vp)
 {
-
+	Fl_Tree_Item * flti = flt->item_clicked();
+   cout << "Clicked on: " << flti->label() << endl;
    return;
 }
 
 int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 {
    add(filename.c_str());
+   close(filename.c_str(), 0);
    file_map[filename] = flrp;
    return(file_map.size());
 }
