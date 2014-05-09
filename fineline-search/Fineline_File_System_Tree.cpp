@@ -65,6 +65,7 @@ Fineline_File_System_Tree::~Fineline_File_System_Tree()
 }
 
 /*
+   Unit testing only.
 */
 void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *p)
 {
@@ -107,7 +108,7 @@ int Fineline_File_System_Tree::save_tree()
 
 int Fineline_File_System_Tree::print_tree()
 {
-   //TODOD:
+   //TODO:
    return(0);
 }
 
@@ -172,4 +173,17 @@ void Fineline_File_System_Tree::rebuild_tree()
 {
    assign_user_icons();
    redraw();
+}
+
+
+fl_file_record_t *get_selected_file_record()
+{
+   //TODO: string selected_file_path = ???
+   return(NULL);
+}
+
+fl_file_record_t *get_file_record(const char *file_path)
+{
+   //TODO:
+   return(NULL);
 }

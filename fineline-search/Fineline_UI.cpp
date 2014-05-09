@@ -100,10 +100,10 @@ Fineline_UI::Fineline_UI()
    file_system_tree->callback((Fl_Callback*)file_system_tree_callback, (void *)1234);
 
    file_metadata_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
-   //TODO: file_metadata_callback
+   file_metadata_browser->callback(file_metadata_callback);
 
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 200);
-   popup_menu->type(Fl_Menu_Button::POPUP3);
+   popup_menu->type(Fl_Menu_Button::POPUP3); // Right mouse button click.
    popup_menu->add("Mark File|Open File|Export File|Copy Metadata|Create Event");
    popup_menu->callback(popup_menu_callback);
 
@@ -166,9 +166,8 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(tab_panel);
 
    window->end();
-   //Fl_Group::current()->resizable(window); causes segmentation fault!!!
 
-   // Now make all the ancillary objects
+   // Now make all the ancillary objects.
 
    flog = new Fineline_Log();
    flog->open_log_file();
@@ -240,9 +239,9 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
    {
       case -1: break;	// Error
       case  1: break; 	// Cancel
-      default:		// Choice
+      default:		    // Choice
          fc->preset_file(fc->filename());
-         //load_forensic_image(fc->filename());
+         //load_forensic_image(fc->filename()); DEPRECATED for large forensic images.
          start_image_process_thread(fc->filename());
    }
 
@@ -278,31 +277,36 @@ void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 
 void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
 {
-   Fl_Menu_Button *menu_button = (Fl_Menu_Button*)w;				// Get the menubar widget
-   const Fl_Menu_Item *item = menu_button->mvalue();		// Get the menu item that was picked
+   Fl_Menu_Button *menu_button = (Fl_Menu_Button*)w;		// Get the menubar widget.
+   const Fl_Menu_Item *item = menu_button->mvalue();		// Get the menu item that was picked.
 
    if ( strcmp(item->label(), "Mark File") == 0 )
    {
+      // mark the file/directory for later processing/reporting/exporting etc.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
    else if ( strcmp(item->label(), "Open File") == 0 )
    {
+      // display the file (images/video/text/docs/web pages) in a dialogue or for unknown binary files open a hex editor.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
    else if ( strcmp(item->label(), "Export File") == 0 )
    {
+      // copy the selected file/directory from the forensic image to an evidence folder.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
    else if ( strcmp(item->label(), "Copy Metadata") == 0 )
    {
+	  // copy the file metadata as text to the system clipboard.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
    else if ( strcmp(item->label(), "Create Event") == 0 )
    {
+      // open the event dialogue to create a fineline event record and add to the timeline.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
@@ -311,15 +315,18 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
 
 void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
 {
-	//DEPRECATED Fl_Tree_Item * flti = flt->item_clicked();
-	Fl_Tree_Item *flti = flt->callback_item();
+	//DEPRECATED: Fl_Tree_Item * flti = flt->item_clicked();
+	Fl_Tree_Item *flti = file_system_tree->callback_item();
+   fl_file_record_t *flrec = NULL;
+   //TODO: string file_path = file_system_tree->item_pathname(flti);
 
 	switch ( flt->callback_reason() )
 	{
       case FL_TREE_REASON_OPENED: break;
       case FL_TREE_REASON_CLOSED: break;
-      case FL_TREE_REASON_SELECTED: cout << "Clicked on: " << flti->label() << endl; break;
-      //case FL_TREE_REASON_RESELECTED: break;
+      case FL_TREE_REASON_SELECTED: cout << "Clicked on: " << flti->label() << endl; 
+         flrec = file_system_tree->find_file(flti->label()); break; //label does not contain the full path, need the full path for the map lookup
+      //case FL_TREE_REASON_RESELECTED: break; compile error - unknown definition???
       case FL_TREE_REASON_DESELECTED: break;
       case FL_TREE_REASON_NONE: break;
    }
@@ -327,29 +334,12 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
    return;
 }
 
-void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
+void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 {
-   Fl_Browser *browser = (Fl_Browser *)p;
-   int x, y, w, h;
-   char line[128];
-   browser->clear();
+   Fl_Browser *fb = (Fl_Browser *)w;
+   if (DEBUG)
+      cout << "Fineline_UI::file_metadata_callback() <INFO> " << endl;
 
-   sprintf(line, "Main screen work area: %dx%d@%d,%d", Fl::w(), Fl::h(), Fl::x(), Fl::y());
-   browser->add(line);
-   Fl::screen_work_area(x, y, w, h);
-   sprintf(line, "Mouse screen work area: %dx%d@%d,%d", w, h, x, y);
-   browser->add(line);
-
-   for (int n = 0; n < Fl::screen_count(); n++)
-	{
-	   int x, y, w, h;
-	   Fl::screen_xywh(x, y, w, h, n);
-	   sprintf(line, "Screen %d: %dx%d@%d,%d", n, w, h, x, y);
-	   browser->add(line);
-	   Fl::screen_work_area(x, y, w, h, n);
-	   sprintf(line, "Work area %d: %dx%d@%d,%d", n, w, h, x, y);
-	   browser->add(line);
-   }
    return;
 }
 
@@ -357,6 +347,14 @@ void Fineline_UI::button_callback(Fl_Button *b, void *p)
 {
    fl_message("Make sure you cannot change the tabs while this modal window is up");
    return;
+}
+
+
+void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
+{
+   //TODO: add file metadata to browser
+   
+
 }
 
 /*
@@ -415,4 +413,31 @@ int Fineline_UI::load_forensic_image(const char *filename)
    delete file_system;
 
    return(0);
+}
+
+
+void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
+{
+   Fl_Browser *browser = (Fl_Browser *)p;
+   int x, y, w, h;
+   char line[128];
+   browser->clear();
+
+   sprintf(line, "Main screen work area: %dx%d@%d,%d", Fl::w(), Fl::h(), Fl::x(), Fl::y());
+   browser->add(line);
+   Fl::screen_work_area(x, y, w, h);
+   sprintf(line, "Mouse screen work area: %dx%d@%d,%d", w, h, x, y);
+   browser->add(line);
+
+   for (int n = 0; n < Fl::screen_count(); n++)
+	{
+	   int x, y, w, h;
+	   Fl::screen_xywh(x, y, w, h, n);
+	   sprintf(line, "Screen %d: %dx%d@%d,%d", n, w, h, x, y);
+	   browser->add(line);
+	   Fl::screen_work_area(x, y, w, h, n);
+	   sprintf(line, "Work area %d: %dx%d@%d,%d", n, w, h, x, y);
+	   browser->add(line);
+   }
+   return;
 }

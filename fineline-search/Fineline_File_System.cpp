@@ -98,12 +98,12 @@ static uint8_t process_file(TskFsFile * fs_file, const char *path)
 static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const char *path, void *ptr)
 {
 
-    /* Ignore NTFS System files */
+   /* Ignore NTFS System files */
    //if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (fs_file->getName()->getName()[0] == '$'))
    //{
    //   return TSK_WALK_CONT;
    //}
-    /* If the name has corresponding metadata, then walk it */
+   /* If the name has corresponding metadata, then walk it */
    if (fs_file->getMeta())
    {
       process_file(fs_file, path);

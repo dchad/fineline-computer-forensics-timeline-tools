@@ -48,11 +48,15 @@ using namespace std;
 class Fineline_File_System_Tree : public Fl_Tree
 {
    public:
+
       Fineline_File_System_Tree(int x, int y, int w, int h);
       virtual ~Fineline_File_System_Tree();
+
       static void file_system_tree_callback(Fl_Tree *flt, void *p);
       int add_file(string filename, fl_file_record_t *flrp);
       fl_file_record_t *find_file(string filename);
+      fl_file_record_t *get_file_record(const char *file_path);
+      fl_file_record_t *get_selected_file();
       int remove_file(string filename);
       int tree_size();
       int clear_tree();
