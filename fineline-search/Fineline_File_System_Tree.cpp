@@ -84,6 +84,10 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 
 fl_file_record_t *Fineline_File_System_Tree::find_file(string filename)
 {
+   if (filename.compare(0, 4, "ROOT") == 0)
+   {
+      filename.erase(0, 5);  // Remove the tree ROOT/ label and path separator
+   }
    map< string, fl_file_record_t* >::iterator p = file_map.find(filename);
 
    if(p == file_map.end())

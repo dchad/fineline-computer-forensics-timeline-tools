@@ -62,11 +62,11 @@ class Fineline_UI
 	  static void export_menu_callback(Fl_Widget *w, void *x);
 	  static void popup_menu_callback(Fl_Widget *w, void *x);
 	  static void file_metadata_callback(Fl_Widget *w, void *x);
-	   
+
 	  static void button_callback(Fl_Button *b, void *p);
      static void file_system_tree_callback(Fl_Tree *flt, void *x);
      static int start_image_process_thread(const char *filename);
-	   
+	  static void update_file_metadata_browser(fl_file_record_t *flrec);
 
 
 
@@ -86,9 +86,9 @@ class Fineline_UI
       static Fineline_Log *flog;
 
 	  void update_screeninfo(Fl_Widget *b, void *p);
-	  void update_file_metadata_browser(fl_file_record_t *flrec);
+
 	  int load_forensic_image(const char *filename);
-	  
+
 
 };
 

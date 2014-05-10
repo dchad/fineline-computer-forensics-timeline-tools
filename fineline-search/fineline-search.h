@@ -36,7 +36,6 @@
 #include <sys/stat.h>
 
 #include "../common/flcommon.h"
-#include "Fineline_Log.h"
 
 struct fl_file_record
 {

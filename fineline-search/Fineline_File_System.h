@@ -42,6 +42,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Browser.H>
 
+#include "Fineline_Log.h"
 #include "Fineline_File_System_Tree.h"
 
 using namespace std;

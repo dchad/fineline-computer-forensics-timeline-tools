@@ -80,8 +80,8 @@ static uint8_t process_file(TskFsFile * fs_file, const char *path)
 
    full_file_path.append(frec->file_name);
 
-   //if (DEBUG)
-   //   fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
+   if (DEBUG)
+      fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
 
    Fl::lock();
 

@@ -25,7 +25,12 @@
    Author: Derek Chadwick
    Date  : 02/04/2014
 
-   Purpose: FineLine FLTK GUI.
+   Purpose: FineLine FLTK GUI. Consists of a main window widget containing:
+            Tabbed Panel
+               |-> Tab 1 : File System Tree and file metadata browser.
+               |-> Tab 2 : Statistical graph of the file system.
+               |-> Tab 3 : Timeline graph.
+               |-> Tab 4 : Keyword search panel.
 
    Notes: EXPERIMENTAL
 
@@ -318,17 +323,27 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
 	//DEPRECATED: Fl_Tree_Item * flti = flt->item_clicked();
 	Fl_Tree_Item *flti = file_system_tree->callback_item();
    fl_file_record_t *flrec = NULL;
-   //TODO: string file_path = file_system_tree->item_pathname(flti);
+   char file_path[FL_PATH_MAX]; // FL_PATH_MAX 2048 is an FLTK constant, Fineline FL_PATH_MAX_LENGTH 4096
 
-	switch ( flt->callback_reason() )
-	{
-      case FL_TREE_REASON_OPENED: break;
-      case FL_TREE_REASON_CLOSED: break;
-      case FL_TREE_REASON_SELECTED: cout << "Clicked on: " << flti->label() << endl; 
-         flrec = file_system_tree->find_file(flti->label()); break; //label does not contain the full path, need the full path for the map lookup
-      //case FL_TREE_REASON_RESELECTED: break; compile error - unknown definition???
-      case FL_TREE_REASON_DESELECTED: break;
-      case FL_TREE_REASON_NONE: break;
+   if (file_system_tree->item_pathname(file_path, FL_PATH_MAX, flti) != 0)
+   {
+      flog->print_log_entry("file_system_tree_callback() <ERROR> Could not get tree item path.");
+      fl_message(" <ERROR> Could not get tree item. ");
+      return;
+   }
+
+   if (flt->callback_reason() == FL_TREE_REASON_SELECTED)
+   {
+      flrec = file_system_tree->find_file(file_path);
+      if (flrec != NULL)
+      {
+         update_file_metadata_browser(flrec);
+      }
+      else
+      {
+         flog->print_log_entry("file_system_tree_callback() <ERROR> Could not get find file record.");
+         fl_message(" <ERROR> Could not get find file record. ");
+      }
    }
 
    return;
@@ -336,7 +351,7 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
 
 void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 {
-   Fl_Browser *fb = (Fl_Browser *)w;
+   //Fl_Browser *fb = (Fl_Browser *)w;
    if (DEBUG)
       cout << "Fineline_UI::file_metadata_callback() <INFO> " << endl;
 
@@ -352,9 +367,39 @@ void Fineline_UI::button_callback(Fl_Button *b, void *p)
 
 void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
 {
-   //TODO: add file metadata to browser
-   
+   string metadata;
 
+   //file_metadata_browser->clear();
+   metadata.append("Filename : ");
+   metadata.append(flrec->file_name);
+   file_metadata_browser->add(metadata.c_str());
+
+   metadata.clear();
+   metadata.append("Filepath : ");
+   metadata.append(flrec->file_path);
+   file_metadata_browser->add(metadata.c_str());
+
+   metadata.clear();
+   metadata.append("Creation Time : ");
+   file_metadata_browser->add(metadata.c_str());
+
+   metadata.clear();
+   metadata.append("Access Time : ");
+   file_metadata_browser->add(metadata.c_str());
+
+   metadata.clear();
+   metadata.append("File Size : ");
+   file_metadata_browser->add(metadata.c_str());
+
+   metadata.clear();
+   metadata.append("File Owner : ");
+   file_metadata_browser->add(metadata.c_str());
+
+   metadata.clear();
+   metadata.append("MD5 Hash : ");
+   file_metadata_browser->add(metadata.c_str());
+
+   return;
 }
 
 /*
