@@ -57,14 +57,15 @@ Fineline_File_System_Tree *Fineline_UI::file_system_tree;
 Fineline_File_System *Fineline_UI::file_system;
 Fl_Native_File_Chooser *Fineline_UI::fc;
 Fineline_Log *Fineline_UI::flog;
+Fineline_Event_Dialog *Fineline_UI::event_dialog;
 
 Fineline_UI::Fineline_UI()
 {
 
-   int win_width = Fl::w() - 50;
-   int win_height = Fl::h() - 75;
+   int win_width = Fl::w() - 60;
+   int win_height = Fl::h() - 80;
    Fl::scheme("plastic");
-   window = new Fl_Double_Window(25, 25, win_width, win_height, "FineLine Forensic Image Analyser");
+   window = new Fl_Double_Window(30, 30, win_width, win_height, "FineLine Forensic Image Analyser");
 
    menu = new Fl_Menu_Bar(5,0, win_width - 10, 30);		// Create menubar, items..
    menu->add("&File/&Open",    "^o", open_menu_callback);
@@ -178,6 +179,10 @@ Fineline_UI::Fineline_UI()
    flog->open_log_file();
    fc = new Fl_Native_File_Chooser();
    socket_thread = new Fineline_Thread(flog);
+
+   // Now make the dialogs
+
+   event_dialog = new Fineline_Event_Dialog(win_width/2 - 200, win_height/2 - 200, 400, 400);
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -312,8 +317,10 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    else if ( strcmp(item->label(), "Create Event") == 0 )
    {
       // open the event dialogue to create a fineline event record and add to the timeline.
-      if (DEBUG)
-         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+      //if (DEBUG)
+      //   cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+
+      event_dialog->show();
    }
    return;
 }

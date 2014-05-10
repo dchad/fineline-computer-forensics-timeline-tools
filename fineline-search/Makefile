@@ -22,6 +22,15 @@ Fineline_Filter_List.cpp \
 Fineline_Event_List.cpp  \
 Fineline_File_System.cpp \
 Fineline_File_System_Tree.cpp \
+Fineline_File_Display_Dialog.cpp \
+Fineline_Event_Dialog.cpp   \
+Fineline_Export_Dialog.cpp  \
+Fineline_File_Metadata_Dialog.cpp \
+Fineline_File_Tree_Dialog.cpp  \
+Fineline_Project_Dialog.cpp    \
+Fineline_Search_Dialog.cpp     \
+Fineline_Statistics_Dialog.cpp \
+Fineline_Timeline_Graph.cpp    \
 ../common/Fineline_Util.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)
