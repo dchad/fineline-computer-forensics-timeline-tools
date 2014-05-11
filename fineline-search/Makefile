@@ -31,6 +31,7 @@ Fineline_Project_Dialog.cpp    \
 Fineline_Search_Dialog.cpp     \
 Fineline_Statistics_Dialog.cpp \
 Fineline_Timeline_Graph.cpp    \
+Fineline_Progress_Dialog.cpp   \
 ../common/Fineline_Util.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)

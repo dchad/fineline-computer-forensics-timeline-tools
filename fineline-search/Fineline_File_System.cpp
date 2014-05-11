@@ -48,25 +48,26 @@
 #define FINELINE_SLEEP(delay) Sleep(delay);
 #endif
 
-/* Static C callback functions for the TSK library calls */
+
 static Fineline_Log *flog = NULL;
 static Fl_Browser *event_browser = NULL;
 static Fineline_File_System_Tree *file_system_tree = NULL;
 static TskImgInfo *image_info = NULL;
 static Fineline_Util flut;
+static Fineline_Progress_Dialog *progress_dialog;
 static int running = 0;
 
+/* Static C callback functions for the TSK library calls */
 
-static uint8_t process_file(TskFsFile * fs_file, const char *path)
+static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 {
    string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)flut.xcalloc(sizeof(fl_file_record_t));
-   int file_name_length = strlen(fs_file->getName()->getName());
+   int file_name_length = filename.size();
 
-   strncpy(frec->file_name, fs_file->getName()->getName(), file_name_length);
-   strncpy(frec->file_path, path, strlen(path));
+   strncpy(frec->file_name, filename.c_str(), file_name_length);
+   strncpy(frec->file_path, path.c_str(), path.size());
 
-   //if ((strncmp(frec->file_name, ".", 1) == 0) || (strncmp(frec->file_name, "..", 2) == 0))
    if ((file_name_length < 3) && (frec->file_name[0] == '.')) // ignore directory and parent directory entries
    {
 	   flut.xfree((char*)frec, sizeof(fl_file_record_t));
@@ -104,12 +105,32 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
    //   return TSK_WALK_CONT;
    //}
    /* If the name has corresponding metadata, then walk it */
-   if (fs_file->getMeta())
+   string filename;
+   string fullpath;
+   string msg;
+   TskFsMeta *fs_meta = fs_file->getMeta();
+
+   if (fs_meta == NULL)
    {
-      process_file(fs_file, path);
+      return(TSK_WALK_CONT);
    }
 
-   return TSK_WALK_CONT;
+   filename.append(fs_file->getName()->getName());
+
+   if (fs_meta->getType() == TSK_FS_META_TYPE_DIR)
+   {
+      if ((filename.size() < 3) && (filename[0] == '.'))
+      {
+         return(TSK_WALK_CONT);
+      }
+      msg.append("Processing directory: ");
+      msg.append(filename);
+      progress_dialog->add_update(msg);
+   }
+   fullpath.append(path);
+   process_file(fs_file, filename, fullpath);
+
+   return(TSK_WALK_CONT);
 }
 
 static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
@@ -202,8 +223,6 @@ void* fs_thread_task(void* p)
    //Completed parsing the image so notify the GUI
    file_system_tree->rebuild_tree();
 
-   file_system_image->close_forensic_image();
-
    return(NULL);
 }
 
@@ -215,11 +234,12 @@ void* fs_thread_task(void* p)
 
 
 
-Fineline_File_System::Fineline_File_System(Fineline_File_System_Tree *ffst, string image_path, Fineline_Log *log)
+Fineline_File_System::Fineline_File_System(Fineline_File_System_Tree *ffst, string image_path, Fineline_Progress_Dialog *fpd, Fineline_Log *log)
 {
    flog = log;
    file_system_tree = ffst;
    fs_image = image_path;
+   progress_dialog = fpd;
 }
 
 Fineline_File_System::~Fineline_File_System()
@@ -229,7 +249,9 @@ Fineline_File_System::~Fineline_File_System()
 
 int Fineline_File_System::open_forensic_image()
 {
-   char msg[256];
+   string update_msg;
+   TSK_IMG_TYPE_ENUM itype;
+
    image_info = new TskImgInfo();
 
    if (image_info->open(fs_image.c_str(), TSK_IMG_TYPE_DETECT, 0) == 1)
@@ -239,8 +261,17 @@ int Fineline_File_System::open_forensic_image()
       return(-1);
    }
 
-   sprintf(msg, "Fineline_File_System::open_forensic_image() <INFO> Opened image: %s\n", fs_image.c_str());
-   flog->print_log_entry(msg);
+   update_msg.append("Fineline_File_System::open_forensic_image() <INFO> Opened image:");
+   update_msg.append(fs_image);
+
+   flog->print_log_entry(update_msg.c_str());
+
+   itype = image_info->getType();
+   update_msg.clear();
+   update_msg.append("Processing image type: ");
+   update_msg.append(image_info->typeToDesc(itype));
+
+   progress_dialog->add_update(update_msg);
 
    return(0);
 }
@@ -259,7 +290,10 @@ int Fineline_File_System::process_forensic_image()
 
 int Fineline_File_System::close_forensic_image()
 {
-   delete image_info;
+   //DEPRECATED
+   if (image_info != NULL)
+      delete image_info;
+
    return(0);
 }
 
@@ -285,7 +319,10 @@ const char *Fineline_File_System::get_image_name()
    return(fs_image.c_str());
 }
 
+void add_progress_text(char *msg)
+{
 
+}
 
 
 

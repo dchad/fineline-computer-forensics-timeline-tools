@@ -49,6 +49,7 @@
 #include "Fineline_File_System_Tree.h"
 #include "Fineline_Event_Dialog.h"
 #include "Fineline_File_Metadata_Dialog.h"
+#include "Fineline_Export_Dialog.h"
 
 class Fineline_UI
 {
@@ -90,6 +91,8 @@ class Fineline_UI
       static Fineline_Log *flog;
       static Fineline_Event_Dialog *event_dialog;
       static Fineline_File_Metadata_Dialog *file_metadata_dialog;
+      static Fineline_Progress_Dialog *progress_dialog;
+      static Fineline_Export_Dialog *export_dialog;
 
 	   void update_screeninfo(Fl_Widget *b, void *p);
 

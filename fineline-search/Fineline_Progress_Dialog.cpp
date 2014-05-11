@@ -1,5 +1,4 @@
 
-
 /*  Copyright 2014 Derek Chadwick
 
     This file is part of the FineLine Computer Forensics Timeline Tools.
@@ -20,14 +19,13 @@
 
 
 /*
-   Fineline_Export_Dialog.cpp
+   Fineline_Progress_Dialog.cpp
 
    Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
-   Date  : 11/05/2014
+   Date  : 02/04/2014
 
-   Purpose: FineLine FLTK GUI file export dialog. Provides functions to
-            export files from a forensic image to an evidence folder.
+   Purpose: FineLine FLTK GUI progress dialog.
 
    Notes: EXPERIMENTAL
 
@@ -35,19 +33,20 @@
 
 
 
-#include "Fineline_Export_Dialog.h"
+
+#include "Fineline_Progress_Dialog.h"
 
 
-Fl_Browser *Fineline_Export_Dialog::file_browser;
+Fl_Browser *Fineline_Progress_Dialog::progress_browser;
 
-Fineline_Export_Dialog::Fineline_Export_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline Export Dialog")
+Fineline_Progress_Dialog::Fineline_Progress_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline Progress Dialog")
 {
    begin();
 
    Fl_Group* browser_group = new Fl_Group(10, 10, w - 10, h - 10);
    {
-      file_browser = new Fl_Browser(20, 20, w - 40, h - 100);
-      Fl_Button* clear_button = new Fl_Button(w - 250, h - 50, 100, 30, "Export");
+      progress_browser = new Fl_Browser(20, 20, w - 40, h - 100);
+      Fl_Button* clear_button = new Fl_Button(w - 250, h - 50, 100, 30, "Clear");
       clear_button->callback((Fl_Callback*)button_callback, (void *)this);
       Fl_Button* close_button = new Fl_Button(w - 140, h - 50, 100, 30, "Close");
       close_button->callback((Fl_Callback*)button_callback, (void *)this);
@@ -58,14 +57,26 @@ Fineline_Export_Dialog::Fineline_Export_Dialog(int x, int y, int w, int h) : Fl_
    end();
 }
 
-Fineline_Export_Dialog::~Fineline_Export_Dialog()
+Fineline_Progress_Dialog::~Fineline_Progress_Dialog()
 {
    //dtor
 }
 
-
-void Fineline_Export_Dialog::button_callback(Fl_Button *b, void *p)
+void Fineline_Progress_Dialog::add_update(string update_text)
 {
-   ((Fineline_Export_Dialog *)p)->hide();
+   progress_browser->add(update_text.c_str());
+   progress_browser->bottomline(progress_browser->size());
+   return;
+}
+
+void Fineline_Progress_Dialog::clear_text()
+{
+   progress_browser->clear();
+   return;
+}
+
+void Fineline_Progress_Dialog::button_callback(Fl_Button *b, void *p)
+{
+   ((Fineline_Progress_Dialog *)p)->hide();
    return;
 }

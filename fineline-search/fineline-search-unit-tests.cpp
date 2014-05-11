@@ -50,6 +50,7 @@ using namespace std;
 #include "Fineline_File_System.h"
 #include "Fineline_File_System_Tree.h"
 #include "Fineline_Util.h"
+#include "Fineline_Progress_Dialog.h"
 
 
 TEST(FineLineSearchThreadTests, ValidateMethods)
@@ -175,12 +176,13 @@ TEST(FineLineSearchEventListTests, ValidateMethods)
 TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
 {
    Fineline_Log *flog = new Fineline_Log();
+   Fineline_Progress_Dialog *fpd = new Fineline_Progress_Dialog(20, 20, 600, 600);
    Fineline_File_System_Tree *fltree = new Fineline_File_System_Tree(20, 20, 100, 100);
    string test_image_1 = "../../testing/ext3-img-kw-1.dd";
    string test_image_2 = "../../testing/8-jpeg-search.dd";
    string test_image_3 = "../../testing/ext-part-test-2.dd";
    string bad_image = "bad-image.dd";
-   Fineline_File_System *ffs = new Fineline_File_System(fltree, bad_image, flog);
+   Fineline_File_System *ffs = new Fineline_File_System(fltree, bad_image, fpd, flog);
 
    ASSERT_TRUE(NULL != ffs);
    ASSERT_TRUE(NULL != fltree);
@@ -191,21 +193,21 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
    EXPECT_EQ(-1, ffs->open_forensic_image());
 
    delete ffs;
-   ffs = new Fineline_File_System(fltree, test_image_1, flog);
+   ffs = new Fineline_File_System(fltree, test_image_1, fpd, flog);
 
    EXPECT_EQ(0, ffs->open_forensic_image());
    EXPECT_EQ(0, ffs->process_forensic_image());
    EXPECT_EQ(0, ffs->close_forensic_image());
 
    delete ffs;
-   ffs = new Fineline_File_System(fltree, test_image_2, flog);
+   ffs = new Fineline_File_System(fltree, test_image_2, fpd, flog);
 
    EXPECT_EQ(0, ffs->open_forensic_image());
    EXPECT_EQ(0, ffs->process_forensic_image());
    EXPECT_EQ(0, ffs->close_forensic_image());
 
    delete ffs;
-   ffs = new Fineline_File_System(fltree, test_image_3, flog);
+   ffs = new Fineline_File_System(fltree, test_image_3, fpd, flog);
 
    EXPECT_EQ(0, ffs->open_forensic_image());
    EXPECT_EQ(0, ffs->process_forensic_image());

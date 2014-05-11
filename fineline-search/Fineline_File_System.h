@@ -44,6 +44,7 @@
 
 #include "Fineline_Log.h"
 #include "Fineline_File_System_Tree.h"
+#include "Fineline_Progress_Dialog.h"
 
 using namespace std;
 
@@ -51,7 +52,7 @@ using namespace std;
 class Fineline_File_System
 {
    public:
-      Fineline_File_System(Fineline_File_System_Tree *ffst, string fs_image, Fineline_Log *log);
+      Fineline_File_System(Fineline_File_System_Tree *ffst, string fs_image, Fineline_Progress_Dialog *fpd, Fineline_Log *log);
       ~Fineline_File_System();
 
       void start_task();
@@ -60,6 +61,7 @@ class Fineline_File_System
       int open_forensic_image();
       int process_forensic_image();
       int close_forensic_image();
+      void add_progress_text(char *msg);
       const char *get_image_name();
 
    protected:

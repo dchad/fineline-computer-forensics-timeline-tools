@@ -44,6 +44,7 @@ using namespace std;
 Fineline_File_System_Tree::Fineline_File_System_Tree(int x, int y, int w, int h) : Fl_Tree(x, y, w, h)
 {
 
+   begin();
    tooltip("File System Browser");
    box(FL_DOWN_BOX);
    color((Fl_Color)55);
@@ -123,6 +124,7 @@ int Fineline_File_System_Tree::tree_size()
 
 int Fineline_File_System_Tree::clear_tree()
 {
+   clear();
    file_map.clear();
    return(file_map.size());
 }

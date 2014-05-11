@@ -38,7 +38,6 @@
 
 #include <iostream>
 
-#include <FL/Fl_Box.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Tree.H>
 #include <FL/Fl_Group.H>
@@ -59,6 +58,8 @@ Fl_Native_File_Chooser *Fineline_UI::fc;
 Fineline_Log *Fineline_UI::flog;
 Fineline_Event_Dialog *Fineline_UI::event_dialog;
 Fineline_File_Metadata_Dialog *Fineline_UI::file_metadata_dialog;
+Fineline_Progress_Dialog *Fineline_UI::progress_dialog;
+Fineline_Export_Dialog *Fineline_UI::export_dialog;
 
 Fineline_UI::Fineline_UI()
 {
@@ -68,7 +69,12 @@ Fineline_UI::Fineline_UI()
    Fl::scheme("plastic");
    window = new Fl_Double_Window(30, 30, win_width, win_height, "FineLine Forensic Image Analyser");
 
+   //----------------------------------------------------------------------------------
+   //   Create Main Menu
+   //----------------------------------------------------------------------------------
+
    menu = new Fl_Menu_Bar(5,0, win_width - 10, 30);		// Create menubar, items..
+   menu->add("&File/&New",     "^n", main_menu_callback);
    menu->add("&File/&Open",    "^o", open_menu_callback);
    menu->add("&File/&Save",    "^s", save_menu_callback);
    menu->add("&File/&Save As", "^a", save_menu_callback);
@@ -77,21 +83,18 @@ Fineline_UI::Fineline_UI()
 
    menu->add("&Edit/&Copy",    "^c", main_menu_callback);
    menu->add("&Edit/&Paste",   "^v", main_menu_callback, 0, FL_MENU_DIVIDER);
-   menu->add("&Edit/Radio 1",   0, main_menu_callback, 0, FL_MENU_RADIO);
-   menu->add("&Edit/Radio 2",   0, main_menu_callback, 0, FL_MENU_RADIO|FL_MENU_DIVIDER);
-   menu->add("&Edit/Toggle 1",  0, main_menu_callback, 0, FL_MENU_TOGGLE);			// Default: off
-   menu->add("&Edit/Toggle 2",  0, main_menu_callback, 0, FL_MENU_TOGGLE);			// Default: off
-   menu->add("&Edit/Toggle 3",  0, main_menu_callback, 0, FL_MENU_TOGGLE|FL_MENU_VALUE);	// Default: on
 
    menu->add("&Help/Google",    0, main_menu_callback);
    menu->add("&Help/About",     0, main_menu_callback);
 
-   menu->add("&Sockets/Start",  0, main_menu_callback);
-   menu->add("&Sockets/Stop",   0, main_menu_callback);
-   menu->add("&ACE/ACE Start",  0, main_menu_callback);
-   menu->add("&ACE/ACE Stop",   0, main_menu_callback);
+   //menu->add("&Sockets/Start",  0, main_menu_callback);
+   //menu->add("&Sockets/Stop",   0, main_menu_callback);
+   //menu->add("&ACE/ACE Start",  0, main_menu_callback);
+   //menu->add("&ACE/ACE Stop",   0, main_menu_callback);
 
+   //----------------------------------------------------------------------------------
    // Define the top level Tabbed panel
+   //----------------------------------------------------------------------------------
 
    Fl_Tabs* tab_panel = new Fl_Tabs(5, 35, win_width - 10, win_height - 70);
    tab_panel->tooltip("Forensic image browser, timeline graphs and keyword searches.");
@@ -109,8 +112,8 @@ Fineline_UI::Fineline_UI()
    file_system_tree->callback((Fl_Callback*)file_system_tree_callback, (void *)1234);
 
    file_metadata_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
-   file_metadata_browser->callback(file_metadata_callback);
-   
+   //TODO: file_metadata_browser->callback(file_metadata_browser_callback);
+
 	save_metadata_button = new Fl_Button(win_width/2 + 15, win_height - 100, 100, 30, "Save");
    save_metadata_button->callback((Fl_Callback*)file_metadata_callback);
    clear_metadata_button = new Fl_Button(win_width/2 + 125, win_height - 100, 100, 30, "Clear");
@@ -200,8 +203,10 @@ Fineline_UI::Fineline_UI()
    // Now make the dialogs
    //----------------------------------------------------------------------------------
 
-   event_dialog = new Fineline_Event_Dialog(win_width/2 - 200, win_height/2 - 200, 400, 400);
-   file_metadata_dialog = new Fineline_File_Metadata_Dialog(win_width/2 - 200, win_height/2 - 200, 400, 400);
+   event_dialog = new Fineline_Event_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
+   file_metadata_dialog = new Fineline_File_Metadata_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
+   progress_dialog = new Fineline_Progress_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
+   export_dialog = new Fineline_Export_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -301,6 +306,10 @@ void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
    if (DEBUG)
       cout << "Fineline_UI::popup_menu_callback() <INFO> " << endl;
 	// TODO: open the export file dialogue
+	// need the hashmap of file records with marked files and
+	// pointer to the file system object.
+	export_dialog->show();
+
 	return;
 }
 
@@ -336,9 +345,6 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    else if ( strcmp(item->label(), "Create Event") == 0 )
    {
       // open the event dialogue to create a fineline event record and add to the timeline.
-      //if (DEBUG)
-      //   cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
-
       event_dialog->show();
    }
    return;
@@ -454,13 +460,21 @@ void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
 int Fineline_UI::start_image_process_thread(const char *filename)
 {
    string fns = filename;
-   file_system = new Fineline_File_System(file_system_tree, fns, flog);
+
+   file_system_tree->clear_tree();
+
+   if (file_system != NULL)
+      delete file_system;
+
+   file_system = new Fineline_File_System(file_system_tree, fns, progress_dialog, flog);
 
    if (file_system == NULL)
    {
       flog->print_log_entry("Fineline_UI::load_forensic_image() <ERROR> Could not create file system object.\n");
       return(-1);
    }
+   progress_dialog->show();
+
    file_system->start_task(); //Note: do not delete file system object after starting the thread
 
    return(0);
@@ -476,7 +490,7 @@ int Fineline_UI::start_image_process_thread(const char *filename)
 int Fineline_UI::load_forensic_image(const char *filename)
 {
    string fns = filename;
-   file_system = new Fineline_File_System(file_system_tree, fns, flog);
+   file_system = new Fineline_File_System(file_system_tree, fns, progress_dialog, flog);
 
    if (file_system == NULL)
    {

@@ -19,41 +19,50 @@
 
 
 /*
-   Fineline_Export_Dialog.h
+   Fineline_Progress_Dialog.h
 
    Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
-   Date  : 11/05/2014
+   Date  : 02/04/2014
 
-   Purpose: FineLine FLTK GUI file export dialog. Provides functions to
-            export files from a forensic image to an evidence folder.
+   Purpose: FineLine FLTK GUI progress dialog.
 
    Notes: EXPERIMENTAL
 
 */
 
 
+#ifndef FINELINE_PROGRESS_DIALOG_H
+#define FINELINE_PROGRESS_DIALOG_H
 
-
-#ifndef FINELINE_EXPORT_DIALOG_H
-#define FINELINE_EXPORT_DIALOG_H
+#include <string>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Browser.H>
+#include <FL/Fl_Box.H>
+#include <FL/filename.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
-class Fineline_Export_Dialog : public Fl_Double_Window
+#include "fineline-search.h"
+
+using namespace std;
+
+class Fineline_Progress_Dialog : public Fl_Double_Window
 {
    public:
-      Fineline_Export_Dialog(int x, int y, int w, int h);
-      virtual ~Fineline_Export_Dialog();
+      Fineline_Progress_Dialog(int x, int y, int w, int h);
+      virtual ~Fineline_Progress_Dialog();
+
+      static void add_update(string update_text);
+      static void clear_text();
+      static void button_callback(Fl_Button *b, void *p);
+
    protected:
    private:
 
-      static Fl_Browser *file_browser;
-
-      static void button_callback(Fl_Button *b, void *p);
+      static Fl_Browser *progress_browser;
 };
 
-#endif // FINELINE_EXPORT_DIALOG_H
+#endif // FINELINE_PROGRESS_DIALOG_H
