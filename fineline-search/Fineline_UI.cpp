@@ -58,6 +58,7 @@ Fineline_File_System *Fineline_UI::file_system;
 Fl_Native_File_Chooser *Fineline_UI::fc;
 Fineline_Log *Fineline_UI::flog;
 Fineline_Event_Dialog *Fineline_UI::event_dialog;
+Fineline_File_Metadata_Dialog *Fineline_UI::file_metadata_dialog;
 
 Fineline_UI::Fineline_UI()
 {
@@ -97,7 +98,9 @@ Fineline_UI::Fineline_UI()
    tab_panel->selection_color((Fl_Color)4);
    tab_panel->labelcolor(FL_BACKGROUND2_COLOR);
 
+   //----------------------------------------------------------------------------------
    // Tab 1 - the file browser tree and file content display tab
+   //----------------------------------------------------------------------------------
 
    Fl_Group* image_browser_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Image Browser");
    image_browser_tab->tooltip("Displays a file system from a forensice image in a tree browser.");
@@ -107,7 +110,13 @@ Fineline_UI::Fineline_UI()
 
    file_metadata_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 200);
    file_metadata_browser->callback(file_metadata_callback);
+   
+	save_metadata_button = new Fl_Button(win_width/2 + 15, win_height - 100, 100, 30, "Save");
+   save_metadata_button->callback((Fl_Callback*)file_metadata_callback);
+   clear_metadata_button = new Fl_Button(win_width/2 + 125, win_height - 100, 100, 30, "Clear");
+   clear_metadata_button->callback((Fl_Callback*)file_metadata_callback);
 
+   // File tree popup menu
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 200);
    popup_menu->type(Fl_Menu_Button::POPUP3); // Right mouse button click.
    popup_menu->add("Mark File|Open File|Export File|Copy Metadata|Create Event");
@@ -116,42 +125,47 @@ Fineline_UI::Fineline_UI()
    image_browser_tab->end();
    Fl_Group::current()->resizable(image_browser_tab);
 
+   //----------------------------------------------------------------------------------
    // Tab 2 - Event summary graph panel
+   //----------------------------------------------------------------------------------
 
    Fl_Group* statistical_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Statistics Graph");
    statistical_graph_tab->tooltip("Summary graph of file system activity.");
-         //o->selection_color((Fl_Color)2);
    statistical_graph_tab->hide();
-         {
-			Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
-            o->callback((Fl_Callback*)button_callback);
-         }  // Fl_Button* o
-         {
-            Fl_Button* o = new Fl_Button(30, 200, 260, 30, "Test event blocking by modal window");
-            o->callback((Fl_Callback*)button_callback);
-         } // Fl_Button* o
+   {
+	   Fl_Button* o = new Fl_Button(20, 90, 100, 30, "button1");
+      o->callback((Fl_Callback*)button_callback);
+   }  // Fl_Button* o
+   {
+      Fl_Button* o = new Fl_Button(20, 200, 100, 30, "modal window");
+      o->callback((Fl_Callback*)button_callback);
+   } // Fl_Button* o
    statistical_graph_tab->end();
    Fl_Group::current()->resizable(statistical_graph_tab);
 
+   //----------------------------------------------------------------------------------
    // Tab 3 - Timeline graph panel
+   //----------------------------------------------------------------------------------
 
    Fl_Group* timeline_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Timeline Graph");
    timeline_graph_tab->tooltip("File System Event Timeline");
          //o->selection_color((Fl_Color)3);
    timeline_graph_tab->hide();
-         {
-            new Fl_Button(20, 90, 60, 80, "button2");
-         } // Fl_Button* o
-         {
-            new Fl_Button(80, 90, 60, 80, "button");
-         } // Fl_Button* o
-         {
-            new Fl_Button(140, 90, 60, 80, "button");
-         } // Fl_Button* o
+   {
+      new Fl_Button(20, 90, 60, 80, "button2");
+   } // Fl_Button* o
+   {
+      new Fl_Button(80, 90, 60, 80, "button");
+   } // Fl_Button* o
+   {
+      new Fl_Button(140, 90, 60, 80, "button");
+   } // Fl_Button* o
    timeline_graph_tab->end();
    Fl_Group::current()->resizable(timeline_graph_tab);
 
+   //----------------------------------------------------------------------------------
    // Tab 4 - Text/Keyword search panel
+   //----------------------------------------------------------------------------------
 
    Fl_Group* search_tab = new Fl_Group(5, 70, win_width - 10, win_height - 80, "Keyword Search");
    search_tab->tooltip("File System Keyword Search");
@@ -173,16 +187,21 @@ Fineline_UI::Fineline_UI()
 
    window->end();
 
+   //----------------------------------------------------------------------------------
    // Now make all the ancillary objects.
+   //----------------------------------------------------------------------------------
 
    flog = new Fineline_Log();
    flog->open_log_file();
    fc = new Fl_Native_File_Chooser();
    socket_thread = new Fineline_Thread(flog);
 
+   //----------------------------------------------------------------------------------
    // Now make the dialogs
+   //----------------------------------------------------------------------------------
 
    event_dialog = new Fineline_Event_Dialog(win_width/2 - 200, win_height/2 - 200, 400, 400);
+   file_metadata_dialog = new Fineline_File_Metadata_Dialog(win_width/2 - 200, win_height/2 - 200, 400, 400);
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -358,16 +377,28 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
 
 void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 {
-   //Fl_Browser *fb = (Fl_Browser *)w;
-   if (DEBUG)
-      cout << "Fineline_UI::file_metadata_callback() <INFO> " << endl;
+   Fl_Button *fb = (Fl_Button *)w;
 
+   if ( strcmp(fb->label(), "Save") == 0 )
+   {
+      // mark the file/directory for later processing/reporting/exporting etc.
+      if (DEBUG)
+         cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
+      file_metadata_dialog->show();
+   }
+   else if ( strcmp(fb->label(), "Clear") == 0 )
+   {
+      // Clear the text from the metadata browser.
+      if (DEBUG)
+         cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
+      file_metadata_browser->clear();
+   }
    return;
 }
 
 void Fineline_UI::button_callback(Fl_Button *b, void *p)
 {
-   fl_message("Make sure you cannot change the tabs while this modal window is up");
+   fl_message("modal window");
    return;
 }
 
@@ -405,6 +436,8 @@ void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
    metadata.clear();
    metadata.append("MD5 Hash : ");
    file_metadata_browser->add(metadata.c_str());
+
+   file_metadata_browser->bottomline(file_metadata_browser->size());
 
    return;
 }

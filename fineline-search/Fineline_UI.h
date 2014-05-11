@@ -48,6 +48,7 @@
 #include "Fineline_File_System.h"
 #include "Fineline_File_System_Tree.h"
 #include "Fineline_Event_Dialog.h"
+#include "Fineline_File_Metadata_Dialog.h"
 
 class Fineline_UI
 {
@@ -77,6 +78,8 @@ class Fineline_UI
       Fl_Double_Window *window;
       Fl_Menu_Bar *menu;
       Fl_Menu_Button *popup_menu;
+      Fl_Button *save_metadata_button;
+      Fl_Button *clear_metadata_button;
       Fl_Box *box;
 
       static Fineline_Thread *socket_thread;
@@ -86,6 +89,7 @@ class Fineline_UI
       static Fl_Native_File_Chooser *fc;
       static Fineline_Log *flog;
       static Fineline_Event_Dialog *event_dialog;
+      static Fineline_File_Metadata_Dialog *file_metadata_dialog;
 
 	   void update_screeninfo(Fl_Widget *b, void *p);
 
