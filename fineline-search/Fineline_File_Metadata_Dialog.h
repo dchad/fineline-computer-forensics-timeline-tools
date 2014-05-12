@@ -35,7 +35,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
-#include <FL/Fl_Browser.H>
+#include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Box.H>
 #include <FL/filename.H>
 #include <FL/Fl_Button.H>
@@ -53,8 +53,13 @@ class Fineline_File_Metadata_Dialog : public Fl_Double_Window
 
       static void button_callback(Fl_Button *b, void *p);
 
+      Fl_Text_Editor *teditor;
+
    protected:
    private:
+
+
+      
 };
 
 #endif // FINELINE_FILE_METADATA_DIALOG_H

@@ -32,9 +32,17 @@
 
 */
 
-
+#include <FL/Fl_Text_Buffer.H>
 
 #include "Fineline_File_Metadata_Dialog.h"
+
+
+int                changed = 0;
+char               filename[FL_PATH_MAX] = "";
+char               title[FL_PATH_MAX];
+Fl_Text_Buffer     *textbuf = 0;
+
+#define TEXTSIZE 14
 
 Fineline_File_Metadata_Dialog::Fineline_File_Metadata_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y ,w, h, "File Metadata Editor")
 {
@@ -42,13 +50,27 @@ Fineline_File_Metadata_Dialog::Fineline_File_Metadata_Dialog(int x, int y, int w
 
    Fl_Group* metadata_group = new Fl_Group(5, 5, w - 5, h - 5);
    metadata_group->tooltip("Edit the file metadata items and click the save button to write the metadata to a text file.");
+
+   textbuf = new Fl_Text_Buffer;
+   teditor = new Fl_Text_Editor(10, 10, w - 10, h - 50);
+   teditor->textfont(FL_COURIER);
+   teditor->textsize(TEXTSIZE);
+   teditor->buffer(textbuf);
+   textbuf->text();
    {
-	   Fl_Button* o = new Fl_Button(10, 90, 100, 30, "Save");
+	   Fl_Button* o = new Fl_Button(w - 330, h - 40, 100, 30, "Save");
       o->callback((Fl_Callback*)button_callback, (void *)this);
-   }  // Fl_Button* o
+      o->tooltip("Save metadata to the project file.");
+   } // Fl_Button* o
    {
-      Fl_Button* o = new Fl_Button(120, 90, 100, 30, "Cancel");
+	   Fl_Button* o = new Fl_Button(w - 220, h - 40, 100, 30, "Save As");
       o->callback((Fl_Callback*)button_callback, (void *)this);
+      o->tooltip("Save to a text file.");
+   } // Fl_Button* o
+   {
+      Fl_Button* o = new Fl_Button(w - 120, h - 40, 100, 30, "Close");
+      o->callback((Fl_Callback*)button_callback, (void *)this);
+      o->tooltip("Close dialog without saving.");
    } // Fl_Button* o
    metadata_group->end();
    Fl_Group::current()->resizable(metadata_group);

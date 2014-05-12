@@ -116,8 +116,16 @@ Fineline_UI::Fineline_UI()
 
 	save_metadata_button = new Fl_Button(win_width/2 + 15, win_height - 100, 100, 30, "Save");
    save_metadata_button->callback((Fl_Callback*)file_metadata_callback);
-   clear_metadata_button = new Fl_Button(win_width/2 + 125, win_height - 100, 100, 30, "Clear");
+   save_metadata_button->tooltip("Save metadata to project file.");
+   edit_metadata_button = new Fl_Button(win_width/2 + 125, win_height - 100, 100, 30, "Edit");
+   edit_metadata_button->callback((Fl_Callback*)file_metadata_callback);
+   edit_metadata_button->tooltip("Edit the metadata list.");
+   export_metadata_button = new Fl_Button(win_width/2 + 235, win_height - 100, 100, 30, "Export");
+   export_metadata_button->callback((Fl_Callback*)file_metadata_callback);
+   export_metadata_button->tooltip("Export the metadata to a text file.");
+   clear_metadata_button = new Fl_Button(win_width/2 + 345, win_height - 100, 100, 30, "Clear");
    clear_metadata_button->callback((Fl_Callback*)file_metadata_callback);
+   clear_metadata_button->tooltip("Clear the metadata list.");
 
    // File tree popup menu
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 200);
@@ -203,10 +211,10 @@ Fineline_UI::Fineline_UI()
    // Now make the dialogs
    //----------------------------------------------------------------------------------
 
-   event_dialog = new Fineline_Event_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
-   file_metadata_dialog = new Fineline_File_Metadata_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
-   progress_dialog = new Fineline_Progress_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
-   export_dialog = new Fineline_Export_Dialog(win_width/2 - 300, win_height/2 - 300, 600, 600);
+   event_dialog = new Fineline_Event_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   file_metadata_dialog = new Fineline_File_Metadata_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   progress_dialog = new Fineline_Progress_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   export_dialog = new Fineline_Export_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -391,6 +399,20 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
       if (DEBUG)
          cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
       file_metadata_dialog->show();
+   }
+   else if ( strcmp(fb->label(), "Edit") == 0 )
+   {
+      // Edit the text in the metadata browser.
+      if (DEBUG)
+         cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
+      file_metadata_dialog->show();
+   }
+   else if ( strcmp(fb->label(), "Export") == 0 )
+   {
+      // TODO: open file chooser the text from the metadata browser.
+      if (DEBUG)
+         cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
+      
    }
    else if ( strcmp(fb->label(), "Clear") == 0 )
    {
