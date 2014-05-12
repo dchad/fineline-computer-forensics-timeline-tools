@@ -67,6 +67,7 @@ class Fineline_UI
 	   static void file_metadata_callback(Fl_Widget *w, void *x);
 
 	   static void button_callback(Fl_Button *b, void *p);
+	   static void tree_button_callback(Fl_Button *b, void *p);
       static void file_system_tree_callback(Fl_Tree *flt, void *x);
       static int start_image_process_thread(const char *filename);
 	   static void update_file_metadata_browser(fl_file_record_t *flrec);
@@ -83,6 +84,8 @@ class Fineline_UI
       Fl_Button *export_metadata_button;
       Fl_Button *edit_metadata_button;
       Fl_Button *clear_metadata_button;
+      Fl_Button *save_tree_button;
+      Fl_Button *filter_tree_button;
       Fl_Box *box;
 
       static Fineline_Thread *socket_thread;

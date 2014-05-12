@@ -46,6 +46,8 @@ Fineline_Progress_Dialog::Fineline_Progress_Dialog(int x, int y, int w, int h) :
    Fl_Group* browser_group = new Fl_Group(10, 10, w - 10, h - 10);
    {
       progress_browser = new Fl_Browser(20, 20, w - 40, h - 100);
+      Fl_Button* save_button = new Fl_Button(w - 360, h - 50, 100, 30, "Save");
+      save_button->callback((Fl_Callback*)button_callback, (void *)this);
       Fl_Button* clear_button = new Fl_Button(w - 250, h - 50, 100, 30, "Clear");
       clear_button->callback((Fl_Callback*)button_callback, (void *)this);
       Fl_Button* close_button = new Fl_Button(w - 140, h - 50, 100, 30, "Close");

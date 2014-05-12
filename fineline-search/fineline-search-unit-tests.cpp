@@ -53,47 +53,6 @@ using namespace std;
 #include "Fineline_Progress_Dialog.h"
 
 
-TEST(FineLineSearchThreadTests, ValidateMethods)
-{
-   Fineline_Log *flog = new Fineline_Log();
-	Fineline_Thread *flt = new Fineline_Thread(flog);
-	Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
-
-   ASSERT_TRUE(NULL != flt);
-   ASSERT_TRUE(NULL != flb);
-   ASSERT_TRUE(NULL != flog);
-
-   EXPECT_EQ(0, flog->open_log_file());
-
-	EXPECT_EQ(0, flt->get_active_threads());
-	EXPECT_EQ(0, flt->get_running());
-
-	flt->start_task(flb);
-
-	EXPECT_EQ(1, flt->get_active_threads());
-	EXPECT_EQ(1, flt->get_running());
-
-	flt->start_task(flb);
-
-	EXPECT_EQ(2, flt->get_active_threads());
-	EXPECT_EQ(1, flt->get_running());
-
-	flt->start_task(flb);
-
-	EXPECT_EQ(3, flt->get_active_threads());
-   EXPECT_EQ(1, flt->get_running());
-
-   flt->stop_task();
-
- 	EXPECT_EQ(0, flt->get_active_threads());
-	EXPECT_EQ(0, flt->get_running());
-
-   //EXPECT_EQ(0, flog->close_log_file());
-
-   //delete flt; NOTE: will cause a segfault because threads have not exited yet.
-   //delete flb;
-}
-
 
 TEST(FineLineSearchUITests, ValidUI)
 {
@@ -276,6 +235,56 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
 
    delete ftree;
 }
+
+// Make sure the thread tests are run last.
+
+TEST(FineLineSearchThreadTests, ValidateMethods)
+{
+   Fineline_Log *flog = new Fineline_Log();
+	Fineline_Thread *flt = new Fineline_Thread(flog);
+	Fl_Browser *flb = new Fl_Browser(20, 20, 100, 100);
+
+   ASSERT_TRUE(NULL != flt);
+   ASSERT_TRUE(NULL != flb);
+   ASSERT_TRUE(NULL != flog);
+
+   EXPECT_EQ(0, flog->open_log_file());
+
+	EXPECT_EQ(0, flt->get_active_threads());
+	EXPECT_EQ(0, flt->get_running());
+
+	flt->start_task(flb);
+
+	EXPECT_EQ(1, flt->get_active_threads());
+	EXPECT_EQ(1, flt->get_running());
+
+	flt->start_task(flb);
+
+	EXPECT_EQ(2, flt->get_active_threads());
+	EXPECT_EQ(1, flt->get_running());
+
+	flt->start_task(flb);
+
+	EXPECT_EQ(3, flt->get_active_threads());
+   EXPECT_EQ(1, flt->get_running());
+
+   flt->stop_task();
+
+ 	EXPECT_EQ(0, flt->get_active_threads());
+	EXPECT_EQ(0, flt->get_running());
+
+   //for (int i = 0; i < 10000000; i++) //need a delay for the threads to exit
+   //{
+   //   if ((i % 100000) == 0)
+   //      flog->print_log_entry("log entry");
+   //}
+
+   //EXPECT_EQ(0, flog->close_log_file());
+
+   //delete flt;
+   //delete flb;
+}
+
 
 int main(int argc, char **argv)
 {

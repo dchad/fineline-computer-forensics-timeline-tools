@@ -88,3 +88,15 @@ void Fineline_File_Metadata_Dialog::button_callback(Fl_Button *b, void *p)
 {
    ((Fineline_File_Metadata_Dialog *)p)->hide();
 }
+
+void Fineline_File_Metadata_Dialog::add_metadata(string metadata)
+{
+   textbuf->append(metadata.c_str());
+   return;
+}
+
+void Fineline_File_Metadata_Dialog::add_metadata_file(string filename)
+{
+   textbuf->appendfile(filename.c_str());
+   return;
+}

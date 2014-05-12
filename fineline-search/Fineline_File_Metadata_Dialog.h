@@ -32,6 +32,7 @@
 
 */
 
+#include <string>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
@@ -44,6 +45,7 @@
 #ifndef FINELINE_FILE_METADATA_DIALOG_H
 #define FINELINE_FILE_METADATA_DIALOG_H
 
+using namespace std;
 
 class Fineline_File_Metadata_Dialog : public Fl_Double_Window
 {
@@ -53,13 +55,16 @@ class Fineline_File_Metadata_Dialog : public Fl_Double_Window
 
       static void button_callback(Fl_Button *b, void *p);
 
+      void add_metadata(string metadata);
+      void add_metadata_file(string filename);
+
       Fl_Text_Editor *teditor;
 
    protected:
    private:
 
 
-      
+
 };
 
 #endif // FINELINE_FILE_METADATA_DIALOG_H
