@@ -40,6 +40,8 @@ using namespace std;
 #include "fineline-search.h"
 #include "Fineline_Log.h"
 
+FILE *Fineline_Log::log_file;
+
 Fineline_Log::Fineline_Log()
 {
    //ctor
@@ -95,7 +97,7 @@ int Fineline_Log::print_log_entry(const char *estr)
    curtime = time (NULL);
    loctime = localtime (&curtime);
    time_str = asctime(loctime);
-   log_entry = flut.rtrim(time_str);
+   log_entry = Fineline_Util::rtrim(time_str);
    log_entry.append(" ");
    log_entry.append(estr);
    fputs (log_entry.c_str(), log_file);

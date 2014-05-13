@@ -38,18 +38,29 @@
 #ifndef FINELINE_EXPORT_DIALOG_H
 #define FINELINE_EXPORT_DIALOG_H
 
+#include <vector>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Button.H>
+
+#include "fineline-search.h"
+
+using namespace std;
 
 class Fineline_Export_Dialog : public Fl_Double_Window
 {
    public:
       Fineline_Export_Dialog(int x, int y, int w, int h);
       virtual ~Fineline_Export_Dialog();
+
+      void add_marked_files(vector< fl_file_record_t* > flist);
+
    protected:
    private:
+
+      vector< fl_file_record_t* > marked_file_list;
 
       static Fl_Browser *file_browser;
 

@@ -33,8 +33,10 @@
 
 */
 
+#include <FL/filename.H>
 
-
+#include "Fineline_Log.h"
+#include "Fineline_Util.h"
 #include "Fineline_Export_Dialog.h"
 
 
@@ -67,5 +69,23 @@ Fineline_Export_Dialog::~Fineline_Export_Dialog()
 void Fineline_Export_Dialog::button_callback(Fl_Button *b, void *p)
 {
    ((Fineline_Export_Dialog *)p)->hide();
+   return;
+}
+
+void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist)
+{
+   unsigned int i;
+   marked_file_list = flist;
+   char full_path[FL_PATH_MAX];
+
+   for (i = 0; i < marked_file_list.size(); i++)
+   {
+      memset((void*)full_path, 0, FL_PATH_MAX);
+      fl_file_record_t *flec = marked_file_list[i];
+      strncpy(full_path, flec->file_path, strlen(flec->file_path));
+      strncat(full_path, flec->file_name, strlen(flec->file_name));
+      file_browser->add(full_path);
+      Fineline_Log::print_log_entry("Fineline_Export_Dialog::add_marked_files() <INFO> added marked file.");
+   }
    return;
 }

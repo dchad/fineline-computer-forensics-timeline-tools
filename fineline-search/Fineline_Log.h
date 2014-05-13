@@ -47,17 +47,15 @@ class Fineline_Log
       Fineline_Log(string log_file_path);
       virtual ~Fineline_Log();
 
-      int open_log_file();
-      int print_log_entry(const char *estr);
-      int print_log_entry(string estr, int error_number);
-      int close_log_file();
+      static int open_log_file();
+      static int print_log_entry(const char *estr);
+      static int print_log_entry(string estr, int error_number);
+      static int close_log_file();
 
    protected:
    private:
 
-      FILE *log_file;
-
-      Fineline_Util flut;
+      static FILE *log_file;
 };
 
 #endif // FINELINE_LOG_H

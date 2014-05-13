@@ -37,6 +37,10 @@
 
 #include <iostream>
 
+#include <FL/fl_ask.H>
+#include <FL/filename.H>
+
+#include "Fineline_Log.h"
 #include "Fineline_File_System_Tree.h"
 
 using namespace std;
@@ -182,14 +186,102 @@ void Fineline_File_System_Tree::rebuild_tree()
 }
 
 
-fl_file_record_t *get_selected_file_record()
+fl_file_record_t *Fineline_File_System_Tree::get_selected_file_record()
 {
    //TODO: string selected_file_path = ???
    return(NULL);
 }
 
-fl_file_record_t *get_file_record(const char *file_path)
+fl_file_record_t *Fineline_File_System_Tree::get_file_record(const char *file_path)
 {
-   //TODO:
-   return(NULL);
+   string fp;
+
+   fp.append(file_path);
+
+   return(find_file(fp));
 }
+
+
+void Fineline_File_System_Tree::mark_file(string filename)
+{
+   fl_file_record_t *flec = find_file(filename);
+
+   if (flec != NULL)
+      flec->marked = 1;
+
+   return;
+}
+
+void Fineline_File_System_Tree::mark_file()
+{
+	Fl_Tree_Item *flti = first_selected_item();
+   fl_file_record_t *flrec = NULL;
+   char file_path[FL_PATH_MAX]; // FL_PATH_MAX 2048 is an FLTK constant, Fineline FL_PATH_MAX_LENGTH 4096
+   string full_path;
+
+   if (flti != 0)
+   {
+      if (item_pathname(file_path, FL_PATH_MAX, flti) != 0)
+      {
+         Fineline_Log::print_log_entry("mark_file() <ERROR> Could not get tree item path.");
+         fl_message(" <ERROR> Could not get tree item. ");
+          return;
+      }
+
+      full_path.append(file_path);
+      flrec = find_file(full_path);
+      if (flrec != NULL)
+      {
+         flrec->marked = 1;
+         flti->labelcolor(FL_DARK_GREEN);
+         flti->labelfont(FL_COURIER_BOLD);
+         Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_file() <INFO> marked file.");
+      }
+   }
+   return;
+}
+
+void Fineline_File_System_Tree::unmark_file()
+{
+	Fl_Tree_Item *flti = first_selected_item();
+   fl_file_record_t *flrec = NULL;
+   char file_path[FL_PATH_MAX]; // FL_PATH_MAX 2048 is an FLTK constant, Fineline FL_PATH_MAX_LENGTH 4096
+   string full_path;
+
+   if (flti != 0)
+   {
+      if (item_pathname(file_path, FL_PATH_MAX, flti) != 0)
+      {
+         Fineline_Log::print_log_entry("unmark_file() <ERROR> Could not get tree item path.");
+         fl_message(" <ERROR> Could not get tree item. ");
+          return;
+      }
+
+      full_path.append(file_path);
+      flrec = find_file(full_path);
+      if (flrec != NULL)
+      {
+         flrec->marked = 0;
+         flti->labelcolor(FL_FOREGROUND_COLOR);
+         flti->labelfont(FL_COURIER);
+      }
+   }
+   return;
+}
+
+vector< fl_file_record_t* > Fineline_File_System_Tree::get_marked_files()
+{
+   vector< fl_file_record_t* > flist;
+
+   map < string, fl_file_record_t* >::iterator p = file_map.begin();
+
+   while (p != file_map.end())
+   {
+      if (p->second->marked == 1)
+         flist.push_back(p->second);
+      p++;
+   }
+
+   return(flist);
+}
+

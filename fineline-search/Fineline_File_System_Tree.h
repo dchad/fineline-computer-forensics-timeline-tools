@@ -36,6 +36,7 @@
 #define FINELINE_FILE_SYSTEM_TREE_H
 
 #include <string>
+#include <vector>
 #include <map>
 
 #include <FL/Fl.H>
@@ -56,7 +57,11 @@ class Fineline_File_System_Tree : public Fl_Tree
       int add_file(string filename, fl_file_record_t *flrp);
       fl_file_record_t *find_file(string filename);
       fl_file_record_t *get_file_record(const char *file_path);
-      fl_file_record_t *get_selected_file();
+      fl_file_record_t *get_selected_file_record();
+      void mark_file(string filename);
+      void mark_file();
+      void unmark_file();
+      vector< fl_file_record_t* > get_marked_files();
       int remove_file(string filename);
       int tree_size();
       int clear_tree();

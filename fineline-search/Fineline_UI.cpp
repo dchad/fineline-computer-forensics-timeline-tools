@@ -136,7 +136,7 @@ Fineline_UI::Fineline_UI()
    // File tree popup menu
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 130);
    popup_menu->type(Fl_Menu_Button::POPUP3); // Right mouse button click.
-   popup_menu->add("Mark File|Open File|Export File|Copy Metadata|Create Event");
+   popup_menu->add("Mark File|Unmark File|Open File|Export File|Copy Metadata|Create Event");
    popup_menu->callback(popup_menu_callback);
 
    image_browser_tab->end();
@@ -322,6 +322,8 @@ void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 	// TODO: open the export file dialogue
 	// need the hashmap of file records with marked files and
 	// pointer to the file system object.
+
+	export_dialog->add_marked_files(file_system_tree->get_marked_files());
 	export_dialog->show();
 
 	return;
@@ -335,6 +337,13 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    if ( strcmp(item->label(), "Mark File") == 0 )
    {
       // mark the file/directory for later processing/reporting/exporting etc.
+      file_system_tree->mark_file();
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   else if ( strcmp(item->label(), "Unmark File") == 0 )
+   {
+      file_system_tree->unmark_file();
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
@@ -346,7 +355,9 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    }
    else if ( strcmp(item->label(), "Export File") == 0 )
    {
-      // copy the selected file/directory from the forensic image to an evidence folder.
+      export_dialog->add_marked_files(file_system_tree->get_marked_files());
+	   export_dialog->show();
+
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
