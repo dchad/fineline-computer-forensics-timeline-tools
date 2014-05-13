@@ -56,6 +56,8 @@ static TskImgInfo *image_info = NULL;
 static Fineline_Util flut;
 static Fineline_Progress_Dialog *progress_dialog;
 static int running = 0;
+static long directory_count = 0;
+static long file_count = 0;
 
 /* Static C callback functions for the TSK library calls */
 
@@ -92,6 +94,7 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    Fl::awake(event_browser); //TODO: is this necessary?
    Fl::unlock();
 
+   file_count++;
 
    return(0);
 }
@@ -99,11 +102,11 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const char *path, void *ptr)
 {
 
-   /* Ignore NTFS System files */
-   //if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (fs_file->getName()->getName()[0] == '$'))
-   //{
-   //   return TSK_WALK_CONT;
-   //}
+   /* TODO: Ignore winsxs System backup files */
+   if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (strstr(path, "winsxs") != NULL))
+   {
+      return TSK_WALK_CONT;
+   }
    /* If the name has corresponding metadata, then walk it */
    string filename;
    string fullpath;
@@ -124,8 +127,10 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
          return(TSK_WALK_CONT);
       }
       msg.append("Processing directory: ");
+      msg.append(path);
       msg.append(filename);
       progress_dialog->add_update(msg);
+      directory_count++;
    }
    fullpath.append(path);
    process_file(fs_file, filename, fullpath);
@@ -136,6 +141,8 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
 static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
 {
    TskFsInfo *fs_info = new TskFsInfo();
+   string msg;
+   char number[256];
    int ret_val = 0;
 
     /* Try it as a file system */
@@ -157,6 +164,18 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    }
 
    delete fs_info;
+
+
+   msg.append("Processed ");
+   msg.append(Fineline_Util::xitoa(directory_count, number, 256, 10));
+   msg.append(" directories.\n");
+   progress_dialog->add_update(msg);
+   msg.clear();
+   msg.append("Processed ");
+   msg.append(Fineline_Util::xitoa(file_count, number, 256, 10));
+   msg.append(" files.\n");
+   progress_dialog->add_update(msg);
+
    return(ret_val);
 }
 
@@ -290,7 +309,7 @@ int Fineline_File_System::process_forensic_image()
 
 int Fineline_File_System::close_forensic_image()
 {
-   //DEPRECATED
+   //DEPRECATED: not required
    if (image_info != NULL)
       delete image_info;
 
@@ -302,6 +321,7 @@ void Fineline_File_System::start_task()
 	running = 1;
 	Fl_Thread thread_id;
 	fl_create_thread(thread_id, fs_thread_task, (void *)this);
+
 }
 
 void Fineline_File_System::stop_task()

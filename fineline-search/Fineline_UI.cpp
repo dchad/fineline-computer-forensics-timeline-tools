@@ -436,6 +436,7 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
       if (DEBUG)
          cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
       file_metadata_browser->clear();
+      file_metadata_dialog->clear_metadata();
    }
    return;
 }

@@ -54,9 +54,24 @@ class Fineline_File_Metadata_Dialog : public Fl_Double_Window
       virtual ~Fineline_File_Metadata_Dialog();
 
       static void button_callback(Fl_Button *b, void *p);
+      static void delete_cb(Fl_Widget *w, void *v);
+      static void paste_cb(Fl_Widget *w, void *v);
+      static void copy_cb(Fl_Widget *w, void *v);
+      static void cut_cb(Fl_Widget *w, void *v);
+      static void find_cb(Fl_Widget *w, void *v);
+      static void find_next_cb(Fl_Widget *w, void *v);
+      static void replace_cb(Fl_Widget *w, void *v);
+      static void replace_next_cb(Fl_Widget *w, void *v);
+      static void quit_cb(Fl_Widget *w, void *v);
+      static void close_cb(Fl_Widget *w, void *v);
+      static void open_cb(Fl_Widget *w, void *v);
+      static void save_cb(Fl_Widget *w, void *v);
+      static void saveas_cb(Fl_Widget *w, void *v);
+      static void insert_cb(Fl_Widget *w, void *v);
 
       void add_metadata(string metadata);
       void add_metadata_file(string filename);
+      void clear_metadata();
 
       Fl_Text_Editor *teditor;
 

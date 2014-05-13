@@ -46,19 +46,19 @@ class Fineline_Util
       Fineline_Util();
       virtual ~Fineline_Util();
 
-      void fatal(const char *str);
-      void *xcalloc(size_t size);
-      void *xmalloc(size_t size);
-      void *xrealloc(void *ptr, size_t size);
-      int xfree(char *buf, int len);
-      int print_help();
-      char* xitoa(int value, char* result, int len, int base);
-      int get_time_string(char *tstr, int slen);
-      int validate_ipv4_address(char *ipv4_addr);
-      int validate_ipv6_address(char *ipv6_addr);
-      char *ltrim(char *s);
-      char *rtrim(char *s);
-      char *trim(char *s);
+      static void fatal(const char *str);
+      static void *xcalloc(size_t size);
+      static void *xmalloc(size_t size);
+      static void *xrealloc(void *ptr, size_t size);
+      static int xfree(char *buf, int len);
+      static int print_help();
+      static char* xitoa(int value, char* result, int len, int base);
+      static int get_time_string(char *tstr, int slen);
+      static int validate_ipv4_address(char *ipv4_addr);
+      static int validate_ipv6_address(char *ipv6_addr);
+      static char *ltrim(char *s);
+      static char *rtrim(char *s);
+      static char *trim(char *s);
 
    protected:
    private:
