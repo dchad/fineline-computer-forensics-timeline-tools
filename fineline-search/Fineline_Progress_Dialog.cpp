@@ -37,8 +37,6 @@
 #include "Fineline_Progress_Dialog.h"
 
 
-Fl_Browser *Fineline_Progress_Dialog::progress_browser;
-
 Fineline_Progress_Dialog::Fineline_Progress_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline Progress Dialog")
 {
    begin();
@@ -79,6 +77,7 @@ void Fineline_Progress_Dialog::clear_text()
 
 void Fineline_Progress_Dialog::button_callback(Fl_Button *b, void *p)
 {
-   ((Fineline_Progress_Dialog *)p)->hide();
+   Fineline_Progress_Dialog *fpd = (Fineline_Progress_Dialog*)p;
+   fpd->hide();
    return;
 }

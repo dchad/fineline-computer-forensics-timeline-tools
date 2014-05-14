@@ -55,14 +55,14 @@ class Fineline_Progress_Dialog : public Fl_Double_Window
       Fineline_Progress_Dialog(int x, int y, int w, int h);
       virtual ~Fineline_Progress_Dialog();
 
-      static void add_update(string update_text);
-      static void clear_text();
+      void add_update(string update_text);
+      void clear_text();
       static void button_callback(Fl_Button *b, void *p);
 
    protected:
    private:
 
-      static Fl_Browser *progress_browser;
+      Fl_Browser *progress_browser;
 };
 
 #endif // FINELINE_PROGRESS_DIALOG_H

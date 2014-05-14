@@ -252,7 +252,7 @@ void Fineline_File_System_Tree::unmark_file()
    {
       if (item_pathname(file_path, FL_PATH_MAX, flti) != 0)
       {
-         Fineline_Log::print_log_entry("unmark_file() <ERROR> Could not get tree item path.");
+         Fineline_Log::print_log_entry("Fineline_File_System_Tree::unmark_file() <ERROR> Could not get tree item path.");
          fl_message(" <ERROR> Could not get tree item. ");
           return;
       }

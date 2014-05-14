@@ -49,22 +49,20 @@
 #endif
 
 
-static Fineline_Log *flog = NULL;
-static Fl_Browser *event_browser = NULL;
-static Fineline_File_System_Tree *file_system_tree = NULL;
-static TskImgInfo *image_info = NULL;
-static Fineline_Util flut;
-static Fineline_Progress_Dialog *progress_dialog;
-static int running = 0;
-static long directory_count = 0;
-static long file_count = 0;
+Fineline_Log *flog = NULL;
+Fineline_File_System_Tree *file_system_tree = NULL;
+TskImgInfo *image_info = NULL;
+Fineline_Progress_Dialog *progress_dialog = NULL;
+int running = 0;
+long directory_count = 0;
+long file_count = 0;
 
 /* Static C callback functions for the TSK library calls */
 
 static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 {
    string full_file_path = path;
-   fl_file_record_t *frec = (fl_file_record_t *)flut.xcalloc(sizeof(fl_file_record_t));
+   fl_file_record_t *frec = (fl_file_record_t *)Fineline_Util::xcalloc(sizeof(fl_file_record_t));
    int file_name_length = filename.size();
 
    strncpy(frec->file_name, filename.c_str(), file_name_length);
@@ -72,7 +70,7 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 
    if ((file_name_length < 3) && (frec->file_name[0] == '.')) // ignore directory and parent directory entries
    {
-	   flut.xfree((char*)frec, sizeof(fl_file_record_t));
+	   Fineline_Util::xfree((char*)frec, sizeof(fl_file_record_t));
 	   return(0);
    }
 
@@ -91,7 +89,7 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
       //do some GUI updates here...
    file_system_tree->add_file(full_file_path.c_str(), frec);
 
-   Fl::awake(event_browser); //TODO: is this necessary?
+   Fl::awake(file_system_tree); //TODO: is this necessary?
    Fl::unlock();
 
    file_count++;
@@ -329,6 +327,15 @@ void Fineline_File_System::stop_task()
 	running = 0;
 }
 
+void Fineline_File_System::export_file(string file_path, string evidence_directory)
+{
+   char msg[256];
+   //TODO:
+   sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s %s\n", evidence_directory.c_str(), file_path.c_str());
+   flog->print_log_entry(msg);
+   return;
+}
+
 int Fineline_File_System::get_running()
 {
 	return(running);
@@ -341,7 +348,7 @@ const char *Fineline_File_System::get_image_name()
 
 void add_progress_text(char *msg)
 {
-
+   return;
 }
 
 

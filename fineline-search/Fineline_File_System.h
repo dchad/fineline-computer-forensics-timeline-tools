@@ -63,6 +63,7 @@ class Fineline_File_System
       int close_forensic_image();
       void add_progress_text(char *msg);
       const char *get_image_name();
+      void export_file(string file_path, string evidence_directory);
 
    protected:
    private:

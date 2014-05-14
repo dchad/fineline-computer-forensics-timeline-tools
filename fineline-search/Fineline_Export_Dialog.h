@@ -44,8 +44,10 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_File_Input.H>
 
 #include "fineline-search.h"
+#include "Fineline_File_System.h"
 
 using namespace std;
 
@@ -55,15 +57,20 @@ class Fineline_Export_Dialog : public Fl_Double_Window
       Fineline_Export_Dialog(int x, int y, int w, int h);
       virtual ~Fineline_Export_Dialog();
 
-      void add_marked_files(vector< fl_file_record_t* > flist);
+      void add_marked_files(vector< fl_file_record_t* > flist, Fineline_File_System *ffs);
 
    protected:
    private:
 
       vector< fl_file_record_t* > marked_file_list;
+      Fineline_File_System *file_system;
+      Fl_Browser *file_browser;
+      string evidence_directory;
+      Fl_File_Input *evidence_directory_field;
+      Fl_Button* export_button;
+      Fl_Button* close_button;
 
-      static Fl_Browser *file_browser;
-
+      void export_files();
       static void button_callback(Fl_Button *b, void *p);
 };
 

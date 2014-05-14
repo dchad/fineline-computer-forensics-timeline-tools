@@ -323,7 +323,7 @@ void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 	// need the hashmap of file records with marked files and
 	// pointer to the file system object.
 
-	export_dialog->add_marked_files(file_system_tree->get_marked_files());
+	export_dialog->add_marked_files(file_system_tree->get_marked_files(), file_system);
 	export_dialog->show();
 
 	return;
@@ -355,7 +355,7 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    }
    else if ( strcmp(item->label(), "Export File") == 0 )
    {
-      export_dialog->add_marked_files(file_system_tree->get_marked_files());
+      export_dialog->add_marked_files(file_system_tree->get_marked_files(), file_system);
 	   export_dialog->show();
 
       if (DEBUG)
