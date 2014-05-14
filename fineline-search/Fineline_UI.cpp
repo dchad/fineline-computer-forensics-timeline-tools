@@ -126,9 +126,9 @@ Fineline_UI::Fineline_UI()
    edit_metadata_button = new Fl_Button(win_width/2 + 125, win_height - 45, 100, 30, "Edit");
    edit_metadata_button->callback((Fl_Callback*)file_metadata_callback);
    edit_metadata_button->tooltip("Edit the metadata list.");
-   export_metadata_button = new Fl_Button(win_width/2 + 235, win_height - 45, 100, 30, "Timeline");
-   export_metadata_button->callback((Fl_Callback*)file_metadata_callback);
-   export_metadata_button->tooltip("Add the metadata to the timeline graph.");
+   timeline_metadata_button = new Fl_Button(win_width/2 + 235, win_height - 45, 100, 30, "Timeline");
+   timeline_metadata_button->callback((Fl_Callback*)file_metadata_callback);
+   timeline_metadata_button->tooltip("Add the metadata to the timeline graph.");
    clear_metadata_button = new Fl_Button(win_width/2 + 345, win_height - 45, 100, 30, "Clear");
    clear_metadata_button->callback((Fl_Callback*)file_metadata_callback);
    clear_metadata_button->tooltip("Clear the metadata list.");
@@ -136,7 +136,7 @@ Fineline_UI::Fineline_UI()
    // File tree popup menu
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 130);
    popup_menu->type(Fl_Menu_Button::POPUP3); // Right mouse button click.
-   popup_menu->add("Mark File|Unmark File|Open File|Export File|Copy Metadata|Create Event");
+   popup_menu->add("Mark File|Unmark File|Open File|Export Files|Copy Metadata|Timeline");
    popup_menu->callback(popup_menu_callback);
 
    image_browser_tab->end();
@@ -349,7 +349,7 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    }
    else if ( strcmp(item->label(), "Open File") == 0 )
    {
-      // display the file (images/video/text/docs/web pages) in a dialogue or for unknown binary files open a hex editor.
+      //TODO: display the file (images/video/text/docs/web pages) in a dialogue or for unknown binary files open a hex editor.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
@@ -363,13 +363,14 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    }
    else if ( strcmp(item->label(), "Copy Metadata") == 0 )
    {
-	  // copy the file metadata as text to the system clipboard.
+	  //TODO: copy the file metadata as text to the system clipboard.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
-   else if ( strcmp(item->label(), "Create Event") == 0 )
+   else if ( strcmp(item->label(), "Timeline") == 0 )
    {
-      // open the event dialogue to create a fineline event record and add to the timeline.
+      // open the event dialogue to create fineline event records for the marked files and add to the timeline graph.
+      event_dialog->add_marked_files(file_system_tree->get_marked_files());
       event_dialog->show();
    }
    return;

@@ -37,6 +37,9 @@
 #ifndef FINELINE_EVENT_DIALOG_H
 #define FINELINE_EVENT_DIALOG_H
 
+#include <vector>
+#include <string>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Browser.H>
@@ -44,8 +47,11 @@
 #include <FL/filename.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Text_Editor.H>
 
 #include "fineline-search.h"
+
+using namespace std;
 
 class Fineline_Event_Dialog : public Fl_Double_Window
 {
@@ -57,10 +63,33 @@ class Fineline_Event_Dialog : public Fl_Double_Window
 
       static void put_file_metadata(fl_file_record_t *flrec);
 
-      //TODO: need a pointer to the timeline graph
+      static void delete_cb(Fl_Widget *w, void *v);
+      static void paste_cb(Fl_Widget *w, void *v);
+      static void copy_cb(Fl_Widget *w, void *v);
+      static void cut_cb(Fl_Widget *w, void *v);
+      static void find_cb(Fl_Widget *w, void *v);
+      static void find_next_cb(Fl_Widget *w, void *v);
+      static void replace_cb(Fl_Widget *w, void *v);
+      static void replace_next_cb(Fl_Widget *w, void *v);
+      static void quit_cb(Fl_Widget *w, void *v);
+      static void close_cb(Fl_Widget *w, void *v);
+      static void open_cb(Fl_Widget *w, void *v);
+      static void save_cb(Fl_Widget *w, void *v);
+      static void saveas_cb(Fl_Widget *w, void *v);
+      static void insert_cb(Fl_Widget *w, void *v);
+
+      void add_metadata(string metadata);
+      void add_metadata_file(string filename);
+      void clear_metadata();
+      void add_marked_files(vector< fl_file_record_t* > flist);
 
    protected:
    private:
+
+      vector< fl_file_record_t* > marked_file_list;
+      Fl_Text_Editor *teditor;
+      //TODO: need a pointer to the timeline graph
+
 };
 
 #endif // FINELINE_EVENT_DIALOG_H

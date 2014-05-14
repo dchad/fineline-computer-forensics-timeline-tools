@@ -81,7 +81,7 @@ class Fineline_UI
       Fl_Menu_Bar *menu;
       Fl_Menu_Button *popup_menu;
       Fl_Button *save_metadata_button;
-      Fl_Button *export_metadata_button;
+      Fl_Button *timeline_metadata_button;
       Fl_Button *edit_metadata_button;
       Fl_Button *clear_metadata_button;
       Fl_Button *save_tree_button;
