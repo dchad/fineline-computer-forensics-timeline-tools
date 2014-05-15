@@ -81,10 +81,40 @@ void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *p)
 
 int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 {
+   // Only add file leaf nodes to the tree if running on Linux, 
+   // Windows has performance issues if there are more than 20000 nodes,
+   // This results in noticable delays when clicking on tree nodes,
+   // so do dynamic leaf node addition when running one Windoze.
+
+#ifdef LINUX_BUILD
    add(filename.c_str());
    close(filename.c_str(), 0);
+#endif
+
    file_map[filename] = flrp;
    return(file_map.size());
+}
+
+void Fineline_File_System_Tree::add_file_nodes(string file_path)
+{
+   char path[FL_PATH_MAX];
+   int path_len = file_path.size();
+
+   if (file_path.compare(0, 4, "ROOT") == 0)
+   {
+      file_path.erase(0, 5);  // Remove the tree ROOT/ label and path separator
+   }
+   strncpy(path, file_path.c_str(), path_len);
+   map< string, fl_file_record_t* >::iterator p = file_map.begin();
+
+   while (p != file_map.end())
+   {
+      fl_file_record_t *flec = p->second;
+      if (strncmp(flec->file_path, path, path_len) == 0)
+      {
+         add(
+      }
+   }
 }
 
 fl_file_record_t *Fineline_File_System_Tree::find_file(string filename)

@@ -64,6 +64,7 @@ class Fineline_File_System
       void add_progress_text(char *msg);
       const char *get_image_name();
       void export_file(string file_path, string evidence_directory);
+      void get_directory_contents(string path);
 
    protected:
    private:

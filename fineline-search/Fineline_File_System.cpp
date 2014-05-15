@@ -36,6 +36,8 @@
 
 */
 
+#include <vector>
+
 #include "fineline-search.h"
 #include "Fineline_File_System.h"
 #include "../common/Fineline_Util.h"
@@ -53,6 +55,7 @@ Fineline_Log *flog = NULL;
 Fineline_File_System_Tree *file_system_tree = NULL;
 TskImgInfo *image_info = NULL;
 Fineline_Progress_Dialog *progress_dialog = NULL;
+vector<string> *directory_contents = NULL;
 int running = 0;
 long directory_count = 0;
 long file_count = 0;
@@ -64,20 +67,23 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)Fineline_Util::xcalloc(sizeof(fl_file_record_t));
    int file_name_length = filename.size();
+   TskFsMeta *fs_meta = fs_file->getMeta();
 
    strncpy(frec->file_name, filename.c_str(), file_name_length);
    strncpy(frec->file_path, path.c_str(), path.size());
 
-   if ((file_name_length < 3) && (frec->file_name[0] == '.')) // ignore directory and parent directory entries
-   {
-	   Fineline_Util::xfree((char*)frec, sizeof(fl_file_record_t));
-	   return(0);
-   }
+   //if ((file_name_length < 3) && (frec->file_name[0] == '.'))
+   //{
+	//   Fineline_Util::xfree((char*)frec, sizeof(fl_file_record_t));
+	//   return(0);
+   //}
 
-   frec->file_size = (long)fs_file->getMeta()->getSize();
-   frec->access_time = (long)fs_file->getMeta()->getATime();
-   frec->creation_time = (long)fs_file->getMeta()->getCrTime();
-
+   frec->id = file_count++;
+   frec->file_size = (long)fs_meta->getSize();
+   frec->access_time = (long)fs_meta->getATime();
+   frec->creation_time = (long)fs_meta->getCrTime();
+   frec->modification_time = (long)fs_meta->getMTime();
+   frec->file_type = (int)fs_meta->getType();
 
    full_file_path.append(frec->file_name);
 
@@ -86,13 +92,12 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 
    Fl::lock();
 
-      //do some GUI updates here...
    file_system_tree->add_file(full_file_path.c_str(), frec);
 
    Fl::awake(file_system_tree); //TODO: is this necessary?
    Fl::unlock();
 
-   file_count++;
+   
 
    return(0);
 }
@@ -101,10 +106,11 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
 {
 
    /* TODO: Ignore winsxs System backup files */
-   if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (strstr(path, "winsxs") != NULL))
-   {
-      return TSK_WALK_CONT;
-   }
+   //if ((TSK_FS_TYPE_ISNTFS(fs_file->getFsInfo()->getFsType())) && (strstr(path, "winsxs") != NULL))
+   //{
+   //   return TSK_WALK_CONT;
+   //}
+
    /* If the name has corresponding metadata, then walk it */
    string filename;
    string fullpath;
@@ -120,14 +126,16 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
 
    if (fs_meta->getType() == TSK_FS_META_TYPE_DIR)
    {
-      if ((filename.size() < 3) && (filename[0] == '.'))
+      if ((filename.size() < 3) && (filename[0] == '.')) //ignore directory entries
       {
          return(TSK_WALK_CONT);
       }
       msg.append("Processing directory: ");
       msg.append(path);
       msg.append(filename);
+      Fl::lock();
       progress_dialog->add_update(msg);
+      Fl::unlock();
       directory_count++;
    }
    fullpath.append(path);
@@ -164,15 +172,29 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    delete fs_info;
 
 
+   msg.append("-------------------------------------------");
+   Fl::lock();
+   progress_dialog->add_update(msg);
+   Fl::unlock();
+   msg.clear();
    msg.append("Processed ");
    msg.append(Fineline_Util::xitoa(directory_count, number, 256, 10));
    msg.append(" directories.\n");
+   Fl::lock();
    progress_dialog->add_update(msg);
+   Fl::unlock();
    msg.clear();
    msg.append("Processed ");
    msg.append(Fineline_Util::xitoa(file_count, number, 256, 10));
    msg.append(" files.\n");
+   Fl::lock();
    progress_dialog->add_update(msg);
+   Fl::unlock();
+   msg.clear();
+   msg.append("-------------------------------------------");
+   Fl::lock();
+   progress_dialog->add_update(msg);
+   Fl::unlock();
 
    return(ret_val);
 }
@@ -257,6 +279,7 @@ Fineline_File_System::Fineline_File_System(Fineline_File_System_Tree *ffst, stri
    file_system_tree = ffst;
    fs_image = image_path;
    progress_dialog = fpd;
+   directory_contents = new vector<string>;
 }
 
 Fineline_File_System::~Fineline_File_System()
@@ -330,9 +353,17 @@ void Fineline_File_System::stop_task()
 void Fineline_File_System::export_file(string file_path, string evidence_directory)
 {
    char msg[256];
-   //TODO:
+   //TODO: read int the content of the selected file and write out the file to the evidence directory.
    sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s %s\n", evidence_directory.c_str(), file_path.c_str());
    flog->print_log_entry(msg);
+   return;
+}
+
+void Fineline_File_System::get_directory_contents(string path)
+{
+   //TODO: get a vector of fl_file_records for the directory.
+   // DEPRECATED: search the existing file records in the file_sytem_tree map.
+
    return;
 }
 
@@ -348,6 +379,7 @@ const char *Fineline_File_System::get_image_name()
 
 void add_progress_text(char *msg)
 {
+   //TODO: put text to progress dialog
    return;
 }
 

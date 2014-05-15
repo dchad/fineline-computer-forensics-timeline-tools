@@ -37,6 +37,8 @@
 
 #include "../common/flcommon.h"
 
+enum FL_FILE_TYPES { FL_DIRECTORY = 1, FL_NORMAL_FILE, FL_SYSTEM_FILE };
+
 struct fl_file_record
 {
    int id;

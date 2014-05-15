@@ -304,11 +304,11 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
    char ipath[256];
 
    menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
-   if ( strcmp(item->label(), "&Save") == 0 )
+   if ( strncmp(item->label(), "&Save", 5) == 0 )
    {
 	  // TODO: open the save file dialogue
    }
-   else if ( strcmp(item->label(), "&Save As") == 0 )
+   else if ( strncmp(item->label(), "&Save As", 8) == 0 )
    {
       // TODO: open the save as file dialogue
    }
@@ -334,26 +334,30 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    Fl_Menu_Button *menu_button = (Fl_Menu_Button*)w;		// Get the menubar widget.
    const Fl_Menu_Item *item = menu_button->mvalue();		// Get the menu item that was picked.
 
-   if ( strcmp(item->label(), "Mark File") == 0 )
+   //TODO: add unmark all menu item.
+
+   if ( strncmp(item->label(), "Mark File", 9) == 0 )
    {
       // mark the file/directory for later processing/reporting/exporting etc.
       file_system_tree->mark_file();
+      Fl::awake(file_system_tree);
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
-   else if ( strcmp(item->label(), "Unmark File") == 0 )
+   else if ( strncmp(item->label(), "Unmark File", 11) == 0 )
    {
       file_system_tree->unmark_file();
+      Fl::awake(file_system_tree);
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
-   else if ( strcmp(item->label(), "Open File") == 0 )
+   else if ( strncmp(item->label(), "Open File", 9) == 0 )
    {
       //TODO: display the file (images/video/text/docs/web pages) in a dialogue or for unknown binary files open a hex editor.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
-   else if ( strcmp(item->label(), "Export File") == 0 )
+   else if ( strncmp(item->label(), "Export Files", 12) == 0 )
    {
       export_dialog->add_marked_files(file_system_tree->get_marked_files(), file_system);
 	   export_dialog->show();
@@ -361,13 +365,13 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
-   else if ( strcmp(item->label(), "Copy Metadata") == 0 )
+   else if ( strncmp(item->label(), "Copy Metadata", 13) == 0 )
    {
 	  //TODO: copy the file metadata as text to the system clipboard.
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
-   else if ( strcmp(item->label(), "Timeline") == 0 )
+   else if ( strncmp(item->label(), "Timeline", 8) == 0 )
    {
       // open the event dialogue to create fineline event records for the marked files and add to the timeline graph.
       event_dialog->add_marked_files(file_system_tree->get_marked_files());
@@ -396,6 +400,14 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
       if (flrec != NULL)
       {
          update_file_metadata_browser(flrec);
+
+#ifndef LINUX_BUILD
+         if (flrec->file_type == TSK_FS_META_TYPE_DIR)
+         {
+            file_system_tree->add_file_nodes(file_path);
+         }
+#endif
+
       }
       else
       {
@@ -411,14 +423,14 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 {
    Fl_Button *fb = (Fl_Button *)w;
 
-   if ( strcmp(fb->label(), "Save") == 0 )
+   if ( strncmp(fb->label(), "Save", 4) == 0 )
    {
-      // mark the file/directory for later processing/reporting/exporting etc.
+      // Open the file chooser dialog to select a file to save the metadata text.
       if (DEBUG)
          cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
 
    }
-   else if ( strcmp(fb->label(), "Edit") == 0 )
+   else if ( strncmp(fb->label(), "Edit", 4) == 0 )
    {
       int i;
       string metadata;
@@ -435,14 +447,14 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 
       file_metadata_dialog->show();
    }
-   else if ( strcmp(fb->label(), "Export") == 0 )
+   else if ( strncmp(fb->label(), "Export", 6) == 0 )
    {
       // TODO: open file chooser the text from the metadata browser.
       if (DEBUG)
          cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
 
    }
-   else if ( strcmp(fb->label(), "Clear") == 0 )
+   else if ( strncmp(fb->label(), "Clear", 5) == 0 )
    {
       // Clear the text from the metadata browser.
       if (DEBUG)
