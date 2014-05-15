@@ -37,6 +37,8 @@
 
 #include <iostream>
 
+#include <tsk/libtsk.h>
+
 #include <FL/fl_ask.H>
 #include <FL/filename.H>
 
@@ -79,9 +81,16 @@ void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *p)
    return;
 }
 
+/*
+   Name   : add_file()
+   Purpose: Add a node to the file system tree widget and store the
+            file metadata record in the file map.
+   Input  : File path of the node, file metadata record pointer.
+   Output : None.
+*/
 int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 {
-   // Only add file leaf nodes to the tree if running on Linux, 
+   // Only add file leaf nodes to the tree if running on Linux,
    // Windows has performance issues if there are more than 20000 nodes,
    // This results in noticable delays when clicking on tree nodes,
    // so do dynamic leaf node addition when running one Windoze.
@@ -89,14 +98,31 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 #ifdef LINUX_BUILD
    add(filename.c_str());
    close(filename.c_str(), 0);
+#else
+   // Windows major culprit is the winsxs directory containing update backups of system files.
+   if (strncmp(flrp->file_name, "winsxs", 6) != 0)
+   {
+      add(filename.c_str());
+      close(filename.c_str(), 0);
+   }
 #endif
 
    file_map[filename] = flrp;
    return(file_map.size());
 }
 
+
+/*
+   Name   : add_file_nodes()
+   Purpose: Dynamically add file leaf nodes to the tree on Windows
+            systems only. Not required on Linux, needed on Windows due
+            to performance issues displaying large file system trees.
+   Input  : File path of the directory node.
+   Output : None.
+*/
 void Fineline_File_System_Tree::add_file_nodes(string file_path)
 {
+   char new_node[FL_PATH_MAX];
    char path[FL_PATH_MAX];
    int path_len = file_path.size();
 
@@ -110,13 +136,24 @@ void Fineline_File_System_Tree::add_file_nodes(string file_path)
    while (p != file_map.end())
    {
       fl_file_record_t *flec = p->second;
+
       if (strncmp(flec->file_path, path, path_len) == 0)
       {
-         add(
+         strncpy(new_node, flec->file_path, strlen(flec->file_path));
+         strncat(new_node, flec->file_name, strlen(flec->file_name));
+         add(new_node);
       }
+      memset(new_node, 0, FL_PATH_MAX);
+      p++;
    }
 }
 
+/*
+   Name   : find_file()
+   Purpose: Lookup the file metadata record in the file map.
+   Input  : File path of the node.
+   Output : Pointer to the file metadata record or NULL.
+*/
 fl_file_record_t *Fineline_File_System_Tree::find_file(string filename)
 {
    if (filename.compare(0, 4, "ROOT") == 0)
@@ -133,6 +170,12 @@ fl_file_record_t *Fineline_File_System_Tree::find_file(string filename)
    return(p->second);
 }
 
+/*
+   Name   : remove_file()
+   Purpose: Delete the file metadata record from the file map.
+   Input  : File path of the file system tree node.
+   Output : Returns the map size.
+*/
 int Fineline_File_System_Tree::remove_file(string filename)
 {
    //TODO:
@@ -151,11 +194,23 @@ int Fineline_File_System_Tree::print_tree()
    return(0);
 }
 
+/*
+   Name   : tree_size()
+   Purpose: Get the tree size.
+   Input  : None.
+   Output : Returns the file map size.
+*/
 int Fineline_File_System_Tree::tree_size()
 {
    return(file_map.size());
 }
 
+/*
+   Name   : clear_tree()
+   Purpose: Empty the file system tree and the file metadata map.
+   Input  : None.
+   Output : Returns the file map size.
+*/
 int Fineline_File_System_Tree::clear_tree()
 {
    clear();
@@ -231,7 +286,12 @@ fl_file_record_t *Fineline_File_System_Tree::get_file_record(const char *file_pa
    return(find_file(fp));
 }
 
-
+/*
+   Name   : mark_file()
+   Purpose: Set the marked attribute in the file metadata record.
+   Input  : File tree path.
+   Output : None.
+*/
 void Fineline_File_System_Tree::mark_file(string filename)
 {
    fl_file_record_t *flec = find_file(filename);
@@ -242,6 +302,14 @@ void Fineline_File_System_Tree::mark_file(string filename)
    return;
 }
 
+/*
+   Name   : mark_file()
+   Purpose: Set the marked attribute in the file metadata record.
+            Gets the first selected item for the file system tree
+            widget and looks up the file metadata record.
+   Input  : None.
+   Output : None.
+*/
 void Fineline_File_System_Tree::mark_file()
 {
 	Fl_Tree_Item *flti = first_selected_item();

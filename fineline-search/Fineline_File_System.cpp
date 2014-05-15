@@ -72,12 +72,6 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    strncpy(frec->file_name, filename.c_str(), file_name_length);
    strncpy(frec->file_path, path.c_str(), path.size());
 
-   //if ((file_name_length < 3) && (frec->file_name[0] == '.'))
-   //{
-	//   Fineline_Util::xfree((char*)frec, sizeof(fl_file_record_t));
-	//   return(0);
-   //}
-
    frec->id = file_count++;
    frec->file_size = (long)fs_meta->getSize();
    frec->access_time = (long)fs_meta->getATime();
@@ -88,7 +82,7 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    full_file_path.append(frec->file_name);
 
    if (DEBUG)
-      fprintf(stdout, "Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
+      printf("Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
 
    Fl::lock();
 
@@ -97,7 +91,7 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    Fl::awake(file_system_tree); //TODO: is this necessary?
    Fl::unlock();
 
-   
+
 
    return(0);
 }

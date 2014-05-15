@@ -65,12 +65,13 @@ class Fineline_UI
 	   static void export_menu_callback(Fl_Widget *w, void *x);
 	   static void popup_menu_callback(Fl_Widget *w, void *x);
 	   static void file_metadata_callback(Fl_Widget *w, void *x);
-
+      static void filter_button_callback(Fl_Button *b, void *p);
 	   static void button_callback(Fl_Button *b, void *p);
 	   static void tree_button_callback(Fl_Button *b, void *p);
       static void file_system_tree_callback(Fl_Tree *flt, void *x);
       static int start_image_process_thread(const char *filename);
 	   static void update_file_metadata_browser(fl_file_record_t *flrec);
+	   static int save_tree(const char *filename);
 
 
 
@@ -98,6 +99,8 @@ class Fineline_UI
       static Fineline_File_Metadata_Dialog *file_metadata_dialog;
       static Fineline_Progress_Dialog *progress_dialog;
       static Fineline_Export_Dialog *export_dialog;
+      //TODO: static Fineline_Tree_Filter_Dialog *tree_filter_dialog;
+      //TODO: static Fineline_Save_Tree_Dialog *save_tree_dialog;
 
 	   void update_screeninfo(Fl_Widget *b, void *p);
 

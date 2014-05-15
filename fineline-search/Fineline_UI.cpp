@@ -237,6 +237,12 @@ void Fineline_UI::show(int argc, char *argv[])
    window->show(argc, argv);
 }
 
+/*
+   Name   : main_menu_callback()
+   Purpose: Called from the main menu to perform various functions.
+   Input  : FLTK menu bar widget.
+   Output : None.
+*/
 void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
 {
   Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
@@ -270,7 +276,13 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
   }
 }
 
-
+/*
+   Name   : open_menu_callback()
+   Purpose: Called from the main menu to open project files
+            or forensic images.
+   Input  : FLTK menu button widget.
+   Output : None.
+*/
 void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
 {
    Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
@@ -287,7 +299,7 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
    {
       case -1: break;	// Error
       case  1: break; 	// Cancel
-      default:		    // Choice
+      default:		      // Choice
          fc->preset_file(fc->filename());
          //load_forensic_image(fc->filename()); DEPRECATED for large forensic images.
          start_image_process_thread(fc->filename());
@@ -296,7 +308,13 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
    return;
 }
 
-
+/*
+   Name   : save_menu_callback()
+   Purpose: Called from the main menu to save the current project
+            or create a new project file.
+   Input  : FLTK menu bar widget.
+   Output : None.
+*/
 void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
 {
    Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
@@ -315,6 +333,13 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
    return;
 }
 
+/*
+   Name   : export_menu_callback()
+   Purpose: Called from the main menu to open the export dialogue to
+            export marked files from the forensic image.
+   Input  : FLTK menu button widget.
+   Output : None.
+*/
 void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 {
    if (DEBUG)
@@ -329,6 +354,14 @@ void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 	return;
 }
 
+/*
+   Name   : popup_menu_callback()
+   Purpose: Called by right clicking on the file system tree widget
+            to run various functions such as marking file nodes and
+            exporting files from the forensic image.
+   Input  : FLTK menu button widget.
+   Output : None.
+*/
 void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
 {
    Fl_Menu_Button *menu_button = (Fl_Menu_Button*)w;		// Get the menubar widget.
@@ -380,6 +413,12 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    return;
 }
 
+/*
+   Name   : file_system_tree_callback()
+   Purpose: Called by a click on the tree widget nodes.
+   Input  : Tree widget pointer.
+   Output : None.
+*/
 void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
 {
 	//DEPRECATED: Fl_Tree_Item * flti = flt->item_clicked();
@@ -402,7 +441,7 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
          update_file_metadata_browser(flrec);
 
 #ifndef LINUX_BUILD
-         if (flrec->file_type == TSK_FS_META_TYPE_DIR)
+         if ((flrec->file_type == TSK_FS_META_TYPE_DIR) && (strncmp(flrec->file_name, "winsxs", 6) == 0))
          {
             file_system_tree->add_file_nodes(file_path);
          }
@@ -419,6 +458,12 @@ void Fineline_UI::file_system_tree_callback(Fl_Tree *flt, void *x)
    return;
 }
 
+/*
+   Name   : file_metadata_callback()
+   Purpose: Called by clicks on the button widgets of the file metadata group.
+   Input  : FLTK button widget.
+   Output : None.
+*/
 void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 {
    Fl_Button *fb = (Fl_Button *)w;
@@ -471,21 +516,47 @@ void Fineline_UI::button_callback(Fl_Button *b, void *p)
    return;
 }
 
+/*
+   Name   : tree_button_callback()
+   Purpose: Called by clicks on the button widgets of the file system tree group.
+   Input  : FLTK button widget.
+   Output : None.
+*/
 void Fineline_UI::tree_button_callback(Fl_Button *b, void *p)
 {
    if ( strcmp(b->label(), "Save") == 0 )
    {
+
       if (DEBUG)
          cout << "Fineline_UI::tree_button_callback() <INFO> " << b->label() << endl;
+
+      fc->title("Save File System Tree");
+      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+         fc->preset_file(fc->filename());
+         save_tree(fc->filename());
+      }
    }
    else if ( strcmp(b->label(), "Filter") == 0 )
    {
       if (DEBUG)
          cout << "Fineline_UI::tree_button_callback() <INFO> " << b->label() << endl;
+
+      //TODO: open the filter dialog
    }
    return;
 }
 
+/*
+   Name   : update_file_metadata_browser()
+   Purpose: Adds the file metadata to the metadata browser widget.
+   Input  : Pointer to the file metadata record.
+   Output : None.
+*/
 void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
 {
    string metadata;
@@ -595,6 +666,23 @@ int Fineline_UI::load_forensic_image(const char *filename)
 }
 
 
+/*
+   Name   : save_tree()
+   Purpose: Writes out the forensic image file system tree to a text file.
+   Input  : filename.
+   Output : returns 0 on success, -1 on fail.
+
+*/
+int Fineline_UI::save_tree(const char *filename)
+{
+   //TODO: open file and write out the file system tree.
+
+   return(0);
+}
+
+
+
+// Unit testing only.
 void Fineline_UI::update_screeninfo(Fl_Widget *b, void *p)
 {
    Fl_Browser *browser = (Fl_Browser *)p;
