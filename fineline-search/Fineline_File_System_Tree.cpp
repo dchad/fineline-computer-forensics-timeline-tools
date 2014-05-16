@@ -100,7 +100,8 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
    close(filename.c_str(), 0);
 #else
    // Windows major culprit is the winsxs directory containing update backups of system files.
-   if (strncmp(flrp->file_name, "winsxs", 6) != 0)
+   //if (strncmp(flrp->file_name, "winsxs", 6) != 0)
+   if (filename.)
    {
       add(filename.c_str());
       close(filename.c_str(), 0);
