@@ -373,14 +373,12 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    {
       // mark the file/directory for later processing/reporting/exporting etc.
       file_system_tree->mark_file();
-      Fl::awake(file_system_tree);
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }
    else if ( strncmp(item->label(), "Unmark File", 11) == 0 )
    {
       file_system_tree->unmark_file();
-      Fl::awake(file_system_tree);
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }

@@ -65,7 +65,6 @@ class Fineline_Export_Dialog : public Fl_Double_Window
       vector< fl_file_record_t* > marked_file_list;
       Fineline_File_System *file_system;
       Fl_Browser *file_browser;
-      string evidence_directory;
       Fl_File_Input *evidence_directory_field;
       Fl_Button* export_button;
       Fl_Button* close_button;

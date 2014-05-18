@@ -100,8 +100,8 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
    close(filename.c_str(), 0);
 #else
    // Windows major culprit is the winsxs directory containing update backups of system files.
-   //if (strncmp(flrp->file_name, "winsxs", 6) != 0)
-   if (filename.)
+   // So add the winsxs directory but leave all the subdirectories for addition by user selection.
+   if (filename.find("winsxs") < (filename.size() + 6))
    {
       add(filename.c_str());
       close(filename.c_str(), 0);
@@ -118,6 +118,7 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
    Purpose: Dynamically add file leaf nodes to the tree on Windows
             systems only. Not required on Linux, needed on Windows due
             to performance issues displaying large file system trees.
+            Only use for the winsxs directory.
    Input  : File path of the directory node.
    Output : None.
 */
@@ -127,6 +128,10 @@ void Fineline_File_System_Tree::add_file_nodes(string file_path)
    char path[FL_PATH_MAX];
    int path_len = file_path.size();
 
+   if (file_path.find("winsxs") == string::npos)
+   {
+      return; // Not a winsxs subdirectory
+   }
    if (file_path.compare(0, 4, "ROOT") == 0)
    {
       file_path.erase(0, 5);  // Remove the tree ROOT/ label and path separator
@@ -322,7 +327,7 @@ void Fineline_File_System_Tree::mark_file()
    {
       if (item_pathname(file_path, FL_PATH_MAX, flti) != 0)
       {
-         Fineline_Log::print_log_entry("mark_file() <ERROR> Could not get tree item path.");
+         Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_file() <ERROR> Could not get tree item path.");
          fl_message(" <ERROR> Could not get tree item. ");
           return;
       }
@@ -334,6 +339,7 @@ void Fineline_File_System_Tree::mark_file()
          flrec->marked = 1;
          flti->labelcolor(FL_DARK_GREEN);
          flti->labelfont(FL_COURIER_BOLD);
+         Fl::awake();
          Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_file() <INFO> marked file.");
       }
    }
@@ -363,6 +369,7 @@ void Fineline_File_System_Tree::unmark_file()
          flrec->marked = 0;
          flti->labelcolor(FL_FOREGROUND_COLOR);
          flti->labelfont(FL_COURIER);
+         Fl::awake();
       }
    }
    return;

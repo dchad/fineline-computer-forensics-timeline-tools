@@ -107,16 +107,17 @@ void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist,
 
 void Fineline_Export_Dialog::export_files()
 {
+   string evidence_directory;
    unsigned int i;
    string full_path;
+
+   evidence_directory.append(evidence_directory_field->value());
 
    for (i = 0; i < marked_file_list.size(); i++)
    {
       fl_file_record_t *flec = marked_file_list[i];
       full_path.append(flec->file_path);
-      //full_path.append(PATH_SEPARATOR);
       full_path.append(flec->file_name);
-      evidence_directory.append(evidence_directory_field->value());
       file_system->export_file(full_path, evidence_directory);
       full_path.clear();
       if (DEBUG)

@@ -36,7 +36,8 @@
 #ifndef FINELINE_FILE_SYSTEM_H
 #define FINELINE_FILE_SYSTEM_H
 
-#include <stdio.h>
+
+#include <sys/stat.h>
 #include <string>
 #include <tsk/libtsk.h>
 #include <FL/Fl.H>
@@ -68,6 +69,8 @@ class Fineline_File_System
 
    protected:
    private:
+
+      int make_path(string s, mode_t mode);
 
 	   string fs_image;
 };

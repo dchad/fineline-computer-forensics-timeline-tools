@@ -36,6 +36,10 @@
 
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <errno.h>
 #include <vector>
 
 #include "fineline-search.h"
@@ -50,17 +54,24 @@
 #define FINELINE_SLEEP(delay) Sleep(delay);
 #endif
 
+using namespace std;
 
 Fineline_Log *flog = NULL;
 Fineline_File_System_Tree *file_system_tree = NULL;
-TskImgInfo *image_info = NULL;
 Fineline_Progress_Dialog *progress_dialog = NULL;
-vector<string> *directory_contents = NULL;
+TskImgInfo *image_info = NULL;                 // Store the forensic image system metadata
+vector< TskFsInfo * > file_system_list; // List of file systems in the forensic image
+
 int running = 0;
 long directory_count = 0;
 long file_count = 0;
 
 /* Static C callback functions for the TSK library calls */
+
+
+
+
+
 
 static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 {
@@ -88,10 +99,8 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 
    file_system_tree->add_file(full_file_path.c_str(), frec);
 
-   Fl::awake(file_system_tree); //TODO: is this necessary?
+   Fl::awake(); //TODO: is this necessary?
    Fl::unlock();
-
-
 
    return(0);
 }
@@ -143,30 +152,38 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    TskFsInfo *fs_info = new TskFsInfo();
    string msg;
    char number[256];
-   int ret_val = 0;
 
     /* Try it as a file system */
    if (fs_info->open(img_info, start, TSK_FS_TYPE_DETECT))
    {
-        tsk_error_print(stderr);
-        /* We could do some carving on the volume data at this point */
-        ret_val = -1;
+      msg.append("<ERROR> Opening file system.");
+      Fl::lock();
+      progress_dialog->add_update(msg);
+      Fl::unlock();
+      msg.clear();
+      return(-1);
    }
    else
    {
       /* Walk the directory structure, starting at the root directory */
+
       if (fs_info->dirWalk(fs_info->getRootINum(), (TSK_FS_DIR_WALK_FLAG_ENUM) (TSK_FS_DIR_WALK_FLAG_RECURSE), process_directory_callback, NULL))
       {
-        tsk_error_print(stderr);
-        ret_val = -1;
+         msg.append("<ERROR> Could not walk file system.");
+         Fl::lock();
+         progress_dialog->add_update(msg);
+         Fl::unlock();
+         msg.clear();
+         return(-1);
       }
-      fs_info->close();
+
    }
 
-   delete fs_info;
+   // If the file system walk is ok then save the file system info in a vector
+   // for later file viewing/extraction by the user.
+   file_system_list.push_back(fs_info);
 
-
-   msg.append("-------------------------------------------");
+   msg.append("---------------------------------------------------------------");
    Fl::lock();
    progress_dialog->add_update(msg);
    Fl::unlock();
@@ -185,12 +202,12 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    progress_dialog->add_update(msg);
    Fl::unlock();
    msg.clear();
-   msg.append("-------------------------------------------");
+   msg.append("---------------------------------------------------------------");
    Fl::lock();
    progress_dialog->add_update(msg);
    Fl::unlock();
 
-   return(ret_val);
+   return(0);
 }
 
 static TSK_WALK_RET_ENUM volume_system_callback(TskVsInfo * vs_info, const TskVsPartInfo * vs_part, void *ptr)
@@ -209,25 +226,27 @@ static uint8_t process_volume_system(TskImgInfo * img_info, TSK_OFF_T start)
 {
    TskVsInfo *vs_info = new TskVsInfo();
    int ret_val = 0;
-    // USE mm_walk to get the volumes
-    if (vs_info->open(img_info, start, TSK_VS_TYPE_DETECT))
-    {
+
+   if (vs_info->open(img_info, start, TSK_VS_TYPE_DETECT))
+   {
         /* There was no volume system, but there could be a file system */
-        tsk_error_reset();
-        if (process_file_system(img_info, start))
-        {
-           ret_val = -1;
-        }
-    }
-    else
-    {
+      tsk_error_reset();
+      if (process_file_system(img_info, start))
+      {
+         ret_val = -1;
+      }
+   }
+   else
+   {
         /* Walk the allocated volumes (skip metadata and unallocated volumes) */
-        if (vs_info->vsPartWalk(0, vs_info->getPartCount() - 1, (TSK_VS_PART_FLAG_ENUM) (TSK_VS_PART_FLAG_ALLOC), volume_system_callback, NULL))
-        {
-            ret_val = -1;
-        }
+      if (vs_info->vsPartWalk(0, vs_info->getPartCount() - 1, (TSK_VS_PART_FLAG_ENUM) (TSK_VS_PART_FLAG_ALLOC), volume_system_callback, NULL))
+      {
+         ret_val = -1;
+      }
     }
+
     delete vs_info;
+
     return(ret_val);
 }
 
@@ -273,7 +292,6 @@ Fineline_File_System::Fineline_File_System(Fineline_File_System_Tree *ffst, stri
    file_system_tree = ffst;
    fs_image = image_path;
    progress_dialog = fpd;
-   directory_contents = new vector<string>;
 }
 
 Fineline_File_System::~Fineline_File_System()
@@ -346,10 +364,56 @@ void Fineline_File_System::stop_task()
 
 void Fineline_File_System::export_file(string file_path, string evidence_directory)
 {
+   TskFsFile *file_info = new TskFsFile();
+   char in_buf[FL_MAX_INPUT_STR];
+   FILE *out_file = NULL;
+   size_t bytes_in = 0;
+   size_t file_pos = 0;
    char msg[256];
-   //TODO: read int the content of the selected file and write out the file to the evidence directory.
+   unsigned int i;
+   //TODO: read in the content of the selected file and write out the file to the evidence directory.
    sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s %s\n", evidence_directory.c_str(), file_path.c_str());
    flog->print_log_entry(msg);
+
+   for (i = 0; i < file_system_list.size(); i++)
+   {
+      TskFsInfo *fs_info = file_system_list[i];
+      if (file_info->open(fs_info, file_info, file_path.c_str()))
+      {
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not export file %s\n", file_path.c_str());
+         flog->print_log_entry(msg);
+      }
+      else
+      {
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Eporting file %s\n", file_path.c_str());
+         flog->print_log_entry(msg);
+
+         string destination_file = evidence_directory;
+         destination_file.append(PATH_SEPARATOR);
+         destination_file.append(file_path);
+         out_file = fopen(destination_file.c_str(), "wb");
+         if (out_file == NULL)
+         {
+            sprintf(msg, "Fineline_File_System::export_file() <ERROR> Could not open file %s\n", destination_file.c_str());
+            flog->print_log_entry(msg);
+            break;
+         }
+         else
+         {
+            while ((bytes_in = file_info->read(file_pos, in_buf, FL_MAX_INPUT_STR, TSK_FS_FILE_READ_FLAG_NONE)) > 0)
+            {
+               fwrite(in_buf, 1, bytes_in, out_file);
+               file_pos += bytes_in;
+            }
+         }
+      }
+   }
+
+   if (out_file != NULL)
+      fclose(out_file);
+
+   delete file_info;
+
    return;
 }
 
@@ -371,10 +435,31 @@ const char *Fineline_File_System::get_image_name()
    return(fs_image.c_str());
 }
 
-void add_progress_text(char *msg)
+//extern int errno;
+
+int Fineline_File_System::make_path(string s, mode_t mode)
 {
-   //TODO: put text to progress dialog
-   return;
+    size_t pre = 0, pos;
+    string dir;
+    int mdret;
+
+    if(s[s.size()-1]!='/')
+    {
+        // force trailing / so we can handle everything in loop
+        s+='/';
+    }
+
+    while((pos=s.find_first_of('/', pre)) != std::string::npos)
+    {
+        dir=s.substr(0,pos++);
+        pre=pos;
+        if(dir.size()==0) continue; // if leading / first time is 0 length
+        if((mdret = mkdir(dir.c_str(), mode)) && errno != EEXIST)
+        {
+            return mdret;
+        }
+    }
+    return mdret;
 }
 
 
