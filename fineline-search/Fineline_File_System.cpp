@@ -38,9 +38,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <errno.h>
 #include <vector>
+
+
+#ifdef LINUX_BUILD
+#include <sys/types.h>
+#include <sys/stat.h>
+#else
+#include <direct.h> // Windows _mkdir()
+#endif
+
+
 
 #include "fineline-search.h"
 #include "Fineline_File_System.h"
@@ -68,11 +77,14 @@ long file_count = 0;
 
 /* Static C callback functions for the TSK library calls */
 
-
-
-
-
-
+/*
+   Function: process_file
+   Purpose : Called from the process_directory_callback for each file in a directory to
+             get the file metadata. Then the file metadata record is added to the
+             GUI file system tree.
+   Input   : file pointer, file name and file path.
+   Output  : Always returns 0 to ensure all files are processed.
+*/
 static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 {
    string full_file_path = path;
@@ -105,7 +117,15 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    return(0);
 }
 
-static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const char *path, void *ptr)
+
+/*
+   Function: process_directory_callback
+   Purpose : Called from the directory walker for each file in a directory, updates
+             the progress dialog and calls process_file to get the file metadata.
+   Input   : file pointer and file path.
+   Output  : Always returns TSK_WALK_CONT to ensure all files are processed.
+*/
+static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile *fs_file, const char *path, void *ptr)
 {
 
    /* TODO: Ignore winsxs System backup files */
@@ -147,6 +167,15 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile * fs_file, const c
    return(TSK_WALK_CONT);
 }
 
+
+/*
+   Function: process_file_system
+   Purpose : Called from the volume walker to process each file system. Does a directory
+             walk through the file system and calls process_directory callback for each
+             directory found.
+   Input   : Forensic image info and offset = 0 for this application.
+   Output  : Always returns 0 to ensure all file systems are processed.
+*/
 static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
 {
    TskFsInfo *fs_info = new TskFsInfo();
@@ -210,6 +239,13 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    return(0);
 }
 
+
+/*
+   Function: volume_system_callback
+   Purpose : Calls process_file_system from the volume walker.
+   Input   : Volume and partitions information pointers and user data pointer = NULL for this application.
+   Output  : Always returns TSK_WALK_CONT to ensure all partitions are processed.
+*/
 static TSK_WALK_RET_ENUM volume_system_callback(TskVsInfo * vs_info, const TskVsPartInfo * vs_part, void *ptr)
 {
     if (process_file_system(const_cast<TskImgInfo *>(vs_info->getImgInfo()), const_cast<TskVsPartInfo *>(vs_part)->getStart() * vs_info->getBlockSize()))
@@ -222,6 +258,14 @@ static TSK_WALK_RET_ENUM volume_system_callback(TskVsInfo * vs_info, const TskVs
     return TSK_WALK_CONT;
 }
 
+
+/*
+   Function: process_volume_system
+   Purpose : Does a partition walk throught the forensic image and
+             calls process_file_system for any file systems found.
+   Input   : Image information pointer and start offset = 0.
+   Output  : Retruns 0 if OK, -1 on error.
+*/
 static uint8_t process_volume_system(TskImgInfo * img_info, TSK_OFF_T start)
 {
    TskVsInfo *vs_info = new TskVsInfo();
@@ -372,7 +416,7 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
    char msg[256];
    unsigned int i;
    //TODO: read in the content of the selected file and write out the file to the evidence directory.
-   sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s %s\n", evidence_directory.c_str(), file_path.c_str());
+   sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s <-> %s\n", evidence_directory.c_str(), file_path.c_str());
    flog->print_log_entry(msg);
 
    for (i = 0; i < file_system_list.size(); i++)
@@ -391,6 +435,12 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
          string destination_file = evidence_directory;
          destination_file.append(PATH_SEPARATOR);
          destination_file.append(file_path);
+         if (make_path(destination_file, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
+         {
+            sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not make path %s\n", destination_file.c_str());
+            flog->print_log_entry(msg);
+         }
+
          out_file = fopen(destination_file.c_str(), "wb");
          if (out_file == NULL)
          {
@@ -417,14 +467,6 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
    return;
 }
 
-void Fineline_File_System::get_directory_contents(string path)
-{
-   //TODO: get a vector of fl_file_records for the directory.
-   // DEPRECATED: search the existing file records in the file_sytem_tree map.
-
-   return;
-}
-
 int Fineline_File_System::get_running()
 {
 	return(running);
@@ -435,31 +477,45 @@ const char *Fineline_File_System::get_image_name()
    return(fs_image.c_str());
 }
 
-//extern int errno;
+
 
 int Fineline_File_System::make_path(string s, mode_t mode)
 {
-    size_t pre = 0, pos;
-    string dir;
-    int mdret;
+   size_t pre = 0, pos;
+   string dir;
+   int ret_val = 0;
+   char msg[256];
 
-    if(s[s.size()-1]!='/')
+printf("debug 1 %s\n", s.c_str());
+   if(s[s.size()-1] != '/')
+   {
+        // remove the file name so we can make all the directories
+      pos = s.find_last_of('/', 0);
+      if (pos == string::npos)
+         return(ret_val);
+      else if (pos < (s.size() - 1))
+         s = s.substr(0, pos+1);
+   }
+printf("debug 2 %s\n", s.c_str());
+    while((pos = s.find_first_of('/', pre)) != string::npos)
     {
-        // force trailing / so we can handle everything in loop
-        s+='/';
-    }
+      dir = s.substr(0, pos++);
+      sprintf(msg, "Fineline_File_System::make_path() <INFO> Making directory %s\n", dir.c_str());
+      flog->print_log_entry(msg);
+      pre = pos;
+      if(dir.size() == 0) continue; // if leading / first time is 0 length
 
-    while((pos=s.find_first_of('/', pre)) != std::string::npos)
-    {
-        dir=s.substr(0,pos++);
-        pre=pos;
-        if(dir.size()==0) continue; // if leading / first time is 0 length
-        if((mdret = mkdir(dir.c_str(), mode)) && errno != EEXIST)
-        {
-            return mdret;
-        }
-    }
-    return mdret;
+#ifdef LINUX_BUILD
+      if((ret_val = mkdir(dir.c_str(), mode)) && (errno != EEXIST))
+#else
+      if((ret_val = _mkdir(dir.c_str())) && (errno != EEXIST))
+#endif
+      {
+         return ret_val;
+      }
+   }
+   printf("debug 3\n");
+   return ret_val;
 }
 
 
