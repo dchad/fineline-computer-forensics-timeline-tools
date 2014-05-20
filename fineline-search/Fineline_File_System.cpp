@@ -77,6 +77,23 @@ long file_count = 0;
 
 /* Static C callback functions for the TSK library calls */
 
+static void progress_message(const char *msg_str)
+{
+   string msg(msg_str);
+   Fl::lock();
+   progress_dialog->add_update(msg);
+   Fl::unlock();
+   return;
+}
+
+static void put_progress_message(string msg)
+{
+   Fl::lock();
+   progress_dialog->add_update(msg);
+   Fl::unlock();
+   return;
+}
+
 /*
    Function: process_file
    Purpose : Called from the process_directory_callback for each file in a directory to
@@ -156,9 +173,7 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile *fs_file, const ch
       msg.append("Processing directory: ");
       msg.append(path);
       msg.append(filename);
-      Fl::lock();
-      progress_dialog->add_update(msg);
-      Fl::unlock();
+      put_progress_message(msg);
       directory_count++;
    }
    fullpath.append(path);
@@ -185,11 +200,7 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
     /* Try it as a file system */
    if (fs_info->open(img_info, start, TSK_FS_TYPE_DETECT))
    {
-      msg.append("<ERROR> Opening file system.");
-      Fl::lock();
-      progress_dialog->add_update(msg);
-      Fl::unlock();
-      msg.clear();
+      progress_message("<ERROR> Opening file system.");
       return(-1);
    }
    else
@@ -198,11 +209,7 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
 
       if (fs_info->dirWalk(fs_info->getRootINum(), (TSK_FS_DIR_WALK_FLAG_ENUM) (TSK_FS_DIR_WALK_FLAG_RECURSE), process_directory_callback, NULL))
       {
-         msg.append("<ERROR> Could not walk file system.");
-         Fl::lock();
-         progress_dialog->add_update(msg);
-         Fl::unlock();
-         msg.clear();
+         progress_message("<ERROR> Could not walk file system.");
          return(-1);
       }
 
@@ -213,28 +220,20 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    file_system_list.push_back(fs_info);
 
    msg.append("---------------------------------------------------------------");
-   Fl::lock();
-   progress_dialog->add_update(msg);
-   Fl::unlock();
+   put_progress_message(msg);
    msg.clear();
    msg.append("Processed ");
    msg.append(Fineline_Util::xitoa(directory_count, number, 256, 10));
    msg.append(" directories.\n");
-   Fl::lock();
-   progress_dialog->add_update(msg);
-   Fl::unlock();
+   put_progress_message(msg);
    msg.clear();
    msg.append("Processed ");
    msg.append(Fineline_Util::xitoa(file_count, number, 256, 10));
    msg.append(" files.\n");
-   Fl::lock();
-   progress_dialog->add_update(msg);
-   Fl::unlock();
+   put_progress_message(msg);
    msg.clear();
    msg.append("---------------------------------------------------------------");
-   Fl::lock();
-   progress_dialog->add_update(msg);
-   Fl::unlock();
+   put_progress_message(msg);
 
    return(0);
 }
@@ -393,12 +392,18 @@ int Fineline_File_System::close_forensic_image()
    return(0);
 }
 
+/*
+   Function: start_task
+   Purpose : Starts the worker function for the posix/win32 thread.
+             Recommended method for processing large forensic images.
+   Input   : None.
+   Output  : None.
+*/
 void Fineline_File_System::start_task()
 {
 	running = 1;
 	Fl_Thread thread_id;
 	fl_create_thread(thread_id, fs_thread_task, (void *)this);
-
 }
 
 void Fineline_File_System::stop_task()
@@ -406,16 +411,26 @@ void Fineline_File_System::stop_task()
 	running = 0;
 }
 
+
+/*
+   Function: export_file
+   Purpose : Opens the requested file in the forensic image and copies the file
+             to the specified evidence directory.
+   Input   : Request file path and destination evidence directory.
+   Output  : The exported file content.
+*/
 void Fineline_File_System::export_file(string file_path, string evidence_directory)
 {
    TskFsFile *file_info = new TskFsFile();
    char in_buf[FL_MAX_INPUT_STR];
    FILE *out_file = NULL;
-   size_t bytes_in = 0;
-   size_t file_pos = 0;
+   int len = 0;
+   int cnt = 0;
+   TSK_OFF_T file_size  = 0;
+   TSK_OFF_T offset = 0;
    char msg[256];
    unsigned int i;
-   //TODO: read in the content of the selected file and write out the file to the evidence directory.
+
    sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s <-> %s\n", evidence_directory.c_str(), file_path.c_str());
    flog->print_log_entry(msg);
 
@@ -450,10 +465,38 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
          }
          else
          {
-            while ((bytes_in = file_info->read(file_pos, in_buf, FL_MAX_INPUT_STR, TSK_FS_FILE_READ_FLAG_NONE)) > 0)
+            // Now read in the content of the selected file and write out to the file in the evidence directory.
+
+            file_size = file_info->getMeta()->getSize();
+            for (offset = 0; offset < file_size; offset += len)
             {
-               fwrite(in_buf, 1, bytes_in, out_file);
-               file_pos += bytes_in;
+               if (file_size - offset < 2048)
+                  len = (size_t) (file_size - offset);
+               else
+                  len = 2048;
+
+               cnt = file_info->read(offset, in_buf, len, TSK_FS_FILE_READ_FLAG_NONE);
+               if (cnt == -1)
+               {
+                  // could check tsk_errno here for a recovery error (TSK_ERR_FS_RECOVER)
+                  if (DEBUG)
+                  {
+                     sprintf(msg, "Fineline_File_System::export_file() <ERROR> Reading file %s\n", file_path.c_str());
+                     flog->print_log_entry(msg);
+                  }
+                  break;
+               }
+               else if (cnt != len)
+               {
+                  if (DEBUG)
+                  {
+                     sprintf(msg, "Fineline_File_System::export_file() <WARNING> Allocation error in %s\n", file_path.c_str());
+                     flog->print_log_entry(msg);
+                  }
+               }
+
+               fwrite(in_buf, 1, cnt, out_file);
+
             }
          }
       }
@@ -478,25 +521,34 @@ const char *Fineline_File_System::get_image_name()
 }
 
 
-
+/*
+   Function: make_path
+   Purpose : Makes the required subdirectories in the evidence
+             directory to export files into.
+   Input   : The file path and file creation mode (only valid for Linux).
+   Output  : Returns 0 on success or -1 on failure.
+*/
 int Fineline_File_System::make_path(string s, mode_t mode)
 {
    size_t pre = 0, pos;
    string dir;
    int ret_val = 0;
+   int path_len = s.size();
    char msg[256];
+   char path[FL_MAX_INPUT_STR];
+   char *p;
 
-printf("debug 1 %s\n", s.c_str());
-   if(s[s.size()-1] != '/')
+   strncpy(path, s.c_str(), path_len);
+   s.clear();
+
+   if (path[path_len] != '/')     // TODO: change to PATH_SEPARATOR
    {
-        // remove the file name so we can make all the directories
-      pos = s.find_last_of('/', 0);
-      if (pos == string::npos)
+      if ((p = strrchr(path, '/')) == NULL) //NOTE: using s.find_last_of() did not work!!!
          return(ret_val);
-      else if (pos < (s.size() - 1))
-         s = s.substr(0, pos+1);
+      else
+         s.append(path, (int)((p - path) + 1));
    }
-printf("debug 2 %s\n", s.c_str());
+
     while((pos = s.find_first_of('/', pre)) != string::npos)
     {
       dir = s.substr(0, pos++);
@@ -514,7 +566,7 @@ printf("debug 2 %s\n", s.c_str());
          return ret_val;
       }
    }
-   printf("debug 3\n");
+
    return ret_val;
 }
 
