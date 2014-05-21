@@ -49,7 +49,7 @@ Fineline_Export_Dialog::Fineline_Export_Dialog(int x, int y, int w, int h) : Fl_
       file_browser = new Fl_Browser(20, 20, w - 40, h - 100);
       evidence_directory_field = new Fl_File_Input(100, h - 50, 250, 30, "Directory:");
       evidence_directory_field->value("./evidence");
-      export_button = new Fl_Button(w - 250, h - 50, 100, 30, "Export");
+      export_button = new Fl_Button(w - 250, h - 50, 100, 30, "Start");
       export_button->callback((Fl_Callback*)button_callback, (void *)this);
       close_button = new Fl_Button(w - 140, h - 50, 100, 30, "Close");
       close_button->callback((Fl_Callback*)button_callback, (void *)this);
@@ -71,7 +71,7 @@ void Fineline_Export_Dialog::button_callback(Fl_Button *b, void *p)
    // if export button call the file system object to export the marked files
    Fineline_Export_Dialog *fed = (Fineline_Export_Dialog *)p;
 
-   if (strncmp(b->label(), "Export", 6) == 0)
+   if (strncmp(b->label(), "Start", 5) == 0)
    {
       fed->export_files();
    }
@@ -90,6 +90,14 @@ void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist,
    char full_path[FL_PATH_MAX];
    marked_file_list = flist;
    file_system = ffs;
+   string msg;
+
+   msg = "------------------------------------------------------------------------";
+   file_browser->add(msg.c_str());
+   msg = "Export marked files.";
+   file_browser->add(msg.c_str());
+   msg = "------------------------------------------------------------------------";
+   file_browser->add(msg.c_str());
 
    for (i = 0; i < marked_file_list.size(); i++)
    {
@@ -101,6 +109,13 @@ void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist,
       if (DEBUG)
          Fineline_Log::print_log_entry("Fineline_Export_Dialog::add_marked_files() <INFO> added marked file.");
    }
+   
+   msg = "------------------------------------------------------------------------";
+   file_browser->add(msg.c_str());
+   msg = "Enter a destination directory and click Start to begin file extraction.";
+   file_browser->add(msg.c_str());
+   msg = "------------------------------------------------------------------------";
+   file_browser->add(msg.c_str());
 
    return;
 }
@@ -109,9 +124,10 @@ void Fineline_Export_Dialog::export_files()
 {
    string evidence_directory;
    unsigned int i;
+   int pos;
    string full_path;
 
-   evidence_directory.append(evidence_directory_field->value());
+   evidence_directory = evidence_directory_field->value();
 
    for (i = 0; i < marked_file_list.size(); i++)
    {

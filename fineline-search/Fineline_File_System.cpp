@@ -38,12 +38,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <errno.h>
-#include <vector>
 
 
 #ifdef LINUX_BUILD
-#include <sys/types.h>
 #include <sys/stat.h>
 #else
 #include <direct.h> // Windows _mkdir()
@@ -93,6 +92,21 @@ static void put_progress_message(string msg)
    Fl::unlock();
    return;
 }
+
+static void check_path_separators()
+{
+   //TODO: check the forensic image file system type for NTFS/FAT and convert
+   // path separators to backslashes.
+
+#ifndef LINUX_BUILD
+      //while ((pos = full_path.find('/')) != string::npos)
+      //{
+      //   full_path[pos] = '\\';
+      //}
+#endif
+      return;
+}
+
 
 /*
    Function: process_file
@@ -417,9 +431,9 @@ void Fineline_File_System::stop_task()
    Purpose : Opens the requested file in the forensic image and copies the file
              to the specified evidence directory.
    Input   : Request file path and destination evidence directory.
-   Output  : The exported file content.
+   Output  : The exported file content, return 0 on success, -1 on error.
 */
-void Fineline_File_System::export_file(string file_path, string evidence_directory)
+int Fineline_File_System::export_file(string file_path, string evidence_directory)
 {
    TskFsFile *file_info = new TskFsFile();
    char in_buf[FL_MAX_INPUT_STR];
@@ -430,6 +444,7 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
    TSK_OFF_T offset = 0;
    char msg[256];
    unsigned int i;
+   string progress_msg;
 
    sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s <-> %s\n", evidence_directory.c_str(), file_path.c_str());
    flog->print_log_entry(msg);
@@ -439,21 +454,23 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
       TskFsInfo *fs_info = file_system_list[i];
       if (file_info->open(fs_info, file_info, file_path.c_str()))
       {
-         sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not export file %s\n", file_path.c_str());
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not open file in forensic image %s\n", file_path.c_str());
          flog->print_log_entry(msg);
+         return(-1);
       }
       else
       {
-         sprintf(msg, "Fineline_File_System::export_file() <INFO> Eporting file %s\n", file_path.c_str());
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Exporting file %s\n", file_path.c_str());
          flog->print_log_entry(msg);
 
          string destination_file = evidence_directory;
          destination_file.append(PATH_SEPARATOR);
          destination_file.append(file_path);
-         if (make_path(destination_file, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
+         if (make_path(destination_file, 0775) != 0)  // Linux/Unix permissions: (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
          {
             sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not make path %s\n", destination_file.c_str());
             flog->print_log_entry(msg);
+            return(-1);
          }
 
          out_file = fopen(destination_file.c_str(), "wb");
@@ -461,7 +478,7 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
          {
             sprintf(msg, "Fineline_File_System::export_file() <ERROR> Could not open file %s\n", destination_file.c_str());
             flog->print_log_entry(msg);
-            break;
+            return(-1);
          }
          else
          {
@@ -506,8 +523,26 @@ void Fineline_File_System::export_file(string file_path, string evidence_directo
       fclose(out_file);
 
    delete file_info;
+      
+   progress_msg = "Exported file: ";
+   progress_msg.append(file_path);
+   put_progress_message(progress_msg);
 
-   return;
+   return(0);
+}
+
+/*
+   Function: export_files
+   Purpose : Opens the requested files in the forensic image and copies the file
+             to the specified evidence directory.
+   Input   : Request file path and destination evidence directory.
+   Output  : The exported file content, return 0 on success, -1 on error.
+*/
+int Fineline_File_System::export_files(vector<string> flist, string evidence_directory)
+{
+   //TODO: iterate over vector and call export_file()
+
+   return(0);
 }
 
 int Fineline_File_System::get_running()
@@ -565,10 +600,12 @@ int Fineline_File_System::make_path(string s, mode_t mode)
       {
          return ret_val;
       }
-   }
+    }
 
    return ret_val;
 }
+
+
 
 
 

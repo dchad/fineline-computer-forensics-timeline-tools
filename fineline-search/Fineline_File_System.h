@@ -36,6 +36,7 @@
 #ifndef FINELINE_FILE_SYSTEM_H
 #define FINELINE_FILE_SYSTEM_H
 
+#include <vector>
 
 #include <sys/stat.h>
 #include <string>
@@ -63,7 +64,8 @@ class Fineline_File_System
       int process_forensic_image();
       int close_forensic_image();
       const char *get_image_name();
-      void export_file(string file_path, string evidence_directory);
+      int export_file(string file_path, string evidence_directory);
+      int export_files(vector<string> flist, string evidence_directory);
 
    protected:
    private:
