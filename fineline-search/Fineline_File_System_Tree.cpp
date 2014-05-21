@@ -90,8 +90,6 @@ void Fineline_File_System_Tree::file_system_tree_callback(Fl_Tree *flt, void *p)
 */
 int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 {
-   int pos;
-
    // Only add file leaf nodes to the tree if running on Linux,
    // Windows has performance issues if there are more than 20000 nodes,
    // This results in noticable delays when clicking on tree nodes,
@@ -103,12 +101,14 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 #else
    // Windows major culprit is the winsxs directory containing backups of updated system files.
    // So add the winsxs directory but leave all the subdirectories for addition by user selection.
-   if ((pos = filename.find("winsxs")) == string::npos)
+   unsigned int pos;
+   pos = filename.find("winsxs")
+   if (pos == string::npos)
    {
       add(filename.c_str());
       close(filename.c_str(), 0);
    }
-   else if (pos < ((int)filename.size() - 6))
+   else if (pos == (filename.size() - 7))
    {
       add(filename.c_str());
       close(filename.c_str(), 0);

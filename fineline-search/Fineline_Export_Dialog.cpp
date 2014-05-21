@@ -92,11 +92,11 @@ void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist,
    file_system = ffs;
    string msg;
 
-   msg = "------------------------------------------------------------------------";
+   msg = "--------------------------------------------------------------------------------------------";
    file_browser->add(msg.c_str());
    msg = "Export marked files.";
    file_browser->add(msg.c_str());
-   msg = "------------------------------------------------------------------------";
+   msg = "--------------------------------------------------------------------------------------------";
    file_browser->add(msg.c_str());
 
    for (i = 0; i < marked_file_list.size(); i++)
@@ -109,12 +109,12 @@ void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist,
       if (DEBUG)
          Fineline_Log::print_log_entry("Fineline_Export_Dialog::add_marked_files() <INFO> added marked file.");
    }
-   
-   msg = "------------------------------------------------------------------------";
+
+   msg = "--------------------------------------------------------------------------------------------";
    file_browser->add(msg.c_str());
    msg = "Enter a destination directory and click Start to begin file extraction.";
    file_browser->add(msg.c_str());
-   msg = "------------------------------------------------------------------------";
+   msg = "--------------------------------------------------------------------------------------------";
    file_browser->add(msg.c_str());
 
    return;
@@ -124,8 +124,8 @@ void Fineline_Export_Dialog::export_files()
 {
    string evidence_directory;
    unsigned int i;
-   int pos;
    string full_path;
+   string msg;
 
    evidence_directory = evidence_directory_field->value();
 
@@ -134,7 +134,12 @@ void Fineline_Export_Dialog::export_files()
       fl_file_record_t *flec = marked_file_list[i];
       full_path.append(flec->file_path);
       full_path.append(flec->file_name);
-      file_system->export_file(full_path, evidence_directory);
+      if (file_system->export_file(full_path, evidence_directory) == 0)
+      {
+         msg = "Exported file: ";
+         msg.append(full_path);
+         file_browser->add(msg.c_str());
+      }
       full_path.clear();
       if (DEBUG)
          Fineline_Log::print_log_entry("Fineline_Export_Dialog::export_files() <INFO> export marked file.");

@@ -136,7 +136,7 @@ Fineline_UI::Fineline_UI()
    // File tree popup menu
    popup_menu = new Fl_Menu_Button(10, 90, win_width/2 - 15, win_height - 130);
    popup_menu->type(Fl_Menu_Button::POPUP3); // Right mouse button click.
-   popup_menu->add("Mark File|Unmark File|Open File|Export Files|Copy Metadata|Timeline");
+   popup_menu->add("Mark File|Unmark File|Unmark All|Open File|Export Files|Copy Metadata|Timeline");
    popup_menu->callback(popup_menu_callback);
 
    image_browser_tab->end();
@@ -379,6 +379,12 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    else if ( strncmp(item->label(), "Unmark File", 11) == 0 )
    {
       file_system_tree->unmark_file();
+      if (DEBUG)
+         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+   }
+   else if ( strncmp(item->label(), "Unmark All", 11) == 0 )
+   {
+      // TODO: file_system_tree->unmark_file();
       if (DEBUG)
          cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
    }

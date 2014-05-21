@@ -93,20 +93,26 @@ static void put_progress_message(string msg)
    return;
 }
 
-static void check_path_separators()
+/*
+static void check_path_separators(TskFsInfo *fs_info, string full_path)
 {
-   //TODO: check the forensic image file system type for NTFS/FAT and convert
-   // path separators to backslashes.
+   unsigned int i;
 
-#ifndef LINUX_BUILD
-      //while ((pos = full_path.find('/')) != string::npos)
-      //{
-      //   full_path[pos] = '\\';
-      //}
-#endif
-      return;
+   // Check the forensic image file system type for NTFS/FAT and convert
+   // path separators to backslashes since the file system tree widget
+   // always uses forward slash.
+
+   if (TSK_FS_TYPE_ISNTFS(fs_info->getFsType()))
+   {
+      for (i = 0; i < full_path.size(); i++)
+      {
+         if (full_path[i] == '/')
+            full_path[i] = '\\';
+      }
+   }
+   return;
 }
-
+*/
 
 /*
    Function: process_file
@@ -233,20 +239,17 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    // for later file viewing/extraction by the user.
    file_system_list.push_back(fs_info);
 
-   msg.append("---------------------------------------------------------------");
+   msg = "-----------------------------------------------------------------------------------";
    put_progress_message(msg);
-   msg.clear();
-   msg.append("Processed ");
+   msg = "Processed ";
    msg.append(Fineline_Util::xitoa(directory_count, number, 256, 10));
    msg.append(" directories.\n");
    put_progress_message(msg);
-   msg.clear();
-   msg.append("Processed ");
+   msg = "Processed ";
    msg.append(Fineline_Util::xitoa(file_count, number, 256, 10));
    msg.append(" files.\n");
    put_progress_message(msg);
-   msg.clear();
-   msg.append("---------------------------------------------------------------");
+   msg = "-----------------------------------------------------------------------------------";
    put_progress_message(msg);
 
    return(0);
@@ -370,14 +373,13 @@ int Fineline_File_System::open_forensic_image()
       return(-1);
    }
 
-   update_msg.append("Fineline_File_System::open_forensic_image() <INFO> Opened image:");
+   update_msg = "Fineline_File_System::open_forensic_image() <INFO> Opened image:";
    update_msg.append(fs_image);
 
    flog->print_log_entry(update_msg.c_str());
 
    itype = image_info->getType();
-   update_msg.clear();
-   update_msg.append("Processing image type: ");
+   update_msg = "Processing image type: ";
    update_msg.append(image_info->typeToDesc(itype));
 
    progress_dialog->add_update(update_msg);
@@ -452,11 +454,12 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
    for (i = 0; i < file_system_list.size(); i++)
    {
       TskFsInfo *fs_info = file_system_list[i];
+
       if (file_info->open(fs_info, file_info, file_path.c_str()))
       {
-         sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not open file in forensic image %s\n", file_path.c_str());
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not open file in file system %i\n", i);
          flog->print_log_entry(msg);
-         return(-1);
+         progress_message(msg);
       }
       else
       {
@@ -466,11 +469,13 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
          string destination_file = evidence_directory;
          destination_file.append(PATH_SEPARATOR);
          destination_file.append(file_path);
+
          if (make_path(destination_file, 0775) != 0)  // Linux/Unix permissions: (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
          {
-            sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not make path %s\n", destination_file.c_str());
+            sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not make subdirectory in %s\n", evidence_directory.c_str());
             flog->print_log_entry(msg);
-            return(-1);
+            progress_message(msg);
+            //return(-1); do not return, directory may already exist, errno checking is unreliable.
          }
 
          out_file = fopen(destination_file.c_str(), "wb");
@@ -478,6 +483,7 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
          {
             sprintf(msg, "Fineline_File_System::export_file() <ERROR> Could not open file %s\n", destination_file.c_str());
             flog->print_log_entry(msg);
+            progress_message(msg);
             return(-1);
          }
          else
@@ -523,7 +529,7 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
       fclose(out_file);
 
    delete file_info;
-      
+
    progress_msg = "Exported file: ";
    progress_msg.append(file_path);
    put_progress_message(progress_msg);
@@ -561,7 +567,7 @@ const char *Fineline_File_System::get_image_name()
    Purpose : Makes the required subdirectories in the evidence
              directory to export files into.
    Input   : The file path and file creation mode (only valid for Linux).
-   Output  : Returns 0 on success or -1 on failure.
+   Output  : Returns 0 on success or errno on failure.
 */
 int Fineline_File_System::make_path(string s, mode_t mode)
 {
