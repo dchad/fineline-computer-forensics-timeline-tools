@@ -141,8 +141,8 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
 
    full_file_path.append(frec->file_name);
 
-   if (DEBUG)
-      printf("Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
+   //if (DEBUG)
+   //   printf("Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
 
    Fl::lock();
 
@@ -252,6 +252,8 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    msg = "-----------------------------------------------------------------------------------";
    put_progress_message(msg);
 
+   Fl::awake();
+
    return(0);
 }
 
@@ -320,6 +322,7 @@ void* fs_thread_task(void* p)
 {
    Fineline_File_System *file_system_image = (Fineline_File_System *)p;
    char msg[256];
+   string pmsg;
 
    sprintf(msg, "fs_thread_task() <INFO> Start forensic image processing thread: %s\n", file_system_image->get_image_name());
    flog->print_log_entry(msg);
@@ -333,7 +336,19 @@ void* fs_thread_task(void* p)
    file_system_image->process_forensic_image();
 
    //Completed parsing the image so notify the GUI
+
+   Fl::awake();
+
    file_system_tree->rebuild_tree();
+
+   pmsg = "-----------------------------------------------------------------------------------";
+   put_progress_message(pmsg);
+   pmsg = "Completed rebuilding file system tree.";
+   put_progress_message(pmsg);
+   pmsg = "-----------------------------------------------------------------------------------";
+   put_progress_message(pmsg);
+
+   Fl::awake();
 
    return(NULL);
 }
@@ -459,22 +474,26 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
       {
          sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not open file in file system %i\n", i);
          flog->print_log_entry(msg);
-         progress_message(msg);
+         //progress_message(msg);
       }
       else
       {
          sprintf(msg, "Fineline_File_System::export_file() <INFO> Exporting file %s\n", file_path.c_str());
          flog->print_log_entry(msg);
 
+         // destination_file.append(PATH_SEPARATOR); 
+         // NOTE: do not use PATH_SEPARATOR, libs will automatically convert to
+         // to platform specific path separator on Linux or Windows.
+
          string destination_file = evidence_directory;
-         destination_file.append(PATH_SEPARATOR);
+         destination_file.append("/");
          destination_file.append(file_path);
 
          if (make_path(destination_file, 0775) != 0)  // Linux/Unix permissions: (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
          {
             sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not make subdirectory in %s\n", evidence_directory.c_str());
             flog->print_log_entry(msg);
-            progress_message(msg);
+            //progress_message(msg);
             //return(-1); do not return, directory may already exist, errno checking is unreliable.
          }
 
@@ -566,7 +585,7 @@ const char *Fineline_File_System::get_image_name()
    Function: make_path
    Purpose : Makes the required subdirectories in the evidence
              directory to export files into.
-   Input   : The file path and file creation mode (only valid for Linux).
+   Input   : The file path and file creation mode (mode is only valid for Linux).
    Output  : Returns 0 on success or errno on failure.
 */
 int Fineline_File_System::make_path(string s, mode_t mode)
@@ -579,15 +598,27 @@ int Fineline_File_System::make_path(string s, mode_t mode)
    char path[FL_MAX_INPUT_STR];
    char *p;
 
-   strncpy(path, s.c_str(), path_len);
-   s.clear();
+   //memset(path, 0, FL_MAX_INPUT_STR); // CLEAR THE BUFFERS!!!
+   //strncpy(path, s.c_str(), path_len);
+   //s.clear();
 
-   if (path[path_len] != '/')     // TODO: change to PATH_SEPARATOR
+   if (path[path_len] != '/')  // NOTE: do not use PATH_SEPARATOR, libs will automatically convert to required path separator
    {
-      if ((p = strrchr(path, '/')) == NULL) //NOTE: using s.find_last_of() did not work!!!
+      //if ((p = strrchr(path, '/')) == NULL) //NOTE: using s.find_last_of() did not work!!!
+      //   return(ret_val);
+      //else
+      //   s.append(path, (int)((p - path) + 1));
+
+      if ((pos = s.find_last_of('/')) == string::npos)
+      {
          return(ret_val);
+      }
       else
-         s.append(path, (int)((p - path) + 1));
+      {
+         s = s.substr(0, pos + 1);
+         sprintf(msg, "Fineline_File_System::make_path() <INFO> Making directory path %s\n", s.c_str());
+         flog->print_log_entry(msg);
+      }
    }
 
     while((pos = s.find_first_of('/', pre)) != string::npos)

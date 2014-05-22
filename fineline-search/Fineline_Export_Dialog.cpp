@@ -140,9 +140,15 @@ void Fineline_Export_Dialog::export_files()
          msg.append(full_path);
          file_browser->add(msg.c_str());
       }
+      else
+      {
+         msg = "Error exporting file: ";
+         msg.append(full_path);
+         file_browser->add(msg.c_str());
+      }
       full_path.clear();
-      if (DEBUG)
-         Fineline_Log::print_log_entry("Fineline_Export_Dialog::export_files() <INFO> export marked file.");
+      //if (DEBUG)
+      //   Fineline_Log::print_log_entry("Fineline_Export_Dialog::export_files() <INFO> export marked file.");
    }
 
    return;
