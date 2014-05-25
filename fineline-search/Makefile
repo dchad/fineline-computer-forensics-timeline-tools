@@ -25,7 +25,8 @@ Fineline_File_System_Tree.cpp \
 Fineline_File_Display_Dialog.cpp \
 Fineline_Event_Dialog.cpp   \
 Fineline_Export_Dialog.cpp  \
-Fineline_File_Metadata_Dialog.cpp \
+Fineline_File_Metadata_Dialog.cpp  \
+Fineline_File_Metadata_Browser.cpp \
 Fineline_File_Tree_Dialog.cpp  \
 Fineline_Project_Dialog.cpp    \
 Fineline_Search_Dialog.cpp     \

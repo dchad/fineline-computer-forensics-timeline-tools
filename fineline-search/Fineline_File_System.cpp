@@ -133,6 +133,8 @@ static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
    strncpy(frec->file_path, path.c_str(), path.size());
 
    frec->id = file_count++;
+   frec->marked = 0;
+   frec->hidden = 0;
    frec->file_size = (long)fs_meta->getSize();
    frec->access_time = (long)fs_meta->getATime();
    frec->creation_time = (long)fs_meta->getCrTime();
@@ -481,7 +483,7 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
          sprintf(msg, "Fineline_File_System::export_file() <INFO> Exporting file %s\n", file_path.c_str());
          flog->print_log_entry(msg);
 
-         // destination_file.append(PATH_SEPARATOR); 
+         // destination_file.append(PATH_SEPARATOR);
          // NOTE: do not use PATH_SEPARATOR, libs will automatically convert to
          // to platform specific path separator on Linux or Windows.
 
@@ -596,19 +598,9 @@ int Fineline_File_System::make_path(string s, mode_t mode)
    int path_len = s.size();
    char msg[256];
    char path[FL_MAX_INPUT_STR];
-   char *p;
-
-   //memset(path, 0, FL_MAX_INPUT_STR); // CLEAR THE BUFFERS!!!
-   //strncpy(path, s.c_str(), path_len);
-   //s.clear();
 
    if (path[path_len] != '/')  // NOTE: do not use PATH_SEPARATOR, libs will automatically convert to required path separator
    {
-      //if ((p = strrchr(path, '/')) == NULL) //NOTE: using s.find_last_of() did not work!!!
-      //   return(ret_val);
-      //else
-      //   s.append(path, (int)((p - path) + 1));
-
       if ((pos = s.find_last_of('/')) == string::npos)
       {
          return(ret_val);

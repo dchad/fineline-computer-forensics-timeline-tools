@@ -127,7 +127,7 @@ void Fineline_Event_Dialog::add_marked_files(vector< fl_file_record_t* > flist)
       strncpy(full_path, flec->file_path, strlen(flec->file_path));
       strncat(full_path, flec->file_name, strlen(flec->file_name));
       text_buffer->append(full_path);
-      Fineline_Log::print_log_entry("Fineline_Event_Dialog::add_marked_files() <INFO> added marked file.");
+      //Fineline_Log::print_log_entry("Fineline_Event_Dialog::add_marked_files() <INFO> added marked file.");
    }
    return;
 }
@@ -145,76 +145,76 @@ void Fineline_Event_Dialog::button_callback(Fl_Button *b, void *p)
 }
 
 
-void Fineline_Event_Dialog::paste_cb(Fl_Widget *w, void* v) 
+void Fineline_Event_Dialog::paste_cb(Fl_Widget *w, void* v)
 {
   Fineline_Event_Dialog* e = (Fineline_Event_Dialog*)v;
   Fl_Text_Editor::kf_paste(0, e->teditor);
 }
 
-void Fineline_Event_Dialog::copy_cb(Fl_Widget *w, void* v) 
+void Fineline_Event_Dialog::copy_cb(Fl_Widget *w, void* v)
 {
   Fineline_Event_Dialog* e = (Fineline_Event_Dialog*)v;
   Fl_Text_Editor::kf_copy(0, e->teditor);
 }
 
-void Fineline_Event_Dialog::cut_cb(Fl_Widget *w, void* v) 
+void Fineline_Event_Dialog::cut_cb(Fl_Widget *w, void* v)
 {
   Fineline_Event_Dialog* e = (Fineline_Event_Dialog*)v;
   Fl_Text_Editor::kf_cut(0, e->teditor);
 }
 
-void Fineline_Event_Dialog::delete_cb(Fl_Widget *w, void*) 
+void Fineline_Event_Dialog::delete_cb(Fl_Widget *w, void*)
 {
   text_buffer->remove_selection();
 }
 
 
-void Fineline_Event_Dialog::find_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::find_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::find_next_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::find_next_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::replace_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::replace_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::replace_next_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::replace_next_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::quit_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::quit_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::close_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::close_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::open_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::open_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::insert_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::insert_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::saveas_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::saveas_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }
 
-void Fineline_Event_Dialog::save_cb(Fl_Widget *w, void *v) 
+void Fineline_Event_Dialog::save_cb(Fl_Widget *w, void *v)
 {
    //TODO:
 }

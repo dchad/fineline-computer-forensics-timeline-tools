@@ -43,6 +43,7 @@ struct fl_file_record
 {
    int id;
    int marked;
+   int hidden;
    long creation_time;
    long access_time;
    long modification_time;

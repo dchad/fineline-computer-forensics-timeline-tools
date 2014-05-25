@@ -31,6 +31,9 @@
                |-> Tab 2 : Statistical graph of the file system.
                |-> Tab 3 : Timeline graph.
                |-> Tab 4 : Keyword search panel.
+               |-> Tab 5 : Report panel, contains the results of the file system analysis,
+                           event list, file system tree, usb devices, email, applications
+                           user accounts and login history, web history, operating system details.
 
    Notes: EXPERIMENTAL
 
@@ -51,7 +54,7 @@
 using namespace std;
 
 Fineline_Thread *Fineline_UI::socket_thread;
-Fl_Browser *Fineline_UI::file_metadata_browser;
+Fineline_File_Metadata_Browser *Fineline_UI::file_metadata_browser;
 Fineline_File_System_Tree *Fineline_UI::file_system_tree;
 Fineline_File_System *Fineline_UI::file_system;
 Fl_Native_File_Chooser *Fineline_UI::fc;
@@ -87,11 +90,6 @@ Fineline_UI::Fineline_UI()
    menu->add("&Help/Google",    0, main_menu_callback);
    menu->add("&Help/About",     0, main_menu_callback);
 
-   //menu->add("&Sockets/Start",  0, main_menu_callback);
-   //menu->add("&Sockets/Stop",   0, main_menu_callback);
-   //menu->add("&ACE/ACE Start",  0, main_menu_callback);
-   //menu->add("&ACE/ACE Stop",   0, main_menu_callback);
-
    //----------------------------------------------------------------------------------
    // Define the top level Tabbed panel
    //----------------------------------------------------------------------------------
@@ -117,8 +115,11 @@ Fineline_UI::Fineline_UI()
    filter_tree_button = new Fl_Button(125, win_height - 45, 100, 30, "Filter");
    filter_tree_button->callback((Fl_Callback*)tree_button_callback);
    filter_tree_button->tooltip("Open the file tree filter dialogue.");
+   timeline_tree_button = new Fl_Button(235, win_height - 45, 100, 30, "Timeline");
+   timeline_tree_button->callback((Fl_Callback*)tree_button_callback);
+   timeline_tree_button->tooltip("Create an event file and add to the timeline graph.");
 
-   file_metadata_browser = new Fl_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 145);
+   file_metadata_browser = new Fineline_File_Metadata_Browser(win_width/2 + 5, 90, win_width/2 - 15, win_height - 145);
 
 	save_metadata_button = new Fl_Button(win_width/2 + 15, win_height - 45, 100, 30, "Save");
    save_metadata_button->callback((Fl_Callback*)file_metadata_callback);
@@ -143,7 +144,7 @@ Fineline_UI::Fineline_UI()
    Fl_Group::current()->resizable(image_browser_tab);
 
    //----------------------------------------------------------------------------------
-   // Tab 2 - Event summary graph panel
+   // Tab 2 - Statistical graph panel
    //----------------------------------------------------------------------------------
 
    Fl_Group* statistical_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 75, "Statistics Graph");
@@ -165,7 +166,7 @@ Fineline_UI::Fineline_UI()
    //----------------------------------------------------------------------------------
 
    Fl_Group* timeline_graph_tab = new Fl_Group(5, 70, win_width - 10, win_height - 75, "Timeline Graph");
-   timeline_graph_tab->tooltip("File System Event Timeline");
+   timeline_graph_tab->tooltip("File System Event Timeline.");
          //o->selection_color((Fl_Color)3);
    timeline_graph_tab->hide();
    {
@@ -185,7 +186,7 @@ Fineline_UI::Fineline_UI()
    //----------------------------------------------------------------------------------
 
    Fl_Group* search_tab = new Fl_Group(5, 70, win_width - 10, win_height - 75, "Keyword Search");
-   search_tab->tooltip("File System Keyword Search");
+   search_tab->tooltip("File System Keyword Search.");
    search_tab->hide();
       {
             new Fl_Button(20, 80, 60, 110, "button2");
@@ -198,6 +199,27 @@ Fineline_UI::Fineline_UI()
       } // Fl_Button* o
    search_tab->end();
    Fl_Group::current()->resizable(search_tab);
+
+
+   //----------------------------------------------------------------------------------
+   // Tab 5 - Report panel
+   //----------------------------------------------------------------------------------
+
+   Fl_Group* report_tab = new Fl_Group(5, 70, win_width - 10, win_height - 75, "Report");
+   report_tab->tooltip("Forensic image analysis report.");
+   report_tab->hide();
+      {
+            new Fl_Button(20, 80, 60, 110, "button2");
+      } // Fl_Button* o
+      {
+            new Fl_Button(80, 80, 60, 110, "button");
+      } // Fl_Button* o
+      {
+            new Fl_Button(140, 80, 60, 110, "button");
+      } // Fl_Button* o
+
+   report_tab->end();
+   Fl_Group::current()->resizable(report_tab);
 
    tab_panel->end();
    Fl_Group::current()->resizable(tab_panel);
@@ -261,14 +283,6 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
   else if ( strcmp(item->label(), "Google") == 0 )
   {
      fl_open_uri("http://google.com/");
-  }
-  else if ( strcmp(item->label(), "Start") == 0 )
-  {
-     socket_thread->start_task(file_metadata_browser);
-  }
-  else if ( strcmp(item->label(), "Stop") == 0 )
-  {
-	 socket_thread->stop_task();
   }
   else if ( strcmp(item->label(), "&Quit") == 0 )
   {
@@ -488,7 +502,7 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
          cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
       for (i = 1; i < file_metadata_browser->size()+1; i++)
       {
-         metadata.append(file_metadata_browser->text(i));
+         metadata.append(file_metadata_browser->get_html_row(i));
          metadata.append("\n");
          file_metadata_dialog->add_metadata(metadata);
          metadata.clear();
@@ -565,6 +579,7 @@ void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
 {
    string metadata;
 
+/*
    file_metadata_browser->add("<metadata>");
 
    metadata.append("Filename : ");
@@ -597,8 +612,9 @@ void Fineline_UI::update_file_metadata_browser(fl_file_record_t *flrec)
    file_metadata_browser->add(metadata.c_str());
 
    file_metadata_browser->add("</metadata>");
-
-   file_metadata_browser->bottomline(file_metadata_browser->size());
+*/
+   file_metadata_browser->add_file_record(flrec);
+   //file_metadata_browser->(file_metadata_browser->size());
 
    return;
 }

@@ -49,6 +49,7 @@
 #include "Fineline_File_System_Tree.h"
 #include "Fineline_Event_Dialog.h"
 #include "Fineline_File_Metadata_Dialog.h"
+#include "Fineline_File_Metadata_Browser.h"
 #include "Fineline_Export_Dialog.h"
 
 class Fineline_UI
@@ -87,16 +88,17 @@ class Fineline_UI
       Fl_Button *clear_metadata_button;
       Fl_Button *save_tree_button;
       Fl_Button *filter_tree_button;
+      Fl_Button *timeline_tree_button;
       Fl_Box *box;
 
       static Fineline_Thread *socket_thread;
-      static Fl_Browser *file_metadata_browser;
       static Fineline_File_System_Tree *file_system_tree;
       static Fineline_File_System *file_system;
       static Fl_Native_File_Chooser *fc;
       static Fineline_Log *flog;
       static Fineline_Event_Dialog *event_dialog;
       static Fineline_File_Metadata_Dialog *file_metadata_dialog;
+      static Fineline_File_Metadata_Browser *file_metadata_browser;
       static Fineline_Progress_Dialog *progress_dialog;
       static Fineline_Export_Dialog *export_dialog;
       //TODO: static Fineline_Tree_Filter_Dialog *tree_filter_dialog;
