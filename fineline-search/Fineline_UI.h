@@ -51,6 +51,8 @@
 #include "Fineline_File_Metadata_Dialog.h"
 #include "Fineline_File_Metadata_Browser.h"
 #include "Fineline_Export_Dialog.h"
+#include "Fineline_Options_Dialog.h"
+#include "Fineline_Project_Dialog.h"
 
 class Fineline_UI
 {
@@ -74,6 +76,7 @@ class Fineline_UI
 	   static void update_file_metadata_browser(fl_file_record_t *flrec);
 	   static int save_tree(const char *filename);
 
+      int run_unit_tests(int argc, char *argv[]);
 
 
    protected:
@@ -101,6 +104,8 @@ class Fineline_UI
       static Fineline_File_Metadata_Browser *file_metadata_browser;
       static Fineline_Progress_Dialog *progress_dialog;
       static Fineline_Export_Dialog *export_dialog;
+      static Fineline_Options_Dialog *options_dialog;
+      static Fineline_Project_Dialog *project_dialog;
       //TODO: static Fineline_Tree_Filter_Dialog *tree_filter_dialog;
       //TODO: static Fineline_Save_Tree_Dialog *save_tree_dialog;
 

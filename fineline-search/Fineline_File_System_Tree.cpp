@@ -102,13 +102,13 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
    // Windows major culprit is the winsxs directory containing backups of updated system files.
    // So add the winsxs directory but leave all the subdirectories for addition by user selection.
    unsigned int pos;
-   pos = filename.find("winsxs"); //TODO: NOT WORKING!!!
+   pos = filename.find("winsxs");
    if (pos == string::npos)
    {
       add(filename.c_str());
       close(filename.c_str(), 0);
    }
-   else if (pos == (filename.size() - 7))
+   else if ((filename.size() - pos) < 7)
    {
       add(filename.c_str());
       close(filename.c_str(), 0);

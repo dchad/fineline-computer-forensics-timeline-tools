@@ -19,13 +19,13 @@
 
 
 /*
-   Fineline_File_Metadata_Browser.cpp
+   Fineline_File_Metadata_Viewer.cpp
 
    Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
    Date  : 25/05/2014
 
-   Purpose: FineLine FLTK GUI file metadata browser widget.
+   Purpose: FineLine FLTK GUI file metadata as html in an Fl_Help_Viewer widget.
 
    Notes: EXPERIMENTAL
 
@@ -40,19 +40,13 @@
 
 #include "Fineline_File_Metadata_Browser.h"
 
-Fineline_File_Metadata_Browser::Fineline_File_Metadata_Browser(int x, int y, int w, int h) : Fl_Browser(x, y, w, h)
+Fineline_File_Metadata_Browser::Fineline_File_Metadata_Browser(int x, int y, int w, int h) : Fl_Help_View(x, y, w, h)
 {
    //ctor
    textfont(FL_HELVETICA);
    textsize(10);
    textcolor(FL_DARK_BLUE);
-
-   static int widths[] = { 100, 150, 150, 150, 100, 100, 100, 100, 100, 50, 0 };            // widths for each column
-   column_widths(widths);
-   column_char('\t');                                                       // tabs as column delimiters
-   type(FL_MULTI_BROWSER);
-
-   //resizable();
+   resizable();
 }
 
 Fineline_File_Metadata_Browser::~Fineline_File_Metadata_Browser()
@@ -64,7 +58,6 @@ Fineline_File_Metadata_Browser::~Fineline_File_Metadata_Browser()
 int Fineline_File_Metadata_Browser::add_file_record(fl_file_record_t *flec)
 {
    char file_size_string[256];
-   string meta_line;
 
    if (flec != NULL)
    {
@@ -72,37 +65,49 @@ int Fineline_File_Metadata_Browser::add_file_record(fl_file_record_t *flec)
 
       file_list.push_back(flec);
 
-      if (size() == 0)
+      if (html_line.size() == 0)
       {
-         meta_line = "Filename\tModification Time\tAccess Time\tCreation Time\tOwner\tFile Size";
-         add(meta_line.c_str());
+         html_line = "<head><title>File Metadata:</title></head><body><table><tr><th>Filename</th><th>Modification Time</th><th>Access Time</th><th>Creation Time</th><th>Owner</th><th>File Size</th></tr>";
+      }
+      else
+      {
+         html_line.erase(html_line.size()-15, html_line.size()-1);
       }
 
-      meta_line = flec->file_name;
+      html_line.append("<tr><td>");
+      html_line.append(flec->file_name);
+      html_line.append("</td>");
 
-      meta_line.append("\t");
-      meta_line.append(flec->file_modification_time_string);
+      html_line.append("<td>");
+      html_line.append(flec->file_modification_time_string);
+      html_line.append("</td>");
 
-      meta_line.append("\t");
-      meta_line.append(flec->file_access_time_string);
+      html_line.append("<td>");
+      html_line.append(flec->file_access_time_string);
+      html_line.append("</td>");
 
-      meta_line.append("\t");
-      meta_line.append(flec->file_creation_time_string);
+      html_line.append("<td>");
+      html_line.append(flec->file_creation_time_string);
+      html_line.append("</td>");
 
-      meta_line.append("\t");
-      meta_line.append(flec->file_owner);
+      html_line.append("<td>");
+      html_line.append(flec->file_owner);
+      html_line.append("</td>");
 
-      meta_line.append("\t");
-      meta_line.append(Fineline_Util::xitoa(flec->file_size, file_size_string, 256, 10));
+      html_line.append("<td>");
+      html_line.append(Fineline_Util::xitoa(flec->file_size, file_size_string, 256, 10));
+      html_line.append("</td>");
 
-      //meta_line.append("\t");
-      //meta_line.append("................................................................");
+      //html_line.append("<td>");
+      //html_line.append("................................................................");
+      //html_line.append("</td>");
 
+      html_line.append("</tr></table></body>");
 
-      add(meta_line.c_str());
+      value(html_line.c_str());
 
       if (DEBUG)
-         Fineline_Log::print_log_entry(meta_line.c_str());
+         Fineline_Log::print_log_entry(html_line.c_str());
    }
    return(0);
 }
@@ -114,37 +119,37 @@ int add_file_record_list(vector< fl_file_record_t* > append_list)
    return(0);
 }
 
-int Fineline_File_Metadata_Browser::add_row(string file_metadata)
+int Fineline_File_Metadata_Browser::add_html_row(string file_metadata)
 {
    return(0);
 }
 
 
-string Fineline_File_Metadata_Browser::get_row(int record_number)
+string Fineline_File_Metadata_Browser::get_html_row(int record_number)
 {
-   string row = text(record_number);
+   string row;
 
    return(row);
 }
 
-int Fineline_File_Metadata_Browser::delete_row(int record_number)
+int Fineline_File_Metadata_Browser::delete_html_row(int record_number)
 {
    return(0);
 }
 
-int Fineline_File_Metadata_Browser::add_table(string metadata_table)
+int Fineline_File_Metadata_Browser::add_html_table(string metadata_table)
 {
    return(0);
 }
 
-string Fineline_File_Metadata_Browser::get_table()
+string Fineline_File_Metadata_Browser::get_html_table()
 {
    string table;
 
    return(table);
 }
 
-int Fineline_File_Metadata_Browser::delete_table()
+int Fineline_File_Metadata_Browser::delete_html_table()
 {
    return(0);
 }

@@ -1,4 +1,7 @@
 
+
+
+
 /*  Copyright 2014 Derek Chadwick
 
     This file is part of the FineLine Computer Forensics Timeline Tools.
@@ -19,27 +22,52 @@
 
 
 /*
-   Fineline_File_Project_Dialog.cpp
+   Fineline_File_Options_Dialog.h
 
    Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
    Date  : 02/04/2014
 
-   Purpose: FineLine FLTK GUI project dialog class implementation.
+   Purpose: FineLine FLTK GUI options dialog definitions.
 
    Notes: EXPERIMENTAL
 
 */
 
 
-#include "Fineline_Project_Dialog.h"
+#ifndef FINELINE_OPTIONS_DIALOG_H
+#define FINELINE_OPTIONS_DIALOG_H
 
-Fineline_Project_Dialog::Fineline_Project_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline Project Dialog")
-{
-   //ctor
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
 
-Fineline_Project_Dialog::~Fineline_Project_Dialog()
+#include <FL/Fl.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Box.H>
+#include <FL/filename.H>
+#include <FL/Fl_Button.H>
+
+#include "fineline-search.h"
+
+class Fineline_Options_Dialog : public Fl_Double_Window
 {
-   //dtor
-}
+   public:
+      Fineline_Options_Dialog(int x, int y, int w, int h);
+      virtual ~Fineline_Options_Dialog();
+
+      int open_options_file();
+      int save_options_file();
+      int close_options_file();
+      int show_dialog();
+
+      static void button_callback(Fl_Button *b, void *p);
+
+   protected:
+   private:
+
+      FILE *options_file;
+};
+
+#endif // FINELINE_OPTIONS_DIALOG_H

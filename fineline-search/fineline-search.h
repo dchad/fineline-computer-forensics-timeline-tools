@@ -24,7 +24,7 @@
    Author: Derek Chadwick
    Date  : 02/03/2014
 
-   Purpose: FineLine global definitions.
+   Purpose: FineLine-search global definitions.
 
 */
 
@@ -35,7 +35,10 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+
 #include "../common/flcommon.h"
+
+#define FL_OPTIONS_FILE "fineline-search-options.txt"
 
 enum FL_FILE_TYPES { FL_DIRECTORY = 1, FL_NORMAL_FILE, FL_SYSTEM_FILE };
 
@@ -56,6 +59,7 @@ struct fl_file_record
    char file_name[256];
    char file_path[FL_MAX_INPUT_STR];
    char file_event_string[FL_MAX_INPUT_STR];
+   char comment[FL_MAX_INPUT_STR];
 };
 
 typedef struct fl_file_record fl_file_record_t;

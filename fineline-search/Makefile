@@ -29,6 +29,7 @@ Fineline_File_Metadata_Dialog.cpp  \
 Fineline_File_Metadata_Browser.cpp \
 Fineline_File_Tree_Dialog.cpp  \
 Fineline_Project_Dialog.cpp    \
+Fineline_Options_Dialog.cpp    \
 Fineline_Search_Dialog.cpp     \
 Fineline_Statistics_Dialog.cpp \
 Fineline_Timeline_Graph.cpp    \

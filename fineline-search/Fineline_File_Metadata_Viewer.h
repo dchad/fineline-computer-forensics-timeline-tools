@@ -20,13 +20,13 @@
 
 
 /*
-   Fineline_File_Metadata_Browser.h
+   Fineline_File_Metadata_Viewer.h
 
    Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
    Date  : 25/05/2014
 
-   Purpose: FineLine FLTK GUI file metadata browser widget.
+   Purpose: FineLine FLTK GUI file metadata as html widget.
 
    Notes: EXPERIMENTAL
 
@@ -41,13 +41,13 @@
 #include <vector>
 
 #include <FL/Fl.H>
-#include <FL/Fl_Browser.H>
+#include <FL/Fl_Help_View.H>
 
 #include "fineline-search.h"
 
 using namespace std;
 
-class Fineline_File_Metadata_Browser : public Fl_Browser
+class Fineline_File_Metadata_Browser : public Fl_Help_View
 {
    public:
       Fineline_File_Metadata_Browser(int x, int y, int w, int h);
@@ -55,12 +55,12 @@ class Fineline_File_Metadata_Browser : public Fl_Browser
 
       int add_file_record(fl_file_record_t *flec);
       int add_file_record_list(vector< fl_file_record_t* > append_list);
-      int add_row(string file_metadata);
-      string get_row(int record_number);
-      int delete_row(int record_number);
-      int add_table(string metadata_table);
-      string get_table();
-      int delete_table();
+      int add_html_row(string file_metadata);
+      string get_html_row(int record_number);
+      int delete_html_row(int record_number);
+      int add_html_table(string metadata_table);
+      string get_html_table();
+      int delete_html_table();
       int get_record_count();
 
       static string format_record_as_html(fl_file_record_t *flec);
@@ -72,6 +72,8 @@ class Fineline_File_Metadata_Browser : public Fl_Browser
       int get_long_time_strings(fl_file_record_t *flec);
 
       vector< fl_file_record_t* > file_list;
+      string html_line;
+
 };
 
 #endif // FINELINE_FILE_METADATA_BROWSER_H

@@ -52,7 +52,8 @@ using namespace std;
 #include "Fineline_Util.h"
 #include "Fineline_Progress_Dialog.h"
 
-
+int x_argc;
+char **x_argv;
 
 TEST(FineLineSearchUITests, ValidUI)
 {
@@ -61,7 +62,9 @@ TEST(FineLineSearchUITests, ValidUI)
 
    ASSERT_TRUE(NULL != flui);
 
-   delete flui;
+   ASSERT_EQ(0, flui->run_unit_tests(x_argc, x_argv));
+
+   //delete flui;
 }
 
 
@@ -288,6 +291,9 @@ TEST(FineLineSearchThreadTests, ValidateMethods)
 
 int main(int argc, char **argv)
 {
+  x_argc = argc;
+  x_argv = argv;
+
   InitGoogleTest(&argc, argv);
 
   printf("Starting FineLine Unit Test Suite\n");

@@ -32,6 +32,12 @@
 
 */
 
+
+
+#ifndef FINELINE_FILE_METADATA_DIALOG_H
+#define FINELINE_FILE_METADATA_DIALOG_H
+
+
 #include <string>
 
 #include <FL/Fl.H>
@@ -41,9 +47,6 @@
 #include <FL/filename.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
-
-#ifndef FINELINE_FILE_METADATA_DIALOG_H
-#define FINELINE_FILE_METADATA_DIALOG_H
 
 using namespace std;
 
