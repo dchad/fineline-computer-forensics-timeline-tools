@@ -60,6 +60,7 @@ class Fineline_Project_Dialog : public Fl_Double_Window
 
    FILE *project_file;
 
+   static void button_callback(Fl_Button *b, void *p);
 };
 
 #endif // FINELINE_PROJECT_DIALOG_H

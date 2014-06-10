@@ -37,9 +37,39 @@
 Fineline_Project_Dialog::Fineline_Project_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline Project Dialog")
 {
    //ctor
+   begin();
+
+   Fl_Group* dialog_group = new Fl_Group(5, 5, w - 5, h - 5);
+   dialog_group->tooltip("Click the save button to save the case/project properties.");
+
+
+   {
+	   Fl_Button* o = new Fl_Button(w - 230, h - 45, 100, 30, "Save");
+      o->callback((Fl_Callback*)button_callback, (void *)this);
+      o->tooltip("Add the events to the timeline graph.");
+   } // Fl_Button* o
+   {
+      Fl_Button* o = new Fl_Button(w - 120, h - 45, 100, 30, "Close");
+      o->callback((Fl_Callback*)button_callback, (void *)this);
+      o->tooltip("Close dialog without saving.");
+   } // Fl_Button* o
+
+   dialog_group->end();
+   Fl_Group::current()->resizable(dialog_group);
+
+   end();
+
+
 }
 
 Fineline_Project_Dialog::~Fineline_Project_Dialog()
 {
    //dtor
+}
+
+void Fineline_Project_Dialog::button_callback(Fl_Button *b, void *p)
+{
+   //TODO: get the calling button label and execute the required action
+
+   ((Fineline_Project_Dialog *)p)->hide();
 }

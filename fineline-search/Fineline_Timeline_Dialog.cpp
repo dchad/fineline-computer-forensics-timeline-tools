@@ -32,8 +32,11 @@
 
 */
 
+#include <iostream>
 
 #include "Fineline_Timeline_Dialog.h"
+
+using namespace std;
 
 Fineline_Timeline_Dialog::Fineline_Timeline_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y ,w, h, "Timeline Dialog")
 {
@@ -42,7 +45,7 @@ Fineline_Timeline_Dialog::Fineline_Timeline_Dialog(int x, int y, int w, int h) :
    Fl_Group* dialog_group = new Fl_Group(5, 5, w - 5, h - 5);
    dialog_group->tooltip("Click the timeline button to add the file metadata to the timeline graph.");
 
-   file_browser = new Fineline_File_Metadata_Browser(10, 10, w - 10, h - 55);
+   file_browser = new Fineline_File_Metadata_Browser(10, 10, w - 10, h - 65);
 
    {
 	   Fl_Button* o = new Fl_Button(w - 230, h - 45, 100, 30, "Timeline");

@@ -268,10 +268,11 @@ Fineline_UI::Fineline_UI()
    export_dialog = new Fineline_Export_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    options_dialog = new Fineline_Options_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    project_dialog = new Fineline_Project_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
-   tree_filter_dialog = new Fineline_Tree_Filter_Dialog();
-   tree_search_dialog = new Fineline_Tree_Search_Dialog();
    report_dialog = new Fineline_Report_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    timeline_dialog = new Fineline_Timeline_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+
+   //tree_filter_dialog = new Fineline_Tree_Filter_Dialog();
+   //tree_search_dialog = new Fineline_Tree_Search_Dialog();
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -454,14 +455,14 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    else if ( strncmp(item->label(), "Timeline", 8) == 0 )
    {
       // open the event dialogue to create fineline event records for the marked files and add to the timeline graph.
-      timeline_dialog->activate();
+      //timeline_dialog->activate();
       timeline_dialog->add_marked_files(file_system_tree->get_marked_files());
       timeline_dialog->show();
    }
    else if ( strncmp(item->label(), "Report", 6) == 0 )
    {
       // open the event dialogue to create fineline event records for the marked files and add to the timeline graph.
-      report_dialog->activate();
+      //report_dialog->activate();
       report_dialog->add_marked_files(file_system_tree->get_marked_files());
       report_dialog->show();
 
