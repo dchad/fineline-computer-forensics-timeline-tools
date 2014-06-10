@@ -53,6 +53,10 @@
 #include "Fineline_Export_Dialog.h"
 #include "Fineline_Options_Dialog.h"
 #include "Fineline_Project_Dialog.h"
+#include "Fineline_Report_Dialog.h"
+#include "Fineline_Timeline_Dialog.h"
+#include "Fineline_Tree_Filter_Dialog.h"
+#include "Fineline_Tree_Search_Dialog.h"
 
 class Fineline_UI
 {
@@ -92,6 +96,8 @@ class Fineline_UI
       Fl_Button *save_tree_button;
       Fl_Button *filter_tree_button;
       Fl_Button *timeline_tree_button;
+      Fl_Button *search_tree_button;
+      Fl_Button *report_tree_button;
       Fl_Box *box;
 
       static Fineline_Thread *socket_thread;
@@ -106,8 +112,12 @@ class Fineline_UI
       static Fineline_Export_Dialog *export_dialog;
       static Fineline_Options_Dialog *options_dialog;
       static Fineline_Project_Dialog *project_dialog;
-      //TODO: static Fineline_Tree_Filter_Dialog *tree_filter_dialog;
-      //TODO: static Fineline_Save_Tree_Dialog *save_tree_dialog;
+      static Fineline_Tree_Filter_Dialog *tree_filter_dialog;
+      static Fineline_Tree_Search_Dialog *tree_search_dialog;
+      static Fineline_Report_Dialog *report_dialog;
+      static Fineline_Timeline_Dialog *timeline_dialog;
+
+      //DEPRECATED: just use file chooser and progress dialog TODO: static Fineline_Save_Tree_Dialog *save_tree_dialog;
 
 	   void update_screeninfo(Fl_Widget *b, void *p);
 

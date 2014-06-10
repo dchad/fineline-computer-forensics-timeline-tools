@@ -20,7 +20,7 @@
 
 
 /*
-   Fineline_Timeline_Dialog.cpp
+   Fineline_Timeline_Dialog.h
 
    Title : FineLine Computer Forensics Image Search GUI
    Author: Derek Chadwick
@@ -36,14 +36,36 @@
 #ifndef FINELINE_TIMELINE_DIALOG_H
 #define FINELINE_TIMELINE_DIALOG_H
 
+#include <vector>
+#include <string>
 
-class Fineline_Timeline_Dialog
+#include <FL/Fl.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Browser.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
+
+#include "fineline-search.h"
+#include "Fineline_File_Metadata_Browser.h"
+
+using namespace std;
+
+class Fineline_Timeline_Dialog : public Fl_Double_Window
 {
+
    public:
-      Fineline_Timeline_Dialog();
+
+      Fineline_Timeline_Dialog(int x, int y, int w, int h);
       virtual ~Fineline_Timeline_Dialog();
+
+      void add_marked_files(vector< fl_file_record_t* > flist);
+
    protected:
    private:
+
+      Fineline_File_Metadata_Browser *file_browser;
+
+      static void button_callback(Fl_Button *b, void *p);
 };
 
 #endif // FINELINE_TIMELINE_DIALOG_H

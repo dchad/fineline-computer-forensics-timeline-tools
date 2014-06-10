@@ -34,6 +34,10 @@ Fineline_Search_Dialog.cpp     \
 Fineline_Statistics_Dialog.cpp \
 Fineline_Timeline_Graph.cpp    \
 Fineline_Progress_Dialog.cpp   \
+Fineline_Report_Dialog.cpp     \
+Fineline_Timeline_Dialog.cpp   \
+Fineline_Tree_Filter_Dialog.cpp \
+Fineline_Tree_Search_Dialog.cpp \
 ../common/Fineline_Util.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)
