@@ -57,6 +57,7 @@
 #include "Fineline_Timeline_Dialog.h"
 #include "Fineline_Tree_Filter_Dialog.h"
 #include "Fineline_Tree_Search_Dialog.h"
+#include "Fineline_File_Display_Dialog.h"
 
 class Fineline_UI
 {
@@ -116,6 +117,7 @@ class Fineline_UI
       static Fineline_Tree_Search_Dialog *tree_search_dialog;
       static Fineline_Report_Dialog *report_dialog;
       static Fineline_Timeline_Dialog *timeline_dialog;
+      static Fineline_File_Display_Dialog *file_display_dialog;
 
       //DEPRECATED: just use file chooser and progress dialog TODO: static Fineline_Save_Tree_Dialog *save_tree_dialog;
 

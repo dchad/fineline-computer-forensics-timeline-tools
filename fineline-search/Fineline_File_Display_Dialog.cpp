@@ -31,16 +31,40 @@
 
 */
 
-
+#include <FL/fl_ask.H>
 
 #include "Fineline_File_Display_Dialog.h"
 
-Fineline_File_Display_Dialog::Fineline_File_Display_Dialog()
+Fineline_File_Display_Dialog::Fineline_File_Display_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline File Display Dialog")
 {
    //ctor
+   begin();
+
+   Fl_Group* browser_group = new Fl_Group(10, 10, w - 10, h - 10);
+   {
+      progress_browser = new Fl_Browser(20, 20, w - 40, h - 100);
+      Fl_Button* save_button = new Fl_Button(w - 360, h - 50, 100, 30, "Save");
+      save_button->callback((Fl_Callback*)button_callback, (void *)this);
+      Fl_Button* clear_button = new Fl_Button(w - 250, h - 50, 100, 30, "Clear");
+      clear_button->callback((Fl_Callback*)button_callback, (void *)this);
+      Fl_Button* close_button = new Fl_Button(w - 140, h - 50, 100, 30, "Close");
+      close_button->callback((Fl_Callback*)button_callback, (void *)this);
+   }
+   browser_group->end();
+   Fl_Group::current()->resizable(browser_group);
+
+   end();
 }
 
 Fineline_File_Display_Dialog::~Fineline_File_Display_Dialog()
 {
    //dtor
+}
+
+
+void Fineline_File_Display_Dialog::button_callback(Fl_Button *b, void *p)
+{
+   fl_message("modal window");
+   ((Fineline_File_Display_Dialog *)p)->hide();
+   return;
 }

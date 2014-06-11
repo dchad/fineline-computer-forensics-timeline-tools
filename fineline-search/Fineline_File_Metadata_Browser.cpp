@@ -198,3 +198,9 @@ int Fineline_File_Metadata_Browser::get_long_time_strings(fl_file_record_t *flec
 
    return(0);
 }
+
+int Fineline_File_Metadata_Browser::save_metadata_list(const char *filename)
+{
+   //TODO: open or create a text file and write out the file metadata list
+   return(0);
+}

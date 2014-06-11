@@ -70,6 +70,7 @@ Fineline_Tree_Filter_Dialog *Fineline_UI::tree_filter_dialog;
 Fineline_Tree_Search_Dialog *Fineline_UI::tree_search_dialog;
 Fineline_Report_Dialog *Fineline_UI::report_dialog;
 Fineline_Timeline_Dialog *Fineline_UI::timeline_dialog;
+Fineline_File_Display_Dialog *Fineline_UI::file_display_dialog;
 
 Fineline_UI::Fineline_UI()
 {
@@ -270,9 +271,9 @@ Fineline_UI::Fineline_UI()
    project_dialog = new Fineline_Project_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    report_dialog = new Fineline_Report_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    timeline_dialog = new Fineline_Timeline_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
-
-   //tree_filter_dialog = new Fineline_Tree_Filter_Dialog();
-   //tree_search_dialog = new Fineline_Tree_Search_Dialog();
+   tree_filter_dialog = new Fineline_Tree_Filter_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   tree_search_dialog = new Fineline_Tree_Search_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   file_display_dialog = new Fineline_File_Display_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -437,9 +438,9 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    }
    else if ( strncmp(item->label(), "Open File", 9) == 0 )
    {
-      //TODO: display the file (images/video/text/docs/web pages) in a dialogue or for unknown binary files open a hex editor.
-      if (DEBUG)
-         cout << "Fineline_UI::popup_menu_callback() <INFO> " << item->label() << endl;
+      //Display the file (images/video/text/docs/web pages) in a dialogue or for unknown binary files open a hex editor.
+      //TODO: file_display_dialog->add_file(file_system_tree->get_selected_file());
+      file_display_dialog->show();
    }
    else if ( strncmp(item->label(), "Export", 6) == 0 )
    {
@@ -455,14 +456,12 @@ void Fineline_UI::popup_menu_callback(Fl_Widget *w, void *x)
    else if ( strncmp(item->label(), "Timeline", 8) == 0 )
    {
       // open the event dialogue to create fineline event records for the marked files and add to the timeline graph.
-      //timeline_dialog->activate();
       timeline_dialog->add_marked_files(file_system_tree->get_marked_files());
       timeline_dialog->show();
    }
    else if ( strncmp(item->label(), "Report", 6) == 0 )
    {
       // open the event dialogue to create fineline event records for the marked files and add to the timeline graph.
-      //report_dialog->activate();
       report_dialog->add_marked_files(file_system_tree->get_marked_files());
       report_dialog->show();
 
@@ -534,8 +533,16 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
    if ( strncmp(fb->label(), "Save", 4) == 0 )
    {
       //TODO: Open the file chooser dialog to select a file to save the metadata text.
-      if (DEBUG)
-         cout << "Fineline_UI::file_metadata_callback() <INFO> " << fb->label() << endl;
+      fc->title("Save File Metadata List");
+      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+         fc->preset_file(fc->filename());
+         file_metadata_browser->save_metadata_list(fc->filename());
+      }
 
    }
    else if ( strncmp(fb->label(), "Report", 6) == 0 )
@@ -554,7 +561,7 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
    }
    else if ( strncmp(fb->label(), "Timeline", 8) == 0 )
    {
-
+      //TODO: timeline_dialog->add_marked_files(file_system_tree->get_marked_filed());
       timeline_dialog->show();
    }
    else if ( strncmp(fb->label(), "Clear", 5) == 0 )
@@ -602,16 +609,16 @@ void Fineline_UI::tree_button_callback(Fl_Button *b, void *p)
       if (DEBUG)
          cout << "Fineline_UI::tree_button_callback() <INFO> " << b->label() << endl;
 
-      //TODO: open the filter dialog
-      //filter_dialog->show();
+      //TODO: pass in the file system tree pointer and open the filter dialog
+      tree_filter_dialog->show();
    }
    else if ( strncmp(b->label(), "Search", 6) == 0 )
    {
       if (DEBUG)
          cout << "Fineline_UI::tree_button_callback() <INFO> " << b->label() << endl;
 
-      // open the search dialogue to enter search criteria.
-      //search_dialog->show();
+      //TODO: pass in the file system tree pointer and open the search dialogue to enter search criteria.
+      tree_search_dialog->show();
    }
    else if ( strncmp(b->label(), "Report", 6) == 0 )
    {
@@ -722,6 +729,8 @@ int Fineline_UI::load_forensic_image(const char *filename)
 int Fineline_UI::save_tree(const char *filename)
 {
    //TODO: open file and write out the file system tree.
+
+   //TODO: MOVE THIS TO THE FILE SYSTEM TREE CLASS!@!
 
    return(0);
 }

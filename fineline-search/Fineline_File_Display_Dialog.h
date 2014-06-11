@@ -36,14 +36,30 @@
 #ifndef FINELINE_FILE_DISPLAY_DIALOG_H
 #define FINELINE_FILE_DISPLAY_DIALOG_H
 
+#include <FL/Fl.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Browser.H>
+#include <FL/Fl_Box.H>
+#include <FL/filename.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
-class Fineline_File_Display_Dialog
+#include "fineline-search.h"
+
+
+class Fineline_File_Display_Dialog : public Fl_Double_Window
 {
    public:
-      Fineline_File_Display_Dialog();
+      Fineline_File_Display_Dialog(int x, int y, int w, int h);
       virtual ~Fineline_File_Display_Dialog();
+
+      static void button_callback(Fl_Button *b, void *p);
+
    protected:
    private:
+
+
+      Fl_Browser *progress_browser;
 };
 
 #endif // FINELINE_FILE_DISPLAY_DIALOG_H

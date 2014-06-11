@@ -62,6 +62,7 @@ class Fineline_File_Metadata_Browser : public Fl_Browser
       string get_table();
       int delete_table();
       int get_record_count();
+      int save_metadata_list(const char *filename);
 
       static string format_record_as_html(fl_file_record_t *flec);
       static string format_record_as_xml(fl_file_record_t *flec);
