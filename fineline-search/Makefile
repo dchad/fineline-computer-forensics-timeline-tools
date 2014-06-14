@@ -38,6 +38,7 @@ Fineline_Report_Dialog.cpp     \
 Fineline_Timeline_Dialog.cpp   \
 Fineline_Tree_Filter_Dialog.cpp \
 Fineline_Tree_Search_Dialog.cpp \
+Fineline_Project.cpp \
 ../common/Fineline_Util.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)
@@ -75,7 +76,7 @@ strip:
 	strip fineline-search
 
 clean:
-	rm *.o *.log fineline-search fineline-search-unit-tests
+	rm *.o *.log *.fle fineline-search fineline-search-unit-tests
 
 tests: $(TESTSOURCES) $(TESTEXECUTABLE)
 

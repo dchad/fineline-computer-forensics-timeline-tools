@@ -42,25 +42,38 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Input.H>
 #include <FL/Fl_Text_Editor.H>
-#include <FL/Fl_Box.H>
-#include <FL/filename.H>
 #include <FL/Fl_Button.H>
 
 #include "fineline-search.h"
-
+#include "Fineline_Project.h"
 
 class Fineline_Project_Dialog : public Fl_Double_Window
 {
    public:
-      Fineline_Project_Dialog(int x, int y, int w, int h);
+      Fineline_Project_Dialog(int x, int y, int w, int h, Fineline_Project *proj);
       virtual ~Fineline_Project_Dialog();
+
+      void show_dialog(bool new_project);
+      void clear_fields();
+
    protected:
    private:
 
-   FILE *project_file;
+   Fineline_Project *project_file;
 
    static void button_callback(Fl_Button *b, void *p);
+
+   Fl_Input *project_name_field;
+   Fl_Input *project_investigator_field;
+   Fl_Input *project_summary_field;
+   Fl_Input *project_start_date_field;
+   Fl_Input *project_end_date_field;
+   Fl_Text_Editor *project_description_field;
+
+   Fl_Text_Buffer *textbuf;
+
 };
 
 #endif // FINELINE_PROJECT_DIALOG_H

@@ -54,12 +54,11 @@
 
 using namespace std;
 
-Fineline_Thread *Fineline_UI::socket_thread;
+// GUI components
+
 Fineline_File_Metadata_Browser *Fineline_UI::file_metadata_browser;
 Fineline_File_System_Tree *Fineline_UI::file_system_tree;
-Fineline_File_System *Fineline_UI::file_system;
 Fl_Native_File_Chooser *Fineline_UI::fc;
-Fineline_Log *Fineline_UI::flog;
 Fineline_Event_Dialog *Fineline_UI::event_dialog;
 Fineline_File_Metadata_Dialog *Fineline_UI::file_metadata_dialog;
 Fineline_Progress_Dialog *Fineline_UI::progress_dialog;
@@ -71,6 +70,15 @@ Fineline_Tree_Search_Dialog *Fineline_UI::tree_search_dialog;
 Fineline_Report_Dialog *Fineline_UI::report_dialog;
 Fineline_Timeline_Dialog *Fineline_UI::timeline_dialog;
 Fineline_File_Display_Dialog *Fineline_UI::file_display_dialog;
+
+// Data/Controller objects
+
+Fineline_Project *Fineline_UI::fineline_project;
+Fineline_File_System *Fineline_UI::file_system;
+Fineline_Thread *Fineline_UI::socket_thread;
+Fineline_Log *Fineline_UI::flog;
+
+// UI Method Implementation
 
 Fineline_UI::Fineline_UI()
 {
@@ -86,7 +94,9 @@ Fineline_UI::Fineline_UI()
 
    menu = new Fl_Menu_Bar(5,0, win_width - 10, 30);		// Create menubar, items..
    menu->add("&File/&New",     "^n", main_menu_callback);
-   menu->add("&File/&Open",    "^o", open_menu_callback);
+   menu->add("&File/&Open/&Project",        "^p", open_menu_callback);
+   menu->add("&File/&Open/&Forensic Image", "^i", open_menu_callback);
+   menu->add("&File/&Open/&Event File",     "^f", open_menu_callback);
    menu->add("&File/&Save",    "^s", save_menu_callback);
    menu->add("&File/&Save As", "^a", save_menu_callback);
    menu->add("&File/&Export",  "^e", export_menu_callback, 0, FL_MENU_DIVIDER);
@@ -94,9 +104,9 @@ Fineline_UI::Fineline_UI()
 
    menu->add("&Edit/&Copy",    "^c", main_menu_callback);
    menu->add("&Edit/&Paste",   "^v", main_menu_callback, 0, FL_MENU_DIVIDER);
-   menu->add("&Edit/&Options", "^p", main_menu_callback);
+   menu->add("&Edit/&Options", "^o", main_menu_callback);
 
-   menu->add("&Help/Google",    0, main_menu_callback);
+   menu->add("&Help/User Guide",    0, main_menu_callback);
    menu->add("&Help/About",     0, main_menu_callback);
 
    //----------------------------------------------------------------------------------
@@ -256,7 +266,7 @@ Fineline_UI::Fineline_UI()
 
    flog = new Fineline_Log();
    flog->open_log_file();
-   fc = new Fl_Native_File_Chooser();
+   fineline_project = new Fineline_Project();
    socket_thread = new Fineline_Thread(flog);
 
    //----------------------------------------------------------------------------------
@@ -268,12 +278,13 @@ Fineline_UI::Fineline_UI()
    progress_dialog = new Fineline_Progress_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    export_dialog = new Fineline_Export_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    options_dialog = new Fineline_Options_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
-   project_dialog = new Fineline_Project_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   project_dialog = new Fineline_Project_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600, fineline_project);
    report_dialog = new Fineline_Report_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    timeline_dialog = new Fineline_Timeline_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    tree_filter_dialog = new Fineline_Tree_Filter_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    tree_search_dialog = new Fineline_Tree_Search_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
    file_display_dialog = new Fineline_File_Display_Dialog(win_width/2 - 300, win_height/2 - 300, 800, 600);
+   fc = new Fl_Native_File_Chooser();
 
    if (DEBUG)
       cout << "Fineline_UI.ctor() <INFO> Finished making UI...\n" << endl;
@@ -298,32 +309,43 @@ void Fineline_UI::show(int argc, char *argv[])
 */
 void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
 {
-  Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
-  const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
-  char ipath[256];
+   Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
+   const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
+   char ipath[256];
 
-  menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
+   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
 
-  fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
-  fprintf(stderr, ", item_pathname() is '%s'\n", ipath);		   // ..and full pathname
+   fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
+   fprintf(stderr, ", item_pathname() is '%s'\n", ipath);		   // ..and full pathname
 
-  if (item->flags & (FL_MENU_RADIO|FL_MENU_TOGGLE))
-  {		// Toggle or radio item?
-    fprintf(stderr, ", value is %s", item->value()?"on":"off");	// Print item's value
-  }
-  else if ( strcmp(item->label(), "Google") == 0 )
-  {
-     fl_open_uri("http://google.com/");
-  }
-  else if ( strcmp(item->label(), "&Options") == 0 )
-  {
-     //TODO: open options dialogue
-  }
-  else if ( strcmp(item->label(), "&Quit") == 0 )
-  {
+   if ( strncmp(item->label(), "&New", 4) == 0 )
+   {
+      fc->title("New Project File");
+      fc->type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+         fc->preset_file(fc->filename());
+         fineline_project->new_project(fc->filename());
+         project_dialog->show_dialog(true); // Open the project dialog to edit the project properties.
+      }
+   }
+   else if ( strncmp(item->label(), "&User Guide", 11) == 0 )
+   {
+     fl_open_uri("http://code.google.com/fineline-computer-forensics-tools/");
+   }
+   else if ( strncmp(item->label(), "&Options", 8) == 0 )
+   {
+     // Open options dialogue
+     options_dialog->show();
+   }
+   else if ( strncmp(item->label(), "&Quit", 5) == 0 )
+   {
      exit(0);
-  }
-  return;
+   }
+   return;
 }
 
 /*
@@ -340,21 +362,53 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
    char ipath[256];
 
    menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
+
    fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
    fprintf(stderr, ", item_pathname() is '%s'\n", ipath);
 
-   fc->title("Open");
-   fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
-   switch ( fc->show() )
+   if ( strstr(item->label(), "&Project") != NULL )
    {
-      case -1: break;	// Error
-      case  1: break; 	// Cancel
-      default:		      // Choice
-         fc->preset_file(fc->filename());
-         //load_forensic_image(fc->filename()); DEPRECATED for large forensic images.
-         start_image_process_thread(fc->filename());
+	  // Save the project file
+      fc->title("Open Project");
+      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+            fc->preset_file(fc->filename());
+            fineline_project->open_project(fc->filename());
+            project_dialog->show_dialog(false);
+      }
    }
+   else if ( strstr(item->label(), "&Forensic") != NULL )
+   {
 
+      fc->title("Open Forensic Image");
+      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+            fc->preset_file(fc->filename());
+            start_image_process_thread(fc->filename());
+      }
+   }
+   else if ( strstr(item->label(), "&Event") != NULL )
+   {
+
+      fc->title("Open Event File");
+      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+            fc->preset_file(fc->filename());
+            //TODO:
+      }
+   }
    return;
 }
 
@@ -375,11 +429,22 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
    menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
    if ( strncmp(item->label(), "&Save", 5) == 0 )
    {
-	  // TODO: open the save file dialogue
+	  // Save the project file
+	  fineline_project->save_project(); //TODO: save filesystem tree, file metadata, timeline events, analysis statistics.
    }
    else if ( strncmp(item->label(), "&Save As", 8) == 0 )
    {
-      // TODO: open the save as file dialogue
+      // Open the save as file dialogue
+      fc->title("Save Project File As");
+      fc->type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+      switch ( fc->show() )
+      {
+         case -1: break;	// Error
+         case  1: break; 	// Cancel
+         default:		      // Choice
+         fc->preset_file(fc->filename());
+         fineline_project->save_project_as(fc->filename());
+      }
    }
    return;
 }
@@ -393,10 +458,8 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
 */
 void Fineline_UI::export_menu_callback(Fl_Widget *w, void *x)
 {
-   if (DEBUG)
-      cout << "Fineline_UI::popup_menu_callback() <INFO> " << endl;
-	// TODO: open the export file dialogue
-	// need the hashmap of file records with marked files and
+
+	// Open the export file dialogue, need the hashmap of file records with marked files and
 	// pointer to the file system object.
 
 	export_dialog->add_marked_files(file_system_tree->get_marked_files(), file_system);
@@ -532,7 +595,7 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
 
    if ( strncmp(fb->label(), "Save", 4) == 0 )
    {
-      //TODO: Open the file chooser dialog to select a file to save the metadata text.
+      // Open the file chooser dialog to select a file to save the metadata text.
       fc->title("Save File Metadata List");
       fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
       switch ( fc->show() )

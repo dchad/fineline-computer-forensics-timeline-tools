@@ -104,6 +104,7 @@ class Fineline_UI
       static Fineline_Thread *socket_thread;
       static Fineline_File_System_Tree *file_system_tree;
       static Fineline_File_System *file_system;
+      static Fineline_Project *fineline_project;
       static Fl_Native_File_Chooser *fc;
       static Fineline_Log *flog;
       static Fineline_Event_Dialog *event_dialog;

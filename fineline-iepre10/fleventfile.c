@@ -1,6 +1,6 @@
 
 /*  Copyright 2014 Derek Chadwick
- 
+
     This file is part of the FineLine Computer Forensics Timeline Tools.
 
     FineLine is free software: you can redistribute it and/or modify
@@ -95,10 +95,10 @@ int write_fineline_event_record(char *estr, FILE *evt_file)
 /*
    Function: write_fineline_project_header()
 
-   Purpose : Creates an event log header string and prints to the event file.
+   Purpose : Creates a project file header string and prints to the project file.
            :
-   Input   : Log header string, event file and log file.
-   Output  : Timestamped log header entry.
+   Input   : Fineline project header string, event file and record count.
+   Output  : Timestamped project header entry.
 */
 int write_fineline_project_header(char *pstr, FILE *evt_file, int record_count)
 {
@@ -122,7 +122,7 @@ int write_fineline_project_header(char *pstr, FILE *evt_file, int record_count)
    loctime = localtime (&curtime);
    time_str = asctime(loctime);
 
-   /* Get the date of the first and last event records and use these to set the project start/end dates 
+   /* Get the date of the first and last event records and use these to set the project start/end dates
    fler = get_first_event_record();
    if (fler != NULL)
    {
