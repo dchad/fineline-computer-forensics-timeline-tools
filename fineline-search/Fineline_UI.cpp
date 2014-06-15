@@ -430,7 +430,8 @@ void Fineline_UI::save_menu_callback(Fl_Widget *w, void *x)
    if ( strncmp(item->label(), "&Save", 5) == 0 )
    {
 	  // Save the project file
-	  fineline_project->save_project(); //TODO: save filesystem tree, file metadata, timeline events, analysis statistics.
+	  fineline_project->save_project();
+	  //TODO: save filesystem tree, file metadata, timeline events, analysis statistics.
    }
    else if ( strncmp(item->label(), "&Save As", 8) == 0 )
    {

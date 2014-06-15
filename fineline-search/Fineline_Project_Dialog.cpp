@@ -47,8 +47,8 @@ Fineline_Project_Dialog::Fineline_Project_Dialog(int x, int y, int w, int h, Fin
    project_summary_field = new Fl_Input(100, 100, w - 120, 30, "Summary:");
    project_start_date_field = new Fl_Input(100, 140, w - 120, 30, "Start Date:");
    project_end_date_field = new Fl_Input(100, 180, w - 120, 30, "End Date:");
-   project_description_field = new Fl_Text_Editor(10, 245, w - 20, 200, "Description:");
-   project_description_field->align(FL_ALIGN_TOP_LEFT);
+   project_description_field = new Fl_Text_Editor(100, 245, w - 120, 250, "Description:");
+   project_description_field->align(FL_ALIGN_LEFT_TOP); //FL_ALIGN_TOP_LEFT);
    textbuf = new Fl_Text_Buffer(FL_MAX_INPUT_STR);
    project_description_field->buffer(textbuf);
    textbuf->text();
@@ -117,7 +117,12 @@ void Fineline_Project_Dialog::show_dialog(bool new_project)
    else
    {
       //TODO: populate the dialog fields from the project file object.
-
+      project_name_field->value(project_file->getProjectName().c_str());
+      project_investigator_field->value(project_file->getProjectInvestigator().c_str());
+      project_summary_field->value(project_file->getProjectSummary().c_str());
+      project_start_date_field->value(project_file->getProjectStartDate().c_str());
+      project_end_date_field->value(project_file->getProjectEndDate().c_str());
+      textbuf->text(project_file->getProjectDescription().c_str());
    }
    show();
 

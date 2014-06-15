@@ -43,6 +43,7 @@
 
 
 #include <string>
+#include <regex>
 
 #include "fineline-search.h"
 

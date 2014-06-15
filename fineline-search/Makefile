@@ -3,7 +3,7 @@
 # Builds Linux version of fineline-search and unit tests.
 
 CC=g++
-CFLAGS=-c -Wall -ansi
+CFLAGS=-c -Wall -ansi -std=c++11
 LDFLAGS=
 
 # Library Dependencies

@@ -1,5 +1,5 @@
 /*  Copyright 2014 Derek Chadwick
- 
+
     This file is part of the FineLine Computer Forensics Timeline Tools.
 
     FineLine is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@
  * Author : Derek Chadwick
  * Date   : 02/01/2014
  * Class  : FineLineEvent
- * 
+ *
  * Description: A single event or item of evidence to be displayed on the timeline.
- * 
- * 
+ *
+ *
  */
 
 package FineLineGUI;
@@ -50,7 +50,7 @@ public class FineLineEvent
     private String evidenceNumber;
     private String eventType;
     private String eventTime;
-    private String eventDescription;
+    //private String eventDescription;
     private Color  eventColor;
     private String eventSummary;
     private String eventDate; //DD/MM/YYYY
@@ -95,9 +95,9 @@ public class FineLineEvent
         hiddenEvent = false;
         hiddenText = false;
         pinned = false;
-        setIconColour();    
+        setIconColour();
     }
-    
+
     public FineLineEvent(String filename, Calendar cal, FineLineConfig flc)
     {
         //Constructor for MACTIME/FLS GENERATED EVENTS
@@ -130,7 +130,7 @@ public class FineLineEvent
         pinned = false;
         setIconColour();
     }
-    
+
     public FineLineEvent(String process, int pid, Calendar cal, FineLineConfig flc)
     {
         //Event imported from a Linux SYSLOG file
@@ -162,7 +162,7 @@ public class FineLineEvent
         pinned = false;
         setIconColour();
     }
-    
+
     public FineLineEvent(String evt)
     {
         //FINELINE GENERATED EVENT FILES
@@ -180,33 +180,33 @@ public class FineLineEvent
         hiddenEvent = false;
         hiddenText = false;
         pinned = false;
-        
+
         Pattern p = Pattern.compile("<id>(.*)</id>", Pattern.DOTALL);
         Matcher m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           eventID = m.group(1); 
+           eventID = m.group(1);
         }
-        
+
         p = Pattern.compile("<evidencenumber>(.*)</evidencenumber>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           evidenceNumber = m.group(1); 
+           evidenceNumber = m.group(1);
         }
-        
+
         p = Pattern.compile("<time>(.*)</time>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
            eventTime = m.group(1); // DD/MM/YYYY HH:MM:SS
         }
-        
+
         p = Pattern.compile("<type>(.*)</type>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           eventType = m.group(1); 
+           eventType = m.group(1);
         }
         if ("Information".equals(eventType))
             eventTypeNumber = FineLineConfig.FL_WIN_INFORMATION;
@@ -224,19 +224,19 @@ public class FineLineEvent
             eventTypeNumber = FineLineConfig.FL_MACTIME_FLS_EVENT;
         else
             eventTypeNumber = FineLineConfig.FL_MANUAL_EVIDENCE_EVENT;
-        
+
         p = Pattern.compile("<summary>(.*)</summary>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           eventSummary = m.group(1); 
+           eventSummary = m.group(1);
         }
-        
+
         p = Pattern.compile("<data>(.*)</data>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           eventData = m.group(1); 
+           eventData = m.group(1);
            if (eventID.equalsIgnoreCase("4648") || eventID.equalsIgnoreCase("4624"))
            {
               p = Pattern.compile("<mstring5>(.*)</mstring5>", Pattern.DOTALL);
@@ -263,66 +263,66 @@ public class FineLineEvent
                  }
               }
            }
-        }     
+        }
 
         p = Pattern.compile("<hiddenevent>(.*)</hiddenevent>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           hiddenEvent = Boolean.valueOf(m.group(1)); 
-        }     
- 
+           hiddenEvent = Boolean.valueOf(m.group(1));
+        }
+
         p = Pattern.compile("<hiddentext>(.*)</hiddentext>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           hiddenText = Boolean.valueOf(m.group(1)); 
-        }     
+           hiddenText = Boolean.valueOf(m.group(1));
+        }
 
         p = Pattern.compile("<marked>(.*)</marked>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           marked = Boolean.valueOf(m.group(1)); 
-        }     
+           marked = Boolean.valueOf(m.group(1));
+        }
 
         p = Pattern.compile("<pinned>(.*)</pinned>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           pinned = Boolean.valueOf(m.group(1)); 
-        }     
-        
+           pinned = Boolean.valueOf(m.group(1));
+        }
+
         p = Pattern.compile("<ypos>(.*)</ypos>", Pattern.DOTALL);
         m = p.matcher(evt);
-        if (m.find()) 
+        if (m.find())
         {
-           yPos = Integer.parseInt(m.group(1)); 
+           yPos = Integer.parseInt(m.group(1));
            iconYPos = yPos - (height/2);
-        }     
-        
+        }
+
         //extract hour and minute from time field for xpos/ypos
         eventDate = eventTime.substring(0, 10); // DD/MM/YYYY
-        //System.out.println("Event Date: " + eventDate); 
-        
+        //System.out.println("Event Date: " + eventDate);
+
         eventDay = Integer.parseInt(eventDate.substring(0,2));
         eventMonth = Integer.parseInt(eventDate.substring(3,5));
         eventYear = Integer.parseInt(eventDate.substring(6,10));
-        
+
         int beg = eventTime.indexOf(" ");
         int end = eventTime.indexOf(":");
         eventDisplayTime = eventTime.substring(beg+1, beg+6);
         String tempStr = eventTime.substring(beg+1, end);
-        
+
         eventHour = Integer.parseInt(tempStr);
         tempStr = eventTime.substring(end+1, end+3);
         eventMinute = Integer.parseInt(tempStr);
-        
+
         setIconColour();
     }
-    
+
     public void setX(int xPos)
-    { 
+    {
         this.xPos = xPos;
         this.iconXPos = xPos - (width/2);
     }
@@ -346,13 +346,13 @@ public class FineLineEvent
     public int getWidth()
     {
         return width;
-    } 
+    }
 
     public int getHeight()
     {
         return height;
     }
-    
+
     public String getTime()
     {
         return eventTime;
@@ -409,16 +409,16 @@ public class FineLineEvent
         magnified = true;
 
     }
-    
+
     public void demagnify (int multi)
     {
         width = width / multi;
         height = height / multi;
         iconXPos = (xPos - (width/2));
-        iconYPos = yPos - (height/2);  
+        iconYPos = yPos - (height/2);
         magnified = false;
     }
-    
+
     public void spread(int y)
     {
         spread = true;
@@ -429,12 +429,12 @@ public class FineLineEvent
         iconYPos = yPos - (height/2);
         hiddenText = true;
     }
-    
+
     public Boolean getSpread()
     {
         return(spread);
     }
-    
+
     public void mark()
     {
         marked = true;
@@ -502,12 +502,12 @@ public class FineLineEvent
            g.drawLine(xPos, yPos + (height/2), xPos, ribbonY);
         }
     }
-    
+
     public Boolean getMagnifiedState()
     {
         return (magnified);
     }
-    
+
     public void paintEvent(Graphics g)
     {
         if (hiddenEvent)
@@ -521,14 +521,14 @@ public class FineLineEvent
            g.setColor(iconColour);
         else
            g.setColor(iconMagnifyColour);
-        
+
         if (!spread || pinned)
         {
            g.fillRect(iconXPos,iconYPos,width,height);
         }
         g.setColor(Color.GRAY);
-        g.drawRect(iconXPos,iconYPos,width,height);  
-        
+        g.drawRect(iconXPos,iconYPos,width,height);
+
         if (marked)
         {
             g.setColor(Color.BLACK);
@@ -536,11 +536,11 @@ public class FineLineEvent
             //g.drawLine(xPos - 2, iconYPos - 2, xPos - 2, yPos + height - 2);
             g.drawOval(xPos - 2, yPos - 2, 4, 4);
         }
-                 
+
         if (hiddenText && !magnified && !pinned)
-              return; 
-        
-        
+              return;
+
+
         g.setColor(Color.DARK_GRAY);
         //g.clearRect(xPos - (timeStringWidth/2), iconYPos - (stringHeight + 2), timeStringWidth, stringHeight);
         g.drawString(eventDisplayTime, (xPos - (timeStringWidth/2)), iconYPos - (stringHeight+2));
@@ -549,7 +549,7 @@ public class FineLineEvent
 
     }
 
-    public String getEventID() 
+    public String getEventID()
     {
        return(eventID);
     }
@@ -558,8 +558,8 @@ public class FineLineEvent
     {
         return(eventSummary);
     }
-    
-    private void setIconColour() 
+
+    private void setIconColour()
     {
         switch(eventTypeNumber)
         {
@@ -585,15 +585,15 @@ public class FineLineEvent
             default: iconColour = Color.GRAY; iconMagnifyColour = Color.LIGHT_GRAY; break;
         }
     }
-    
+
     @Override
     public String toString()
     {
         String temp = "<event><id>" + eventID + "</id><time>" + eventTime + "</time><type>" + eventType + "</type><summary>" + eventSummary + "</summary>";
         temp = temp + "<hiddenevent>" + hiddenEvent.toString() + "</hiddenevent><hiddentext>" + hiddenText.toString() + "</hiddentext><marked>" + marked.toString() + "</marked>";
         temp = temp + "<ypos>" + Integer.toString(yPos) + "</ypos><evidencenumber>" + evidenceNumber + "</evidencenumber>";
-        temp = temp + "<pinned>" + pinned.toString() + "</pinned><data>" + eventData + "</data></event>"; 
-       
+        temp = temp + "<pinned>" + pinned.toString() + "</pinned><data>" + eventData + "</data></event>";
+
         return(temp);
     }
 
@@ -601,28 +601,28 @@ public class FineLineEvent
     {
         //do some pretty text formatting
     }
-    
-    public String getDisplayTime() 
+
+    public String getDisplayTime()
     {
        return(eventDisplayTime);
     }
 
-    public String getEvidenceNumber() 
+    public String getEvidenceNumber()
     {
        return(evidenceNumber);
     }
 
-    public String getData() 
+    public String getData()
     {
        return(eventData);
     }
 
-    void setSummary(String text) 
+    void setSummary(String text)
     {
         eventSummary = text;
     }
 
-    void setDate(String text) 
+    void setDate(String text)
     {
         eventDate = text;
         eventDay = Integer.parseInt(eventDate.substring(0,2));
@@ -630,7 +630,7 @@ public class FineLineEvent
         eventYear = Integer.parseInt(eventDate.substring(6,10));
     }
 
-    void setDisplayTime(String text) 
+    void setDisplayTime(String text)
     {
         eventDisplayTime = text;
         String tempStr = eventDisplayTime.substring(0, 2);
@@ -640,24 +640,24 @@ public class FineLineEvent
         //TODO: need time format validation on this string
     }
 
-    void setEvidenceNumber(String text) 
+    void setEvidenceNumber(String text)
     {
         evidenceNumber = text;
     }
 
-    void setData(String text) 
+    void setData(String text)
     {
         eventData = text;
     }
 
-    void setEventID(int i) 
+    void setEventID(int i)
     {
         eventID = Integer.toString(i);
     }
 
-    void setTime(String text) 
+    void setTime(String text)
     {
         eventTime = text;
     }
-    
+
 }
