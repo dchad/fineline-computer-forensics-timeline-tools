@@ -105,6 +105,7 @@ Fineline_UI::Fineline_UI()
    menu->add("&Edit/&Copy",    "^c", main_menu_callback);
    menu->add("&Edit/&Paste",   "^v", main_menu_callback, 0, FL_MENU_DIVIDER);
    menu->add("&Edit/&Options", "^o", main_menu_callback);
+   menu->add("&Edit/&Project", "^r", main_menu_callback);
 
    menu->add("&Help/User Guide",    0, main_menu_callback);
    menu->add("&Help/About",     0, main_menu_callback);
@@ -341,6 +342,11 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
      // Open options dialogue
      options_dialog->show();
    }
+   else if ( strncmp(item->label(), "&Project", 8) == 0 )
+   {
+     // Open the project dialogue
+     project_dialog->show();
+   }
    else if ( strncmp(item->label(), "&Quit", 5) == 0 )
    {
      exit(0);
@@ -406,7 +412,7 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
          case  1: break; 	// Cancel
          default:		      // Choice
             fc->preset_file(fc->filename());
-            //TODO:
+            //TODO: start an event file loader thread to read events and add to the timeline graph.
       }
    }
    return;

@@ -398,3 +398,7 @@ vector< fl_file_record_t* > Fineline_File_System_Tree::get_marked_files()
    return(flist);
 }
 
+map< string, fl_file_record_t* > Fineline_File_System_Tree::get_file_map()
+{
+   return(file_map);
+}

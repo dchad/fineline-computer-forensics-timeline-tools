@@ -42,8 +42,16 @@ Fineline_Tree_Filter_Dialog::Fineline_Tree_Filter_Dialog(int x, int y, int w, in
 
    Fl_Group* browser_group = new Fl_Group(10, 10, w - 10, h - 10);
    {
-      progress_browser = new Fl_Browser(20, 20, w - 40, h - 100);
-      Fl_Button* save_button = new Fl_Button(w - 360, h - 50, 100, 30, "Save");
+      textbuf = new Fl_Text_Buffer(FL_MAX_INPUT_STR);
+      filter_file_field = new Fl_Input(100, 20, w - 160, 30, "Filter File:");
+      filter_file_button = new Fl_Button(w - 50, 20, 30, 30, "File");
+      filter_file_button->callback((Fl_Callback*)button_callback, (void *)this);
+      keyword_editor = new Fl_Text_Editor(100, 70, w - 120, 210, "Keywords:");
+      keyword_editor->align(FL_ALIGN_LEFT_TOP);
+      keyword_editor->buffer(textbuf);
+      progress_browser = new Fl_Browser(100, 300, w - 120, 210, "Progress:");
+      progress_browser->align(FL_ALIGN_LEFT_TOP);
+      Fl_Button* save_button = new Fl_Button(w - 360, h - 50, 100, 30, "Start");
       save_button->callback((Fl_Callback*)button_callback, (void *)this);
       Fl_Button* clear_button = new Fl_Button(w - 250, h - 50, 100, 30, "Clear");
       clear_button->callback((Fl_Callback*)button_callback, (void *)this);
@@ -63,8 +71,63 @@ Fineline_Tree_Filter_Dialog::~Fineline_Tree_Filter_Dialog()
 
 void Fineline_Tree_Filter_Dialog::button_callback(Fl_Button *b, void *p)
 {
-   fl_message("modal window");
-   ((Fineline_Tree_Filter_Dialog *)p)->hide();
+   //fl_message("modal window");
+   if (strncmp(b->label(), "Start", 5) == 0)
+   {
+      //TODO: start a thread to process the file system tree.
+   }
+   else if (strncmp(b->label(), "Clear", 5) == 0)
+   {
+      //TODO: clear the fields.
+   }
+   else if (strncmp(b->label(), "Close", 5) == 0)
+   {
+      ((Fineline_Tree_Filter_Dialog *)p)->hide();
+   }
+
    return;
 }
+
+/*
+   Name   : add_matched_file()
+   Purpose: Called from the filter process thread to update the progress browser.
+   Input  : String containing the file path.
+   Output : None.
+*/
+void Fineline_Tree_Filter_Dialog::add_matched_file(string filepath)
+{
+
+   return;
+}
+
+/*
+   Name   : start_filter_thread()
+   Purpose: Creates a thread to perform a keyword filter of the file system tree.
+   Input  : Pointer to this dialog and the file tree vector.
+   Output : None.
+*/
+void Fineline_Tree_Filter_Dialog::start_filter_thread()
+{
+   // TODO: start the filter processing thread.
+
+   return;
+}
+
+void Fineline_Tree_Filter_Dialog::show_dialog(Fineline_File_System_Tree *ffst)
+{
+   // First make a copy of the file system map so we can revert back to the
+   // original file system if the user removes the filter
+
+   Fineline_File_Map fsm = ffst->get_file_map();
+
+   if (file_map.size() > 0)
+      file_map.clear();
+
+   file_map.insert(fsm.begin(), fsm.end());
+
+   show();
+
+   return;
+}
+
 

@@ -46,6 +46,8 @@
 
 using namespace std;
 
+typedef map< string, fl_file_record_t* > Fineline_File_Map;
+
 class Fineline_File_System_Tree : public Fl_Tree
 {
    public:
@@ -62,6 +64,7 @@ class Fineline_File_System_Tree : public Fl_Tree
       void mark_file();
       void unmark_file();
       vector< fl_file_record_t* > get_marked_files();
+      Fineline_File_Map get_file_map();
       int remove_file(string filename);
       int tree_size();
       int clear_tree();
@@ -74,7 +77,7 @@ class Fineline_File_System_Tree : public Fl_Tree
    protected:
    private:
 
-      map< string, fl_file_record_t* > file_map;
+      Fineline_File_Map file_map;
 
 };
 

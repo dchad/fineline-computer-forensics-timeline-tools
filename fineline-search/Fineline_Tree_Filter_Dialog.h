@@ -37,15 +37,22 @@
 #ifndef FINELINE_TREE_FILTER_DIALOG_H
 #define FINELINE_TREE_FILTER_DIALOG_H
 
+#include <map>
+#include <string>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Browser.H>
+#include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Box.H>
 #include <FL/filename.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
+#include "Fineline_File_System_Tree.h"
 #include "fineline-search.h"
+
+using namespace std;
 
 class Fineline_Tree_Filter_Dialog : public Fl_Double_Window
 {
@@ -54,11 +61,21 @@ class Fineline_Tree_Filter_Dialog : public Fl_Double_Window
       virtual ~Fineline_Tree_Filter_Dialog();
 
       static void button_callback(Fl_Button *b, void *p);
+      void add_matched_file(string filepath);
+      void show_dialog(Fineline_File_System_Tree *ffst);
 
    protected:
    private:
 
       Fl_Browser *progress_browser;
+      Fl_Text_Editor *keyword_editor;
+      Fl_Input *filter_file_field;
+      Fl_Button *filter_file_button;
+      Fl_Text_Buffer *textbuf;
+
+      Fineline_File_Map file_map;
+
+      void start_filter_thread();
 };
 
 #endif // FINELINE_TREE_FILTER_DIALOG_H
