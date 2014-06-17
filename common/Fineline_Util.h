@@ -34,11 +34,16 @@
 #ifndef FINELINE_UTIL_H
 #define FINELINE_UTIL_H
 
+#include <string>
+#include <vector>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+
+using namespace std;
 
 class Fineline_Util
 {
@@ -59,6 +64,7 @@ class Fineline_Util
       static char *ltrim(char *s);
       static char *rtrim(char *s);
       static char *trim(char *s);
+      static void split(vector<string> &keyword_list, const string keywords);
 
    protected:
    private:

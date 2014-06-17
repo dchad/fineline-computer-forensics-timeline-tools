@@ -122,7 +122,7 @@ static void check_path_separators(TskFsInfo *fs_info, string full_path)
    Input   : file pointer, file name and file path.
    Output  : Always returns 0 to ensure all files are processed.
 */
-static uint8_t process_file(TskFsFile * fs_file, string filename, string path)
+static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
 {
    string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)Fineline_Util::xcalloc(sizeof(fl_file_record_t));
@@ -320,7 +320,7 @@ static uint8_t process_volume_system(TskImgInfo * img_info, TSK_OFF_T start)
    Input   : Pointer to the file system object.
    Output  : Adds events to the file system tree GUI widget.
 */
-void* fs_thread_task(void* p)
+void *fs_thread_task(void *p)
 {
    Fineline_File_System *file_system_image = (Fineline_File_System *)p;
    char msg[256];

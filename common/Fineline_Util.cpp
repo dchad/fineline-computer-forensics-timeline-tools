@@ -219,3 +219,22 @@ char *Fineline_Util::trim(char *s)
 {
     return rtrim(ltrim(s));
 }
+
+//#include <iostream>
+
+void Fineline_Util::split(vector<string> &keyword_list, const string keywords)
+{
+   string delimiters = " ,\t\r\n"; // delimters are space, comma, tab and newlines.
+   size_t  start = 0, end = 0;
+
+   while (start != string::npos)
+   {
+      start = keywords.find_first_not_of(delimiters, end);
+      end = keywords.find_first_of(delimiters, start);
+      if (start != string::npos)
+      {
+         keyword_list.push_back(keywords.substr(start, end - start));
+         //cout << keywords.substr(start, end - start) << endl;
+      }
+   }
+}

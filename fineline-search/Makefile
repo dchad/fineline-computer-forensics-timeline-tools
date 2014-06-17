@@ -39,6 +39,7 @@ Fineline_Timeline_Dialog.cpp   \
 Fineline_Tree_Filter_Dialog.cpp \
 Fineline_Tree_Search_Dialog.cpp \
 Fineline_Project.cpp \
+Fineline_Tree_Filter.cpp \
 ../common/Fineline_Util.cpp
 MAINSOURCES=fineline-search.cpp $(SOURCES)
 TESTSOURCES=fineline-search-unit-tests.cpp $(SOURCES)

@@ -61,7 +61,7 @@ class Fineline_Tree_Filter_Dialog : public Fl_Double_Window
       virtual ~Fineline_Tree_Filter_Dialog();
 
       static void button_callback(Fl_Button *b, void *p);
-      void add_matched_file(string filepath);
+      void add_update_message(string filepath);
       void show_dialog(Fineline_File_System_Tree *ffst);
 
    protected:
@@ -74,8 +74,10 @@ class Fineline_Tree_Filter_Dialog : public Fl_Double_Window
       Fl_Text_Buffer *textbuf;
 
       Fineline_File_Map file_map;
+      Fineline_File_System_Tree *file_system_tree;
 
       void start_filter_thread();
+      void restore_tree();
 };
 
 #endif // FINELINE_TREE_FILTER_DIALOG_H

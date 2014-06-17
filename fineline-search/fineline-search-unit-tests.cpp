@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -51,6 +52,8 @@ using namespace std;
 #include "Fineline_File_System_Tree.h"
 #include "Fineline_Util.h"
 #include "Fineline_Progress_Dialog.h"
+#include "Fineline_Tree_Filter.h"
+#include "Fineline_Tree_Filter_Dialog.h"
 
 int x_argc;
 char **x_argv;
@@ -215,7 +218,7 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
       filename.append(".exe");
       ftree->add_file(filename, flf);
    }
-      for (i = 0; i < 1000; i++)
+   for (i = 0; i < 1000; i++)
    {
       flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
       ASSERT_TRUE(NULL != flf);
@@ -224,7 +227,7 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
       filename.append(".txt");
       ftree->add_file(filename, flf);
    }
-      for (i = 0; i < 1000; i++)
+   for (i = 0; i < 1000; i++)
    {
       flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
       ASSERT_TRUE(NULL != flf);
@@ -276,16 +279,78 @@ TEST(FineLineSearchThreadTests, ValidateMethods)
  	EXPECT_EQ(0, flt->get_active_threads());
 	EXPECT_EQ(0, flt->get_running());
 
-   //for (int i = 0; i < 10000000; i++) //need a delay for the threads to exit
-   //{
-   //   if ((i % 100000) == 0)
-   //      flog->print_log_entry("log entry");
-   //}
+}
 
-   //EXPECT_EQ(0, flog->close_log_file());
+TEST(FineLineSearchUtilityTests, ValidateMethods)
+{
+   Fineline_Util flut;
+   string test_keywords = "one two three   .doc  \t  \n   .jpg .gif,.pdf";
+   vector< string > keyword_list;
 
-   //delete flt;
-   //delete flb;
+   flut.split(keyword_list, test_keywords);
+
+   EXPECT_EQ(7, (int)keyword_list.size());
+}
+
+TEST(FineLineTreeFilterTests, ValidateMethods)
+{
+   Fineline_Util flut;
+   string test_keywords = "   .jpg   .doc \t\t\n .gif, .pdf .bin .exe fred villain, methlab";
+   Fineline_File_System_Tree *ftree = new Fineline_File_System_Tree(20, 100, 800, 600);
+   Fineline_Tree_Filter_Dialog *ftfd = new Fineline_Tree_Filter_Dialog(20, 100, 800, 600);
+   //Fineline_Tree_Filter *ffilter = new Fineline_Tree_Filter(ftree, test_keywords, ftfd);
+   fl_file_record_t * flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+   string filename;
+   char num[256];
+   int i;
+
+   ASSERT_TRUE(NULL != ftree);
+   ASSERT_TRUE(NULL != ftfd);
+   //ASSERT_TRUE(NULL != ffilter);
+   ASSERT_TRUE(NULL != flf);
+
+   EXPECT_EQ(0, ftree->tree_size());
+
+   for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\temp\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".jpg");
+      ftree->add_file(filename, flf);
+   }
+   for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\Windows\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".doc");
+      ftree->add_file(filename, flf);
+   }
+   for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\Users\\admin\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".pdf");
+      ftree->add_file(filename, flf);
+   }
+   for (i = 0; i < 1000; i++)
+   {
+      flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+      ASSERT_TRUE(NULL != flf);
+      filename = "C:\\Users\\admin\\file";
+      filename.append(flut.xitoa(i, num, 256, 10));
+      filename.append(".txt");
+      ftree->add_file(filename, flf);
+   }
+
+   //ffilter->process_file_system_tree();
+
+   EXPECT_EQ(3000, ftree->tree_size());
 }
 
 

@@ -34,6 +34,9 @@
 #include <FL/fl_ask.H>
 
 #include "Fineline_Tree_Filter_Dialog.h"
+#include "Fineline_Tree_Filter.h"
+
+Fineline_Tree_Filter *tree_filter;
 
 Fineline_Tree_Filter_Dialog::Fineline_Tree_Filter_Dialog(int x, int y, int w, int h) : Fl_Double_Window(x, y, w, h, "Fineline Filter Dialog")
 {
@@ -71,18 +74,24 @@ Fineline_Tree_Filter_Dialog::~Fineline_Tree_Filter_Dialog()
 
 void Fineline_Tree_Filter_Dialog::button_callback(Fl_Button *b, void *p)
 {
-   //fl_message("modal window");
+   Fineline_Tree_Filter_Dialog *ftfd = (Fineline_Tree_Filter_Dialog*)p;
+
    if (strncmp(b->label(), "Start", 5) == 0)
    {
       //TODO: start a thread to process the file system tree.
+      ftfd->start_filter_thread();
    }
    else if (strncmp(b->label(), "Clear", 5) == 0)
    {
-      //TODO: clear the fields.
+      // clear the fields and restore the original file system tree.
+      ftfd->filter_file_field->value("");
+      ftfd->progress_browser->clear();
+      ftfd->textbuf->remove(0, ftfd->textbuf->length());
+      ftfd->restore_tree();
    }
    else if (strncmp(b->label(), "Close", 5) == 0)
    {
-      ((Fineline_Tree_Filter_Dialog *)p)->hide();
+      ftfd->hide();
    }
 
    return;
@@ -94,9 +103,10 @@ void Fineline_Tree_Filter_Dialog::button_callback(Fl_Button *b, void *p)
    Input  : String containing the file path.
    Output : None.
 */
-void Fineline_Tree_Filter_Dialog::add_matched_file(string filepath)
+void Fineline_Tree_Filter_Dialog::add_update_message(string filepath)
 {
-
+   progress_browser->add(filepath.c_str());
+   progress_browser->bottomline(progress_browser->size());
    return;
 }
 
@@ -108,7 +118,15 @@ void Fineline_Tree_Filter_Dialog::add_matched_file(string filepath)
 */
 void Fineline_Tree_Filter_Dialog::start_filter_thread()
 {
-   // TODO: start the filter processing thread.
+   string keywords = textbuf->text();
+
+   if (tree_filter != NULL)
+      delete tree_filter;
+
+   tree_filter = new Fineline_Tree_Filter(file_system_tree, keywords, this);
+
+   // Now start the filter processing thread.
+   tree_filter->start_task();
 
    return;
 }
@@ -116,18 +134,24 @@ void Fineline_Tree_Filter_Dialog::start_filter_thread()
 void Fineline_Tree_Filter_Dialog::show_dialog(Fineline_File_System_Tree *ffst)
 {
    // First make a copy of the file system map so we can revert back to the
-   // original file system if the user removes the filter
-
-   Fineline_File_Map fsm = ffst->get_file_map();
+   // original file system tree if the user removes the filter.
+   file_system_tree = ffst;
+   Fineline_File_Map fsm = file_system_tree->get_file_map();
 
    if (file_map.size() > 0)
       file_map.clear();
 
-   file_map.insert(fsm.begin(), fsm.end());
+   if (fsm.size() > 0)
+      file_map.insert(fsm.begin(), fsm.end());
 
    show();
 
    return;
 }
 
+void Fineline_Tree_Filter_Dialog::restore_tree()
+{
+   //TODO: restore the original file system tree.
 
+   return;
+}
