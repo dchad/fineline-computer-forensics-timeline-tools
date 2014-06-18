@@ -126,11 +126,12 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
 {
    string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)Fineline_Util::xcalloc(sizeof(fl_file_record_t));
-   int file_name_length = filename.size();
    TskFsMeta *fs_meta = fs_file->getMeta();
 
-   strncpy(frec->file_name, filename.c_str(), file_name_length);
+   full_file_path.append(filename);
+   strncpy(frec->file_name, filename.c_str(), filename.size());
    strncpy(frec->file_path, path.c_str(), path.size());
+   strncpy(frec->full_path, full_file_path.c_str(), full_file_path.size());
 
    frec->id = file_count++;
    frec->marked = 0;
@@ -140,8 +141,6 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
    frec->creation_time = (long)fs_meta->getCrTime();
    frec->modification_time = (long)fs_meta->getMTime();
    frec->file_type = (int)fs_meta->getType();
-
-   full_file_path.append(frec->file_name);
 
    //if (DEBUG)
    //   printf("Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());

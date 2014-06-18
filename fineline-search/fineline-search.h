@@ -58,6 +58,7 @@ struct fl_file_record
    char file_owner[256];
    char file_name[256];
    char file_path[FL_MAX_INPUT_STR];
+   char full_path[FL_MAX_INPUT_STR];
    char file_event_string[FL_MAX_INPUT_STR];
    char comment[FL_MAX_INPUT_STR];
 };

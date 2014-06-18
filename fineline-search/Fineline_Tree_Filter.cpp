@@ -45,7 +45,7 @@ Fineline_Tree_Filter::Fineline_Tree_Filter(Fineline_File_System_Tree *ffst, stri
 {
    //ctor
    file_system_tree = ffst;
-   file_map.insert(file_system_tree->get_file_map().begin(), file_system_tree->get_file_map().end());
+   file_map = file_system_tree->get_file_map();
    tree_filter_dialog = ftd;
 
    // Now tokenize the keywords into a vector.
@@ -57,15 +57,6 @@ Fineline_Tree_Filter::Fineline_Tree_Filter(Fineline_File_System_Tree *ffst, stri
 Fineline_Tree_Filter::~Fineline_Tree_Filter()
 {
    //dtor
-}
-
-static void progress_message(const char *msg_str)
-{
-   string msg(msg_str);
-   Fl::lock();
-   tree_filter_dialog->add_update_message(msg);
-   Fl::unlock();
-   return;
 }
 
 static void put_progress_message(string msg)
@@ -127,12 +118,10 @@ int Fineline_Tree_Filter::get_running()
 */
 int Fineline_Tree_Filter::process_file_system_tree()
 {
-   //char msg[256];
    string pmsg;
-   //bool completed = false;
    int i, keyword_list_size = keyword_list.size();
 
-   Fineline_Log::print_log_entry("fl_thread_task() <INFO> Started tree filter processing thread.\n");
+   Fineline_Log::print_log_entry("process_file_system_tree() <INFO> Started tree filter processing thread.");
 
    file_system_tree->clear_tree();
 
@@ -143,9 +132,8 @@ int Fineline_Tree_Filter::process_file_system_tree()
       // Iterate through the file system map and compare each file name with each keyword,
       // if a match then add to the file system tree and put a progress message on the dialog.
       fl_file_record_t *flec = p->second;
-      string full_path = flec->file_path;
-      full_path.append(flec->file_path);
-
+      string full_path = flec->full_path;
+      //cout << "Processing file: " << full_path << endl;
       for (i = 0; i < keyword_list_size; i++)
       {
          if (full_path.find(keyword_list[i], 0) != string::npos)
@@ -153,6 +141,7 @@ int Fineline_Tree_Filter::process_file_system_tree()
             file_system_tree->add_file(full_path, flec);
          }
       }
+      p++;
    }
 
    Fl::awake();
@@ -167,6 +156,8 @@ int Fineline_Tree_Filter::process_file_system_tree()
    put_progress_message(pmsg);
 
    Fl::awake();
+
+   Fineline_Log::print_log_entry("process_file_system_tree() <INFO> Finished tree filter processing thread.");
 
    return(0);
 }

@@ -207,6 +207,7 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
       filename = "C:\\temp\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".doc");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    for (i = 0; i < 1000; i++)
@@ -216,6 +217,7 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
       filename = "C:\\Windows\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".exe");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    for (i = 0; i < 1000; i++)
@@ -225,6 +227,7 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
       filename = "C:\\Users\\admin\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".txt");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    for (i = 0; i < 1000; i++)
@@ -234,6 +237,7 @@ TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
       filename = "/etc/file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".bin");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    EXPECT_EQ(4000, ftree->tree_size());
@@ -298,8 +302,8 @@ TEST(FineLineTreeFilterTests, ValidateMethods)
    string test_keywords = "   .jpg   .doc \t\t\n .gif, .pdf .bin .exe fred villain, methlab";
    Fineline_File_System_Tree *ftree = new Fineline_File_System_Tree(20, 100, 800, 600);
    Fineline_Tree_Filter_Dialog *ftfd = new Fineline_Tree_Filter_Dialog(20, 100, 800, 600);
-   //Fineline_Tree_Filter *ffilter = new Fineline_Tree_Filter(ftree, test_keywords, ftfd);
-   fl_file_record_t * flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
+   Fineline_Tree_Filter *ffilter;
+   fl_file_record_t *flf = (fl_file_record_t *) flut.xmalloc(sizeof(fl_file_record_t));
    string filename;
    char num[256];
    int i;
@@ -318,6 +322,7 @@ TEST(FineLineTreeFilterTests, ValidateMethods)
       filename = "C:\\temp\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".jpg");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    for (i = 0; i < 1000; i++)
@@ -327,6 +332,7 @@ TEST(FineLineTreeFilterTests, ValidateMethods)
       filename = "C:\\Windows\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".doc");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    for (i = 0; i < 1000; i++)
@@ -336,6 +342,7 @@ TEST(FineLineTreeFilterTests, ValidateMethods)
       filename = "C:\\Users\\admin\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".pdf");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
    for (i = 0; i < 1000; i++)
@@ -345,10 +352,11 @@ TEST(FineLineTreeFilterTests, ValidateMethods)
       filename = "C:\\Users\\admin\\file";
       filename.append(flut.xitoa(i, num, 256, 10));
       filename.append(".txt");
+      strncpy(flf->full_path, filename.c_str(), filename.size());
       ftree->add_file(filename, flf);
    }
-
-   //ffilter->process_file_system_tree();
+   ffilter = new Fineline_Tree_Filter(ftree, test_keywords, ftfd);
+   ffilter->process_file_system_tree();
 
    EXPECT_EQ(3000, ftree->tree_size());
 }
