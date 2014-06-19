@@ -47,18 +47,22 @@ Fineline_Tree_Filter_Dialog::Fineline_Tree_Filter_Dialog(int x, int y, int w, in
    {
       textbuf = new Fl_Text_Buffer(FL_MAX_INPUT_STR);
       filter_file_field = new Fl_Input(100, 20, w - 160, 30, "Filter File:");
-      filter_file_button = new Fl_Button(w - 50, 20, 30, 30, "File");
+      filter_file_button = new Fl_Button(w - 50, 20, 30, 30, "File"); //TODO: add file open icon
+      filter_file_button->tooltip("Open a text file of keywords.");
       filter_file_button->callback((Fl_Callback*)button_callback, (void *)this);
       keyword_editor = new Fl_Text_Editor(100, 70, w - 120, 210, "Keywords:");
       keyword_editor->align(FL_ALIGN_LEFT_TOP);
       keyword_editor->buffer(textbuf);
       progress_browser = new Fl_Browser(100, 300, w - 120, 210, "Progress:");
       progress_browser->align(FL_ALIGN_LEFT_TOP);
-      Fl_Button* save_button = new Fl_Button(w - 360, h - 50, 100, 30, "Start");
-      save_button->callback((Fl_Callback*)button_callback, (void *)this);
+      Fl_Button* start_button = new Fl_Button(w - 360, h - 50, 100, 30, "Start");
+      start_button->tooltip("Start the filter process.");
+      start_button->callback((Fl_Callback*)button_callback, (void *)this);
       Fl_Button* clear_button = new Fl_Button(w - 250, h - 50, 100, 30, "Clear");
+      clear_button->tooltip("Clear the filter and restore the original file system tree.");
       clear_button->callback((Fl_Callback*)button_callback, (void *)this);
       Fl_Button* close_button = new Fl_Button(w - 140, h - 50, 100, 30, "Close");
+      close_button->tooltip("Close the filter dialogue, do not restore the original file system tree.");
       close_button->callback((Fl_Callback*)button_callback, (void *)this);
    }
    browser_group->end();
@@ -134,15 +138,13 @@ void Fineline_Tree_Filter_Dialog::start_filter_thread()
 void Fineline_Tree_Filter_Dialog::show_dialog(Fineline_File_System_Tree *ffst)
 {
    // First make a copy of the file system map so we can revert back to the
-   // original file system tree if the user removes the filter.
+   // original file system tree if the user removes the filter using the clear button.
    file_system_tree = ffst;
-   Fineline_File_Map fsm = file_system_tree->get_file_map();
 
    if (file_map.size() > 0)
       file_map.clear();
 
-   if (fsm.size() > 0)
-      file_map.insert(fsm.begin(), fsm.end());
+   file_map = file_system_tree->get_file_map();
 
    show();
 
@@ -151,7 +153,8 @@ void Fineline_Tree_Filter_Dialog::show_dialog(Fineline_File_System_Tree *ffst)
 
 void Fineline_Tree_Filter_Dialog::restore_tree()
 {
-   //TODO: restore the original file system tree.
-
+   // Restore the original file system tree. Called when the user clicks the clear button
+   // to remove filter from file system tree.
+   file_system_tree->add_file_map(file_map);
    return;
 }

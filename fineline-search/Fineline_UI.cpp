@@ -679,8 +679,8 @@ void Fineline_UI::tree_button_callback(Fl_Button *b, void *p)
       if (DEBUG)
          cout << "Fineline_UI::tree_button_callback() <INFO> " << b->label() << endl;
 
-      //TODO: pass in the file system tree pointer and open the filter dialog
-      tree_filter_dialog->show();
+      // Pass in the file system tree pointer and open the filter dialog
+      tree_filter_dialog->show_dialog(file_system_tree);
    }
    else if ( strncmp(b->label(), "Search", 6) == 0 )
    {

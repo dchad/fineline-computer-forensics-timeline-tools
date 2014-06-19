@@ -131,7 +131,6 @@ int Fineline_File_System_Tree::add_file(string filename, fl_file_record_t *flrp)
 */
 void Fineline_File_System_Tree::add_file_nodes(string file_path)
 {
-   char new_node[FL_PATH_MAX];
    char path[FL_PATH_MAX];
    int path_len = file_path.size();
 
@@ -152,11 +151,32 @@ void Fineline_File_System_Tree::add_file_nodes(string file_path)
 
       if (strncmp(flec->file_path, path, path_len) == 0)
       {
-         strncpy(new_node, flec->file_path, strlen(flec->file_path));
-         strncat(new_node, flec->file_name, strlen(flec->file_name));
-         add(new_node);
+         add(flec->full_path);
       }
-      memset(new_node, 0, FL_PATH_MAX);
+      p++;
+   }
+}
+
+
+/*
+   Name   : add_file_map()
+   Purpose: Add a file map to the file system tree. Called from the search, filter
+          : and import dialogues to create or restore the file system tree.
+   Input  : File map containing records or every file in the file system.
+   Output : None.
+*/
+void Fineline_File_System_Tree::add_file_map(Fineline_File_Map &fmap)
+{
+   // First clear the file system tree, copy the import map to our local map,
+   // then iterate over the map and add each node to file system tree.
+   clear();
+   file_map = fmap;
+   map< string, fl_file_record_t* >::iterator p = fmap.begin();
+
+   while (p != fmap.end())
+   {
+      fl_file_record_t *flec = p->second;
+      add(flec->full_path);
       p++;
    }
 }
