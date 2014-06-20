@@ -312,12 +312,6 @@ void Fineline_UI::main_menu_callback(Fl_Widget *w, void *x)
 {
    Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
    const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
-   char ipath[256];
-
-   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
-
-   fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
-   fprintf(stderr, ", item_pathname() is '%s'\n", ipath);		   // ..and full pathname
 
    if ( strncmp(item->label(), "&New", 4) == 0 )
    {
@@ -604,7 +598,7 @@ void Fineline_UI::file_metadata_callback(Fl_Widget *w, void *x)
    {
       // Open the file chooser dialog to select a file to save the metadata text.
       fc->title("Save File Metadata List");
-      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      fc->type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);		// only picks files that exist
       switch ( fc->show() )
       {
          case -1: break;	// Error
@@ -664,14 +658,17 @@ void Fineline_UI::tree_button_callback(Fl_Button *b, void *p)
    if ( strncmp(b->label(), "Save", 4) == 0 )
    {
       fc->title("Save File System Tree");
-      fc->type(Fl_Native_File_Chooser::BROWSE_FILE);		// only picks files that exist
+      fc->type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);		// only picks files that exist
       switch ( fc->show() )
       {
          case -1: break;	// Error
          case  1: break; 	// Cancel
          default:		      // Choice
          fc->preset_file(fc->filename());
-         save_tree(fc->filename());
+         if (file_system_tree->save_tree(progress_dialog, fc->filename()) < 0)
+         {
+            fl_message("<ERROR> Could not save file system tree!");
+         }
       }
    }
    else if ( strncmp(b->label(), "Filter", 6) == 0 )

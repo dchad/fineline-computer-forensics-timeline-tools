@@ -43,6 +43,7 @@
 #include <FL/Fl_Tree.H>
 
 #include "fineline-search.h"
+#include "Fineline_Progress_Dialog.h"
 
 using namespace std;
 
@@ -70,7 +71,7 @@ class Fineline_File_System_Tree : public Fl_Tree
       int remove_file(string filename);
       int tree_size();
       int clear_tree();
-      int save_tree();
+      int save_tree(Fineline_Progress_Dialog *pd, const char *filename);
       int print_tree();
       void assign_user_icons();
       void rebuild_tree();

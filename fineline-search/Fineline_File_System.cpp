@@ -73,6 +73,8 @@ vector< TskFsInfo * > file_system_list; // List of file systems in the forensic 
 int running = 0;
 long directory_count = 0;
 long file_count = 0;
+int file_system_number = 0;
+char file_system_label[256];
 
 /* Static C callback functions for the TSK library calls */
 
@@ -80,7 +82,7 @@ static void progress_message(const char *msg_str)
 {
    string msg(msg_str);
    Fl::lock();
-   progress_dialog->add_update(msg);
+   progress_dialog->add_progress_message(msg);
    Fl::unlock();
    return;
 }
@@ -88,7 +90,7 @@ static void progress_message(const char *msg_str)
 static void put_progress_message(string msg)
 {
    Fl::lock();
-   progress_dialog->add_update(msg);
+   progress_dialog->add_progress_message(msg);
    Fl::unlock();
    return;
 }
@@ -131,7 +133,8 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
    full_file_path.append(filename);
    strncpy(frec->file_name, filename.c_str(), filename.size());
    strncpy(frec->file_path, path.c_str(), path.size());
-   strncpy(frec->full_path, full_file_path.c_str(), full_file_path.size());
+   strncpy(frec->full_path, file_system_label, strlen(file_system_label));  // The full path includes the file system label since
+   strncat(frec->full_path, full_file_path.c_str(), full_file_path.size()); // a multi-volume image will contain multiple file systems.
 
    frec->id = file_count++;
    frec->marked = 0;
@@ -142,8 +145,8 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
    frec->modification_time = (long)fs_meta->getMTime();
    frec->file_type = (int)fs_meta->getType();
 
-   //if (DEBUG)
-   //   printf("Fineline_File_System::process_file() <INFO> file name: %s\n", full_file_path.c_str());
+   if (DEBUG)
+      printf("Fineline_File_System::process_file() <INFO> file name: %s\n", frec->full_path);
 
    Fl::lock();
 
@@ -216,7 +219,7 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
 {
    TskFsInfo *fs_info = new TskFsInfo();
    string msg;
-   char number[256];
+   char number_str[256];
 
     /* Try it as a file system */
    if (fs_info->open(img_info, start, TSK_FS_TYPE_DETECT))
@@ -226,7 +229,15 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    }
    else
    {
-      /* Walk the directory structure, starting at the root directory */
+      /* Create the file system label then walk the directory structure, starting at the root directory */
+      memset((void *)file_system_label, 0, 256);
+      memset((void *)number_str, 0, 256);
+      file_system_number++;
+      Fineline_Util::xitoa(file_system_number, number_str, 256, 10);
+      strncpy(file_system_label, "FS", 2);
+      strncat(file_system_label, number_str, strlen(number_str));
+      strncat(file_system_label, "/", 1);
+
 
       if (fs_info->dirWalk(fs_info->getRootINum(), (TSK_FS_DIR_WALK_FLAG_ENUM) (TSK_FS_DIR_WALK_FLAG_RECURSE), process_directory_callback, NULL))
       {
@@ -243,11 +254,11 @@ static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
    msg = "-----------------------------------------------------------------------------------";
    put_progress_message(msg);
    msg = "Processed ";
-   msg.append(Fineline_Util::xitoa(directory_count, number, 256, 10));
+   msg.append(Fineline_Util::xitoa(directory_count, number_str, 256, 10));
    msg.append(" directories.\n");
    put_progress_message(msg);
    msg = "Processed ";
-   msg.append(Fineline_Util::xitoa(file_count, number, 256, 10));
+   msg.append(Fineline_Util::xitoa(file_count, number_str, 256, 10));
    msg.append(" files.\n");
    put_progress_message(msg);
    msg = "-----------------------------------------------------------------------------------";
@@ -398,7 +409,7 @@ int Fineline_File_System::open_forensic_image()
    update_msg = "Processing image type: ";
    update_msg.append(image_info->typeToDesc(itype));
 
-   progress_dialog->add_update(update_msg);
+   put_progress_message(update_msg);
 
    return(0);
 }

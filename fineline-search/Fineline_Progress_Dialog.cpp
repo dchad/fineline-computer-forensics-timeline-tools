@@ -62,9 +62,16 @@ Fineline_Progress_Dialog::~Fineline_Progress_Dialog()
    //dtor
 }
 
-void Fineline_Progress_Dialog::add_update(string update_text)
+void Fineline_Progress_Dialog::add_progress_message(string msg)
 {
-   progress_browser->add(update_text.c_str());
+   progress_browser->add(msg.c_str());
+   progress_browser->bottomline(progress_browser->size());
+   return;
+}
+
+void Fineline_Progress_Dialog::add_progress_message(char *msg)
+{
+   progress_browser->add(msg);
    progress_browser->bottomline(progress_browser->size());
    return;
 }

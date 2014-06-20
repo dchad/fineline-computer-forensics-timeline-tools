@@ -34,7 +34,7 @@
 */
 
 
-
+#include <stdio.h>
 #include <iostream>
 
 #include <tsk/libtsk.h>
@@ -215,9 +215,37 @@ int Fineline_File_System_Tree::remove_file(string filename)
    return(file_map.size());
 }
 
-int Fineline_File_System_Tree::save_tree()
+int Fineline_File_System_Tree::save_tree(Fineline_Progress_Dialog *pd, const char *filename)
 {
-   //TODO:
+   // Open the output file and iterate through the file map and write out each node.
+   string msg;
+   char file_path[FL_MAX_INPUT_STR];
+   Fl_Tree_Item *tip = first();
+   FILE *fp = fopen(filename, "w");
+
+   if (fp == NULL)
+   {
+	   msg = "save_tree() <ERROR>: Could not create file: ";
+	   msg.append(filename);
+	   Fineline_Log::print_log_entry(msg.c_str());
+      return(-1);
+   }
+
+   msg = "Saving file system tree to file: ";
+   msg.append(filename);
+   pd->add_progress_message(msg);
+   for (tip = first(); tip; tip = next(tip))
+   {
+      item_pathname(file_path, FL_MAX_INPUT_STR, tip);
+      fprintf(fp, "%s\n", file_path);
+      pd->add_progress_message(file_path);
+   }
+
+   fclose(fp);
+
+   msg = "Finished saving file system tree.";
+   pd->add_progress_message(msg);
+
    return(0);
 }
 
@@ -314,7 +342,7 @@ fl_file_record_t *Fineline_File_System_Tree::get_file_record(const char *file_pa
 {
    string fp;
 
-   fp.append(file_path);
+   fp = file_path;
 
    return(find_file(fp));
 }

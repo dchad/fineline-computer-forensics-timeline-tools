@@ -55,7 +55,8 @@ class Fineline_Progress_Dialog : public Fl_Double_Window
       Fineline_Progress_Dialog(int x, int y, int w, int h);
       virtual ~Fineline_Progress_Dialog();
 
-      void add_update(string update_text);
+      void add_progress_message(string msg);
+      void add_progress_message(char *msg);
       void clear_text();
       static void button_callback(Fl_Button *b, void *p);
 
