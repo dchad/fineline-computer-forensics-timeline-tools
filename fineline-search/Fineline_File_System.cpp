@@ -126,15 +126,13 @@ static void check_path_separators(TskFsInfo *fs_info, string full_path)
 */
 static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
 {
-   string full_file_path = path;
    fl_file_record_t *frec = (fl_file_record_t *)Fineline_Util::xcalloc(sizeof(fl_file_record_t));
    TskFsMeta *fs_meta = fs_file->getMeta();
 
-   full_file_path.append(filename);
    strncpy(frec->file_name, filename.c_str(), filename.size());
    strncpy(frec->file_path, path.c_str(), path.size());
    strncpy(frec->full_path, file_system_label, strlen(file_system_label));  // The full path includes the file system label since
-   strncat(frec->full_path, full_file_path.c_str(), full_file_path.size()); // a multi-volume image will contain multiple file systems.
+   strncat(frec->full_path, path.c_str(), path.size()); // a multi-volume image will contain multiple file systems.
 
    frec->id = file_count++;
    frec->marked = 0;
@@ -150,7 +148,7 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
 
    Fl::lock();
 
-   file_system_tree->add_file(full_file_path.c_str(), frec);
+   file_system_tree->add_file(frec->full_path, frec);
 
    Fl::awake(); //TODO: is this necessary?
    Fl::unlock();
@@ -213,7 +211,7 @@ static TSK_WALK_RET_ENUM process_directory_callback(TskFsFile *fs_file, const ch
              walk through the file system and calls process_directory callback for each
              directory found.
    Input   : Forensic image info and offset = 0 for this application.
-   Output  : Always returns 0 to ensure all file systems are processed.
+   Output  : Returns -1 on error, 0 if success.
 */
 static uint8_t process_file_system(TskImgInfo * img_info, TSK_OFF_T start)
 {

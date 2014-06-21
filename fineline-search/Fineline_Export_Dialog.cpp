@@ -103,8 +103,8 @@ void Fineline_Export_Dialog::add_marked_files(vector< fl_file_record_t* > flist,
    {
       memset((void*)full_path, 0, FL_PATH_MAX);
       fl_file_record_t *flec = marked_file_list[i];
-      strncpy(full_path, flec->file_path, strlen(flec->file_path));
-      strncat(full_path, flec->file_name, strlen(flec->file_name));
+      strncpy(full_path, flec->file_path, strlen(flec->file_path)); //Do not use the full path as it has the
+      strncat(full_path, flec->file_name, strlen(flec->file_name)); //the file system label at the start.
       file_browser->add(full_path);
       if (DEBUG)
          Fineline_Log::print_log_entry("Fineline_Export_Dialog::add_marked_files() <INFO> added marked file.");

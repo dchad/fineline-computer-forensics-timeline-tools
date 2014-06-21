@@ -359,12 +359,6 @@ void Fineline_UI::open_menu_callback(Fl_Widget *w, void *x)
 {
    Fl_Menu_Bar *menu_bar = (Fl_Menu_Bar*)w;				// Get the menubar widget
    const Fl_Menu_Item *item = menu_bar->mvalue();		// Get the menu item that was picked
-   char ipath[256];
-
-   menu_bar->item_pathname(ipath, sizeof(ipath));	   // Get full pathname of picked item
-
-   fprintf(stderr, "callback: You picked '%s'", item->label());	// Print item picked
-   fprintf(stderr, ", item_pathname() is '%s'\n", ipath);
 
    if ( strstr(item->label(), "&Project") != NULL )
    {
