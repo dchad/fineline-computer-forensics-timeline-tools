@@ -52,6 +52,7 @@ struct fl_file_record
    long modification_time;
    long file_size;
    int  file_type;
+   int  file_system_id;
    char file_access_time_string[32];
    char file_creation_time_string[32];
    char file_modification_time_string[32];

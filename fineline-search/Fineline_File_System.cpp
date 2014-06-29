@@ -133,6 +133,7 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
    strncpy(frec->file_path, path.c_str(), path.size());
    strncpy(frec->full_path, file_system_label, strlen(file_system_label));  // The full path includes the file system label since
    strncat(frec->full_path, path.c_str(), path.size()); // a multi-volume image will contain multiple file systems.
+   strncat(frec->full_path, filename.c_str(), filename.size());
 
    frec->id = file_count++;
    frec->marked = 0;
@@ -142,6 +143,7 @@ static uint8_t process_file(TskFsFile *fs_file, string filename, string path)
    frec->creation_time = (long)fs_meta->getCrTime();
    frec->modification_time = (long)fs_meta->getMTime();
    frec->file_type = (int)fs_meta->getType();
+   frec->file_system_id = file_system_number;
 
    if (DEBUG)
       printf("Fineline_File_System::process_file() <INFO> file name: %s\n", frec->full_path);
@@ -377,6 +379,9 @@ Fineline_File_System::Fineline_File_System(Fineline_File_System_Tree *ffst, stri
    file_system_tree = ffst;
    fs_image = image_path;
    progress_dialog = fpd;
+   file_count = 0;
+   directory_count = 0;
+   file_system_number = 0;
 }
 
 Fineline_File_System::~Fineline_File_System()
@@ -565,6 +570,123 @@ int Fineline_File_System::export_file(string file_path, string evidence_director
 
    return(0);
 }
+
+/*
+   Function: export_file
+   Purpose : Opens the requested file in the forensic image and copies the file
+             to the specified evidence directory.
+   Input   : Request file record pointer and destination evidence directory.
+   Output  : The exported file content, return 0 on success, -1 on error.
+*/
+int Fineline_File_System::export_file(fl_file_record_t *flec, string evidence_directory)
+{
+   TskFsFile *file_info = new TskFsFile();
+   char in_buf[FL_MAX_INPUT_STR];
+   FILE *out_file = NULL;
+   int len = 0;
+   int cnt = 0;
+   TSK_OFF_T file_size  = 0;
+   TSK_OFF_T offset = 0;
+   char msg[256];
+   int fs_id;
+   string progress_msg;
+   string file_path;
+
+   sprintf(msg, "Fineline_File_System::export_file() <INFO> exporting file %s <-> %s\n", evidence_directory.c_str(), flec->full_path);
+   flog->print_log_entry(msg);
+
+   fs_id = flec->file_system_id - 1;
+   if ((fs_id > -1) && (fs_id < (int)file_system_list.size()))
+   {
+      TskFsInfo *fs_info = file_system_list[fs_id];
+      file_path = flec->file_path;
+      file_path.append(flec->file_name);
+      if (file_info->open(fs_info, file_info, file_path.c_str()))
+      {
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not open file in file system %i\n", fs_id);
+         flog->print_log_entry(msg);
+      }
+      else
+      {
+         sprintf(msg, "Fineline_File_System::export_file() <INFO> Exporting file %s\n", file_path.c_str());
+         flog->print_log_entry(msg);
+
+         // destination_file.append(PATH_SEPARATOR);
+         // NOTE: do not use PATH_SEPARATOR, libs will automatically convert to
+         // to platform specific path separator on Linux or Windows.
+
+         string destination_file = evidence_directory;
+         destination_file.append("/");
+         destination_file.append(file_path);
+
+         if (make_path(destination_file, 0775) != 0)  // Linux/Unix permissions: (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
+         {
+            sprintf(msg, "Fineline_File_System::export_file() <INFO> Could not make subdirectory in %s\n", evidence_directory.c_str());
+            flog->print_log_entry(msg);
+            //progress_message(msg);
+            //return(-1); do not return, directory may already exist, errno checking is unreliable.
+         }
+
+         out_file = fopen(destination_file.c_str(), "wb");
+         if (out_file == NULL)
+         {
+            sprintf(msg, "Fineline_File_System::export_file() <ERROR> Could not open file %s\n", destination_file.c_str());
+            flog->print_log_entry(msg);
+            progress_message(msg);
+            return(-1);
+         }
+         else
+         {
+            // Now read in the content of the selected file and write out to the file in the evidence directory.
+
+            file_size = file_info->getMeta()->getSize();
+            for (offset = 0; offset < file_size; offset += len)
+            {
+               if (file_size - offset < 2048)
+                  len = (size_t) (file_size - offset);
+               else
+                  len = 2048;
+
+               cnt = file_info->read(offset, in_buf, len, TSK_FS_FILE_READ_FLAG_NONE);
+               if (cnt == -1)
+               {
+                  // could check tsk_errno here for a recovery error (TSK_ERR_FS_RECOVER)
+                  if (DEBUG)
+                  {
+                     sprintf(msg, "Fineline_File_System::export_file() <ERROR> Reading file %s\n", file_path.c_str());
+                     flog->print_log_entry(msg);
+                  }
+                  break;
+               }
+               else if (cnt != len)
+               {
+                  if (DEBUG)
+                  {
+                     sprintf(msg, "Fineline_File_System::export_file() <WARNING> Allocation error in %s\n", file_path.c_str());
+                     flog->print_log_entry(msg);
+                  }
+               }
+
+               fwrite(in_buf, 1, cnt, out_file);
+
+            }
+         }
+      }
+   }
+
+   if (out_file != NULL)
+      fclose(out_file);
+
+   delete file_info;
+
+   progress_msg = "Exported file: ";
+   progress_msg.append(file_path);
+   put_progress_message(progress_msg);
+
+   return(0);
+}
+
+
 
 /*
    Function: export_files

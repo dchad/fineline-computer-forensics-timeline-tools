@@ -44,6 +44,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Browser.H>
 
+#include "fineline-search.h"
 #include "Fineline_Log.h"
 #include "Fineline_File_System_Tree.h"
 #include "Fineline_Progress_Dialog.h"
@@ -65,6 +66,7 @@ class Fineline_File_System
       int close_forensic_image();
       const char *get_image_name();
       int export_file(string file_path, string evidence_directory);
+      int export_file(fl_file_record_t *flec, string evidence_directory);
       int export_files(vector<string> flist, string evidence_directory);
 
    protected:

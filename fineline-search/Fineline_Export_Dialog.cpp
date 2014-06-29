@@ -124,7 +124,6 @@ void Fineline_Export_Dialog::export_files()
 {
    string evidence_directory;
    unsigned int i;
-   string full_path;
    string msg;
 
    evidence_directory = evidence_directory_field->value();
@@ -132,21 +131,18 @@ void Fineline_Export_Dialog::export_files()
    for (i = 0; i < marked_file_list.size(); i++)
    {
       fl_file_record_t *flec = marked_file_list[i];
-      full_path.append(flec->file_path);
-      full_path.append(flec->file_name);
-      if (file_system->export_file(full_path, evidence_directory) == 0)
+      if (file_system->export_file(flec, evidence_directory) == 0)
       {
          msg = "Exported file: ";
-         msg.append(full_path);
+         msg.append(flec->full_path);
          file_browser->add(msg.c_str());
       }
       else
       {
          msg = "Error exporting file: ";
-         msg.append(full_path);
+         msg.append(flec->full_path);
          file_browser->add(msg.c_str());
       }
-      full_path.clear();
       //if (DEBUG)
       //   Fineline_Log::print_log_entry("Fineline_Export_Dialog::export_files() <INFO> export marked file.");
    }

@@ -186,6 +186,7 @@ TEST(FineLineSearchFileSystemProcessingTests, ValidateMethods)
 }
 
 
+
 TEST(FineLineSearchFileSystemTreeTests, ValidateMethods)
 {
    Fineline_Util flut;
@@ -359,6 +360,52 @@ TEST(FineLineTreeFilterTests, ValidateMethods)
    ffilter->process_file_system_tree();
 
    EXPECT_EQ(3000, ftree->tree_size());
+}
+
+TEST(FineLineSearchFileSystemExportTests, ValidateMethods)
+{
+   Fineline_Log *flog = new Fineline_Log();
+   Fineline_Progress_Dialog *fpd = new Fineline_Progress_Dialog(20, 20, 600, 600);
+   Fineline_File_System_Tree *fltree = new Fineline_File_System_Tree(20, 20, 100, 100);
+   Fineline_File_System *ffs;
+   string test_image_2 = "../../testing/8-jpeg-search.dd";
+   fl_file_record_t *flf = (fl_file_record_t *) Fineline_Util::xmalloc(sizeof(fl_file_record_t));
+   string filename;
+   string evidence_directory = "./evidence";
+
+   ASSERT_TRUE(NULL != flf);
+   ASSERT_TRUE(NULL != fltree);
+   ASSERT_TRUE(NULL != flog);
+   ASSERT_TRUE(NULL != fpd);
+
+   flog->open_log_file();
+
+   ffs = new Fineline_File_System(fltree, test_image_2, fpd, flog);
+
+   ASSERT_TRUE(NULL != ffs);
+   //EXPECT_EQ(0, ffs->open_forensic_image());
+   //EXPECT_EQ(0, ffs->process_forensic_image());
+
+   // Extract the following files from the forensic image:
+   // "FS1/invalid/file4.jpg"
+   // "FS1/misc/file11.dat"
+   // "FS1/del1/file6.jpg"
+   // "FS1/archive/file10.tar.gz"
+
+   //strncpy(flf->file_name, "file4.jpg", 9);
+   //strncpy(flf->file_path, "invalid", 7);
+   //strncpy(flf->full_path, "FS1/invalid/file4.jpg", 21);
+   //flf->file_system_id = 1;
+   //filename = "invalid/file4.jpg";
+
+   //ffs->export_file(filename, evidence_directory);
+   // getting mutex failures when calling export_file()
+
+   flog->close_log_file();
+
+   delete ffs;
+   delete fltree;
+   delete flog;
 }
 
 
