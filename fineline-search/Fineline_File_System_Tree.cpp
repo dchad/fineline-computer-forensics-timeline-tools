@@ -394,6 +394,12 @@ void Fineline_File_System_Tree::mark_file()
          flrec->marked = 1;
          flti->labelcolor(FL_DARK_GREEN);
          flti->labelfont(FL_COURIER_BOLD);
+         if (flrec->file_type == TSK_FS_META_TYPE_DIR) //If a directory then mark all the files in the directory.
+         {
+            //TODO: recursively iterate through the tree subdirectory children and mark each one.
+            mark_children(flti);
+
+         }
          Fl::awake();
          Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_file() <INFO> marked file.");
       }
@@ -424,6 +430,12 @@ void Fineline_File_System_Tree::unmark_file()
          flrec->marked = 0;
          flti->labelcolor(FL_FOREGROUND_COLOR);
          flti->labelfont(FL_COURIER);
+         if (flrec->file_type == TSK_FS_META_TYPE_DIR) //If a directory then mark all the files in the directory.
+         {
+            //TODO: recursively iterate through the tree subdirectory children and mark each one.
+            unmark_children(flti);
+
+         }
          Fl::awake();
       }
    }
