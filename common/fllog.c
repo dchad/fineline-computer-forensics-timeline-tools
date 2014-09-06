@@ -34,7 +34,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "fineline-ws.h"
+#include "flcommon.h"
 
 static FILE *log_file;
 

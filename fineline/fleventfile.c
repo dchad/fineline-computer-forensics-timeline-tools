@@ -1,6 +1,6 @@
 
 /*  Copyright 2014 Derek Chadwick
- 
+
     This file is part of the FineLine Computer Forensics Timeline Tools.
 
     FineLine is free software: you can redistribute it and/or modify
@@ -58,7 +58,7 @@ FILE *open_fineline_event_file(char *evt_file_name)
 }
 
 
-/* DEPRECATED: format superseded.
+/*
    Function: write_fineline_event_record()
 
    Purpose : Creates an event string and prints to the fineline event file and stdout.
@@ -154,6 +154,7 @@ int write_fineline_project_header(char *pstr, FILE *evt_file, int record_count)
 
    return(0);
 }
+
 
 
 

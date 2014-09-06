@@ -36,6 +36,7 @@
 #ifndef FINELINE_COMMON_H
 #define FINELINE_COMMON_H
 
+#include <sys/types.h>
 
 #define DEBUG 1
 
@@ -47,11 +48,13 @@
 #define MAX_EVENT_DESC_SIZE 256
 #define MAX_EVENT_ID_SIZE 8
 
-#define FL_FILE_OUT  0x01
-#define FL_GUI_OUT   0x02
-#define FL_INDEX_IN  0x04
-#define FL_CACHE_IN  0x08
-#define FL_FILTER_ON 0x10
+#define FL_FILE_OUT       0x01
+#define FL_GUI_OUT        0x02
+#define FL_INDEX_IN       0x04
+#define FL_CACHE_IN       0x08
+#define FL_FILTER_ON      0x10
+#define FL_UNIFIED2_INPUT 0x20
+#define FL_CAPTURE_INPUT  0x40
 
 #define FL_FILE_ACCESS_TIME   0x01
 #define FL_FILE_CREATION_TIME 0x02
@@ -109,7 +112,6 @@ struct fl_project_header
 
 typedef struct fl_project_header fl_project_header_t;
 
-
 /* flutil.c */
 
 int fatal(char *str);
@@ -132,6 +134,13 @@ int init_socket(char *gui_ip_address);
 int send_event(char *event_string);
 char *get_response();
 int close_socket();
+
+
+/* flog.c */
+
+int open_log_file(char *startup_path);
+int print_log_entry(char *estr);
+int close_log_file();
 
 #endif
 

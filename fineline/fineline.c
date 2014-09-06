@@ -1,5 +1,5 @@
 /*  Copyright 2014 Derek Chadwick
- 
+
     This file is part of the FineLine Computer Forensics Timeline Tools.
 
     FineLine is free software: you can redistribute it and/or modify
@@ -91,14 +91,14 @@ int parse_command_line_args(int argc, char *argv[], char *fl_event_filename, cha
    int input_file_specified = 0;
    char timestr[100];
    int tlen;
-   
+
    tlen = get_time_string(timestr, 99);
-   
+
    memset(fl_event_filename, 0, FL_PATH_MAX);
    memset(in_file, 0, FL_PATH_MAX);
    memset(filter_file, 0, FL_PATH_MAX);
    strncpy(fl_event_filename, EVENT_FILE, strlen(EVENT_FILE)); /* the default event filename */
-   
+
    if (tlen > 0)
    {
       strncat(fl_event_filename, timestr, tlen);
@@ -108,7 +108,7 @@ int parse_command_line_args(int argc, char *argv[], char *fl_event_filename, cha
       print_log_entry("parse_command_line_args() <WARNING> Invalid time string.\n");
    }
    strncat(fl_event_filename, EVENT_FILE_EXT, 4);
-   
+
    if (argc < 2)
    {
 	  print_log_entry("parse_command_line_args(): invalid arguments < 2\n");
@@ -173,27 +173,27 @@ int parse_command_line_args(int argc, char *argv[], char *fl_event_filename, cha
                return(-1);
             }
          }
-		 else if (strncmp(argv[i], "-a", 2) == 0)
-		 {
-			 if ((i+1) < argc)
-			 {
-			    printf("parse_command_line_args() <INFO> GUI IP address: %s\n", argv[i+1]);
-             strncpy(gui_ip_address, argv[i+1], strlen(argv[i+1]));
-			    if (validate_ipv4_address(gui_ip_address) < 0)
-			    {
-				    print_log_entry("parse_command_line_args() <ERROR> Invalid IPv4 address.\n");
-                return(-1);
-			    }
-			 }
-			 else
-			 {
-			    print_log_entry("parse_command_line_args() <ERROR> Missing IPv4 address.\n");
-             return(-1);
-			 }
-		 }
+		   else if (strncmp(argv[i], "-a", 2) == 0)
+		   {
+			   if ((i+1) < argc)
+			   {
+			      printf("parse_command_line_args() <INFO> GUI IP address: %s\n", argv[i+1]);
+               strncpy(gui_ip_address, argv[i+1], strlen(argv[i+1]));
+			      if (validate_ipv4_address(gui_ip_address) < 0)
+			      {
+				      print_log_entry("parse_command_line_args() <ERROR> Invalid IPv4 address.\n");
+                  return(-1);
+			      }
+			   }
+			   else
+			   {
+			      print_log_entry("parse_command_line_args() <ERROR> Missing IPv4 address.\n");
+               return(-1);
+			   }
+		   }
          else if (strncmp(argv[i], "-f", 2) == 0)
          {
-            /* Windows event file name to use for input */
+            /* Filter event file name */
             if ((i+1) < argc)
             {
                printf("parse_command_line_args() <INFO> Filter file: %s\n", argv[i+1]);
@@ -202,7 +202,7 @@ int parse_command_line_args(int argc, char *argv[], char *fl_event_filename, cha
             }
             else
             {
-               print_log_entry("parse_command_line_args() <ERROR> Missing Windows event file name.\n");
+               print_log_entry("parse_command_line_args() <ERROR> Missing filter file name.\n");
                return(-1);
             }
          }
@@ -218,7 +218,7 @@ int parse_command_line_args(int argc, char *argv[], char *fl_event_filename, cha
 	   retval = retval | FL_EVTX_IN;
 	   print_log_entry("parse_command_line_args() <INFO> Default input file = Security.evtx\n");
    }
-   
+
    print_log_entry("parse_command_line_args() <INFO> Finished processing command line arguments.\n");
 
    return(retval);
