@@ -97,7 +97,7 @@ int Fineline_Util::xfree(char *buf, int len)
 int Fineline_Util::print_help()
 {
    printf("\nFineLine Computer Forensics Timeline Constructor 1.0\n\n");
-   printf("Command: fineline <options>\n\n");
+   printf("Command: fineline-search <options>\n\n");
    printf("Output to a fineline event file                   : -w\n");
    printf("Only send events to GUI                           : -s\n");
    printf("Specify fineline output filename                  : -o FILENAME\n");

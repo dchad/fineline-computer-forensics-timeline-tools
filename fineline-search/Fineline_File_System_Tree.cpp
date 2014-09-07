@@ -215,6 +215,12 @@ int Fineline_File_System_Tree::remove_file(string filename)
    return(file_map.size());
 }
 
+/*
+   Name   : save_tree()
+   Purpose: Serialize to tree into a text file.
+   Input  : File name.
+   Output : Returns 0 on success, -1 on error.
+*/
 int Fineline_File_System_Tree::save_tree(Fineline_Progress_Dialog *pd, const char *filename)
 {
    // Open the output file and iterate through the file map and write out each node.
@@ -384,7 +390,7 @@ void Fineline_File_System_Tree::mark_file()
       {
          Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_file() <ERROR> Could not get tree item path.");
          fl_message(" <ERROR> Could not get tree item. ");
-          return;
+         return;
       }
 
       full_path.append(file_path);
@@ -396,9 +402,7 @@ void Fineline_File_System_Tree::mark_file()
          flti->labelfont(FL_COURIER_BOLD);
          if (flrec->file_type == TSK_FS_META_TYPE_DIR) //If a directory then mark all the files in the directory.
          {
-            //TODO: recursively iterate through the tree subdirectory children and mark each one.
             mark_children(flti);
-
          }
          Fl::awake();
          Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_file() <INFO> marked file.");
@@ -433,13 +437,98 @@ void Fineline_File_System_Tree::unmark_file()
          if (flrec->file_type == TSK_FS_META_TYPE_DIR) //If a directory then mark all the files in the directory.
          {
             //TODO: recursively iterate through the tree subdirectory children and mark each one.
-            unmark_children(flti);
-
+            if (flti->has_children())
+            {
+               unmark_children(flti);
+            }
          }
          Fl::awake();
       }
    }
    return;
+}
+
+void Fineline_File_System_Tree::mark_children(Fl_Tree_Item *flti)
+{
+   Fl_Tree_Item *fltc;
+   fl_file_record_t *flrec = NULL;
+   char file_path[FL_PATH_MAX]; // FL_PATH_MAX 2048 is an FLTK constant, Fineline FL_PATH_MAX_LENGTH 4096
+   string full_path;
+   int ccount, i;
+
+   if ((ccount = flti->children()) > 0)
+   {
+      for (i = 0; i < ccount; i++)
+      {
+         fltc = flti->child(i);
+         if (fltc != 0)
+         {
+            if (item_pathname(file_path, FL_PATH_MAX, fltc) != 0)
+            {
+               Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_children() <ERROR> Could not get tree item path.");
+               fl_message(" <ERROR> Could not get tree item. ");
+               return;
+            }
+
+            full_path = file_path;
+            flrec = find_file(full_path);
+            if (flrec != NULL)
+            {
+               flrec->marked = 1;
+               fltc->labelcolor(FL_DARK_GREEN);
+               fltc->labelfont(FL_COURIER_BOLD);
+               if (flrec->file_type == TSK_FS_META_TYPE_DIR) //If a directory then mark all the files in the directory.
+               {
+                  mark_children(fltc);
+               }
+               Fl::awake();
+               Fineline_Log::print_log_entry("Fineline_File_System_Tree::mark_children() <INFO> marked file.");
+            }
+         }
+      }
+   }
+}
+
+
+void Fineline_File_System_Tree::unmark_children(Fl_Tree_Item *flti)
+{
+   Fl_Tree_Item *fltc;
+   fl_file_record_t *flrec = NULL;
+   char file_path[FL_PATH_MAX]; // FL_PATH_MAX 2048 is an FLTK constant, Fineline FL_PATH_MAX_LENGTH 4096
+   string full_path;
+   int ccount, i;
+
+   if ((ccount = flti->children()) > 0)
+   {
+      for (i = 0; i < ccount; i++)
+      {
+         fltc = flti->child(i);
+         if (fltc != 0)
+         {
+            if (item_pathname(file_path, FL_PATH_MAX, fltc) != 0)
+            {
+               Fineline_Log::print_log_entry("Fineline_File_System_Tree::unmark_children() <ERROR> Could not get tree item path.");
+               fl_message(" <ERROR> Could not get tree item. ");
+               return;
+            }
+
+            full_path = file_path;
+            flrec = find_file(full_path);
+            if (flrec != NULL)
+            {
+               flrec->marked = 0;
+               fltc->labelcolor(FL_FOREGROUND_COLOR);
+               fltc->labelfont(FL_HELVETICA);
+               if (flrec->file_type == TSK_FS_META_TYPE_DIR) //If a directory then mark all the files in the directory.
+               {
+                  unmark_children(fltc);
+               }
+               Fl::awake();
+               Fineline_Log::print_log_entry("Fineline_File_System_Tree::unmark_children() <INFO> unmarked file.");
+            }
+         }
+      }
+   }
 }
 
 vector< fl_file_record_t* > Fineline_File_System_Tree::get_marked_files()

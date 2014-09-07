@@ -54,7 +54,7 @@ int link_header_length;
 int options;
 struct in_addr server_ipv4_addr;
 unsigned int server_ipv4_port;
-/* TODO: add ifl6 support. */
+/* TODO: add ipv6 support. */
 
 pcap_t* open_pcap_socket(char* device, const char* bpfstr)
 {
@@ -161,14 +161,14 @@ void process_packet(u_char *user, struct pcap_pkthdr *packethdr, u_char *packetp
    struct udphdr* udphdr;
    char ip_header_info[256], srcip[256], dstip[256], event_data[512], temp_data[256], key_value[512];
    unsigned short id, seq;
-   FL_ip_record_t *ip_record;
-   char FL_event_string[FL_MAX_INPUT_STR];
+   fl_ip_record_t *ip_record;
+   char event_string[FL_MAX_INPUT_STR];
 
    /* CLEAR THE BUFFERS */
    memset(event_data, 0, 512);
    memset(key_value, 0, 512);
    memset(temp_data, 0, 256);
-   memset(FL_event_string, 0, FL_MAX_INPUT_STR);
+   memset(event_string, 0, FL_MAX_INPUT_STR);
 
    /* Skip the datalink layer header and get the IP header fields. */
    packetptr += link_header_length;
@@ -230,7 +230,7 @@ void process_packet(u_char *user, struct pcap_pkthdr *packethdr, u_char *packetp
    }
    else
    {
-      ip_record = xcalloc(sizeof(FL_ip_record_t));
+      ip_record = xcalloc(sizeof(fl_ip_record_t));
       strncpy(ip_record->key_value, key_value, strlen((key_value)));
       ip_record->data_size = ntohs(iphdr->ip_len);
       ip_record->packet_count = 1;
@@ -238,12 +238,12 @@ void process_packet(u_char *user, struct pcap_pkthdr *packethdr, u_char *packetp
    }
 
    /* Create a Fineline event record string */
-   create_event_record(FL_event_string, event_data);
+   create_event_record(event_string, event_data);
 
    /* Now write a Fineline event record. */
    if (options & FL_FILE_OUT)
    {
-      write_event_record(FL_event_string);
+      write_event_record(event_string);
    }
 
    /*
@@ -253,11 +253,11 @@ void process_packet(u_char *user, struct pcap_pkthdr *packethdr, u_char *packetp
       this is a double check to prevent a packet storm in case the BPF
       filters are not working or have been omitted.
    */
-   if (options & FL_SERVER_OUT)
+   if (options & FL_GUI_OUT)
    {
-      if (!((iphdr->ip_p == IPPROTO_TCP) && (iphdr->ip_dst.s_addr == server_ifl4_addr.s_addr) && (tcphdr->dest == server_ipv4_port)))
+      if (!((iphdr->ip_p == IPPROTO_TCP) && (iphdr->ip_dst.s_addr == server_ipv4_addr.s_addr) && (tcphdr->dest == server_ipv4_port)))
       {
-         send_event(FL_event_string);
+         send_event(event_string);
       }
    }
 
@@ -285,7 +285,7 @@ void terminate_capture(int signal_number)
       close_fineline_event_file();
    }
 
-   if (options & FL_SERVER_OUT)
+   if (options & FL_GUI_OUT)
       close_socket();
 
    print_ip_map();
@@ -317,7 +317,7 @@ int start_capture(char *interface, const char *bpf_string, char *event_file, cha
       print_log_entry("start_capture() <ERROR> Invalide server Ifl4 address.\n");
       return(-1);
    }
-   server_ifl4_port = htons(atoi(SERVER_PORT_STRING));
+   server_ipv4_port = htons(atoi(GUI_SERVER_PORT_STRING));
 
    if (options & FL_FILE_OUT)
    {
@@ -329,7 +329,7 @@ int start_capture(char *interface, const char *bpf_string, char *event_file, cha
       write_fineline_project_header("fineline Sensor Packet Capture Log");
    }
 
-   if (options & FL_SERVER_OUT)
+   if (options & FL_GUI_OUT)
    {
       if (init_socket(server_address) == -1)
       {

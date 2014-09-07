@@ -115,7 +115,52 @@ int Fineline_Log::print_log_entry(const char *estr)
 */
 int Fineline_Log::print_log_entry(string estr, int error_number)
 {
-   //TODO:
+   time_t curtime;
+   struct tm *loctime;
+   string log_entry;
+   char *time_str;
+   char temp_str[32];
+
+   /* Get the current time. */
+   curtime = time (NULL);
+   loctime = localtime (&curtime);
+   time_str = asctime(loctime);
+   log_entry = Fineline_Util::rtrim(time_str);
+   log_entry.append(" ");
+   log_entry.append(estr);
+   log_entry.append(Fineline_Util::xitoa(error_number, temp_str, 32, 10));
+   fputs (log_entry.c_str(), log_file);
+   cout << log_entry << endl;
+
+   return(0);
+}
+
+/*
+   Method  : print_log_entry()
+   Purpose : Creates a log entry and prints to the log file and stdin.
+           :
+   Input   : Log string.
+   Output  : Timestamped log entry.
+*/
+int Fineline_Log::print_log_entry(string estr, string dstr)
+{
+   time_t curtime;
+   struct tm *loctime;
+   string log_entry;
+   char *time_str;
+
+   /* Get the current time. */
+   curtime = time (NULL);
+   loctime = localtime (&curtime);
+   time_str = asctime(loctime);
+   log_entry = Fineline_Util::rtrim(time_str);
+   log_entry.append(" ");
+   log_entry.append(estr);
+   log_entry.append(" ");
+   log_entry.append(dstr);
+   log_entry.append("\n");
+   fputs (log_entry.c_str(), log_file);
+   cout << log_entry << endl;
 
    return(0);
 }

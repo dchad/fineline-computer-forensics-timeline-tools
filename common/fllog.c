@@ -90,6 +90,48 @@ int print_log_entry(char *estr)
    return(0);
 }
 
+int sprint_log_entry(char *estr, char *eval)
+{
+   time_t curtime;
+   struct tm *loctime;
+   int slen = strlen(estr) + strlen(eval) + 100;
+   char *log_entry = (char *)xcalloc(slen);
+   char *time_str;
+
+   /* Get the current time. */
+   curtime = time (NULL);
+   loctime = localtime (&curtime);
+   time_str = asctime(loctime);
+   sprintf(log_entry, "%s %s : %s\n", time_str, estr, eval);
+   fputs (log_entry, log_file);
+   printf("%s", log_entry);
+
+   xfree(log_entry, slen);
+
+   return(0);
+}
+
+int iprint_log_entry(char *estr, int ival)
+{
+   time_t curtime;
+   struct tm *loctime;
+   int slen = strlen(estr) + 100;
+   char *log_entry = (char *)xcalloc(slen);
+   char *time_str;
+
+   /* Get the current time. */
+   curtime = time (NULL);
+   loctime = localtime (&curtime);
+   time_str = asctime(loctime);
+   sprintf(log_entry, "%s %s: %d\n", time_str, estr, ival);
+   fputs (log_entry, log_file);
+   printf("%s", log_entry);
+
+   xfree(log_entry, slen);
+
+   return(0);
+}
+
 int close_log_file()
 {
 

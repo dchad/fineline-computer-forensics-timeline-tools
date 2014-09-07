@@ -50,6 +50,7 @@ class Fineline_Log
       static int open_log_file();
       static int print_log_entry(const char *estr);
       static int print_log_entry(string estr, int error_number);
+      static int print_log_entry(string estr, string dstr);
       static int close_log_file();
 
    protected:

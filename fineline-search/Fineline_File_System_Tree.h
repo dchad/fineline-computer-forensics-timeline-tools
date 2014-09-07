@@ -66,6 +66,8 @@ class Fineline_File_System_Tree : public Fl_Tree
       void mark_file(string filename);
       void mark_file();
       void unmark_file();
+      void unmark_children(Fl_Tree_Item *flti);
+      void mark_children(Fl_Tree_Item *flti);
       vector< fl_file_record_t* > get_marked_files();
       Fineline_File_Map get_file_map();
       int remove_file(string filename);

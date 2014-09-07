@@ -122,6 +122,7 @@ int xfree(char *buf, int len);
 int print_help();
 char* xitoa(int value, char* result, int len, int base);
 int get_time_string(char *tstr, int slen);
+int get_ip_address(char *interface, char *ip_addr);
 int validate_ipv4_address(char *ipv4_addr);
 int validate_ipv6_address(char *ipv6_addr);
 char *ltrim(char *s);
@@ -140,6 +141,8 @@ int close_socket();
 
 int open_log_file(char *startup_path);
 int print_log_entry(char *estr);
+int sprint_log_entry(char *estr, char *eval);
+int iprint_log_entry(char *estr, int ival);
 int close_log_file();
 
 #endif
