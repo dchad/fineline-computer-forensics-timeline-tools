@@ -25,7 +25,8 @@
 
    Purpose: Fineline Sensor Main Function. Processes command line options
             and executes packet sniffer mode or Snort/Suricata log follower
-            mode.
+            mode. This is a modified copy of the code from Pivotal Network
+            Security tools.
 
 */
 
