@@ -9,7 +9,7 @@ A collection of command line and GUI tools for analysing event logs on Linux and
 
 User Guide, Windows Binaries, Java GUI Package and source code tarball can be downloaded from:
 
-https://googledrive.com/host/0B6maxAp3j2akRnBvcGdSTThJbXM/
+https://drive.google.com/file/d/0B6maxAp3j2akSWhUOWZ6NktUOUk/view?usp=sharing
 
 Unzip the binary package into any directory, no installation or system configuration is required.
 
@@ -252,74 +252,26 @@ National Security Agency/Central Security Agency. (2013). Spotting the Adversary
 
 FineLine? Project File: consists of a project header followed by 0 or more eventlists obtained from computers relevant to the investigation.
 
-<finelineproject>
-
-<projectname>
-
-</projectname>
-
-<investigator>
-
-</investigator>
-
-<summary>
-
-</summary>
-
-<filename>
-
-</filename>
-
-<startdate>
-
-</startdate>
-
-<enddate>
-
-</enddate>
-
-<description>
-
-</description>
-
-</finelineproject>
-
-<eventlists>
-
-<listcount>
-
-</listcount>
-
-<eventlist1>
-
-<computername>
-
-</computername>
-
-<eventcount>
-
-</eventcount>
-
-<dateacquired>
-
-</dateacquired>
-
-<event1>
-
-</event1>
-
-<event2>
-
-</event2>
-
-. . .
-
-</eventlist1>
-
-<eventlist2>
-
-</eventlist2>
-
-. . .
-
-</eventlists>
+    <finelineproject>
+    <projectname> </projectname>
+    <investigator> </investigator>
+    <summary> </summary>
+    <filename> </filename>
+    <startdate> </startdate>
+    <enddate> </enddate>
+    <description> </description>
+    </finelineproject>
+    <eventlists>
+    <listcount> </listcount>
+    <eventlist1>
+    <computername> </computername>
+    <eventcount> </eventcount>
+    <dateacquired> </dateacquired>
+    <event1> </event1>
+    <event2> </event2>
+    . . .
+    </eventlist1>
+    <eventlist2>
+    </eventlist2>
+    . . .
+    </eventlists>
